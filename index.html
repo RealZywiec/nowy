@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FormulaPlan — Generator Planów Treningowych</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070707;--bg2:#0f0f0f;--bg3:#171717;--card:#111111;
+  --border:#1f1f1f;--border2:#2c2c2c;
+  --accent:#c8ff00;--accent2:#ff4d00;--accent3:#00d4ff;
+  --text:#ebebeb;--muted:#555;--muted2:#888;
+  --font-d:'Barlow Condensed',sans-serif;
+  --font-b:'Syne',sans-serif;
+  --font-m:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);overflow-x:hidden;min-height:100vh}
+
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.screen{display:none;flex-direction:column;align-items:center;position:relative;z-index:1}
+.screen.active{display:flex}
+
+/* ── HERO ── */
+#hero{padding:80px 24px 60px}
+.hero-inner{max-width:720px;width:100%;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(200,255,0,.4);padding:6px 16px;border-radius:100px;margin-bottom:28px}
+.badge-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{font-family:var(--font-d);font-size:clamp(52px,10vw,96px);font-weight:900;line-height:.92;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:18px}
+.hero-h1 em{font-style:italic;color:var(--accent)}
+.hero-sub{display:block;font-size:clamp(28px,5vw,52px);color:var(--muted2);font-weight:600;margin-top:4px}
+.hero-desc{font-size:15px;color:var(--muted2);line-height:1.7;max-width:480px;margin:0 auto 36px}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-bottom:48px}
+.hs{text-align:center}
+.hs strong{display:block;font-family:var(--font-d);font-size:38px;font-weight:900;color:var(--accent)}
+.hs span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#000;font-family:var(--font-d);font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:16px 40px;border-radius:4px;border:none;cursor:pointer;transition:.2s}
+.btn-cta:hover{background:#fff;transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,255,0,.25)}
+.how-wrap{max-width:720px;width:100%;padding:60px 24px 80px}
+.sec-label{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;display:flex;align-items:center;gap:12px}
+.sec-label::before,.sec-label::after{content:'';height:1px;background:var(--border);flex:1;max-width:40px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step-card{background:var(--card);border:1px solid var(--border);padding:24px;border-radius:6px;position:relative;overflow:hidden}
+.step-card::before{content:attr(data-n);position:absolute;top:-8px;right:12px;font-family:var(--font-d);font-size:80px;font-weight:900;color:var(--border2);line-height:1}
+.step-card h3{font-family:var(--font-d);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:8px}
+.step-card p{font-size:13px;color:var(--muted2);line-height:1.6}
+
+/* ── QUIZ ── */
+#quiz{padding:40px 24px 80px}
+.quiz-inner{max-width:600px;width:100%}
+.prog-label{display:flex;justify-content:space-between;font-family:var(--font-m);font-size:11px;color:var(--muted);margin-bottom:10px}
+.prog-track{height:3px;background:var(--border);border-radius:100px;overflow:hidden;margin-bottom:40px}
+.prog-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.q-cat{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.q-text{font-family:var(--font-d);font-size:clamp(26px,5vw,42px);font-weight:800;text-transform:uppercase;line-height:1.05;margin-bottom:8px}
+.q-hint{font-size:13px;color:var(--muted2);margin-bottom:28px;line-height:1.6}
+.opts{display:grid;gap:10px;margin-bottom:4px}
+.opts.c2{grid-template-columns:1fr 1fr}
+.opts.c3{grid-template-columns:1fr 1fr 1fr}
+.opt{background:var(--card);border:1px solid var(--border);padding:16px 20px;border-radius:6px;cursor:pointer;text-align:left;transition:.18s;position:relative}
+.opt:hover{border-color:var(--border2);background:var(--bg3)}
+.opt.sel{border-color:var(--accent);background:rgba(200,255,0,.05)}
+.opt.sel::after{content:'✓';position:absolute;top:12px;right:14px;color:var(--accent);font-size:14px;font-weight:700}
+.opt-lbl{font-family:var(--font-d);font-size:18px;font-weight:700;text-transform:uppercase;display:block}
+.opt-sub{font-size:12px;color:var(--muted2);line-height:1.4;display:block;margin-top:2px}
+.slider-val{font-family:var(--font-d);font-size:56px;font-weight:900;color:var(--accent);margin-bottom:12px}
+.slider-val span{font-size:22px;color:var(--muted2);margin-left:4px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:100px;outline:none;margin-bottom:10px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:var(--accent);border-radius:50%;cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 3px rgba(200,255,0,.2);transition:.15s}
+input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,0,.2)}
+.slider-mm{display:flex;justify-content:space-between;font-family:var(--font-m);font-size:11px;color:var(--muted)}
+.multi-hint{font-family:var(--font-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.quiz-nav{display:flex;gap:12px;margin-top:28px}
+.btn-back{background:transparent;border:1px solid var(--border);color:var(--muted2);font-family:var(--font-d);font-size:16px;font-weight:700;text-transform:uppercase;padding:14px 22px;border-radius:4px;cursor:pointer;transition:.18s}
+.btn-back:hover{border-color:var(--border2);color:var(--text)}
+.btn-next{flex:1;background:var(--accent);border:none;color:#000;font-family:var(--font-d);font-size:18px;font-weight:800;text-transform:uppercase;padding:14px;border-radius:4px;cursor:pointer;transition:.18s}
+.btn-next:hover{background:#fff}
+.btn-next:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+
+/* ── ANALYZING ── */
+#analyzing{min-height:100vh;justify-content:center;padding:40px 24px;text-align:center;gap:28px}
+.spin{width:100px;height:100px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#analyzing h2{font-family:var(--font-d);font-size:38px;font-weight:900;text-transform:uppercase}
+#analyzing h2 span{color:var(--accent)}
+.an-steps{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px}
+.an-step{display:flex;align-items:center;gap:12px;font-family:var(--font-m);font-size:12px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:4px;text-align:left;transition:.3s}
+.an-step.done{border-color:var(--accent);color:var(--accent)}
+.an-icon{width:16px;text-align:center;flex-shrink:0}
+
+/* ── RESULTS ── */
+#results{padding:40px 24px 80px}
+.res-inner{max-width:720px;width:100%}
+.res-header{margin-bottom:40px}
+.res-tag{font-family:var(--font-m);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.2em;margin-bottom:12px}
+.res-h2{font-family:var(--font-d);font-size:clamp(38px,7vw,66px);font-weight:900;text-transform:uppercase;line-height:.95;margin-bottom:8px}
+.res-h2 span{color:var(--accent)}
+.res-sub{font-size:14px;color:var(--muted2)}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.m-card{background:var(--card);border:1px solid var(--border);padding:20px;border-radius:6px}
+.m-card.acc{border-color:var(--accent);background:rgba(200,255,0,.04)}
+.m-lbl{font-family:var(--font-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+.m-val{font-family:var(--font-d);font-size:34px;font-weight:900;line-height:1}
+.m-val .u{font-size:14px;color:var(--muted2);margin-left:2px}
+.m-val.green{color:var(--accent)}
+.m-sub{font-size:12px;color:var(--muted2);margin-top:4px}
+.macros-card{background:var(--card);border:1px solid var(--border);padding:24px;border-radius:6px;margin-bottom:28px}
+.macros-title{font-family:var(--font-d);font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:18px}
+.macros-bar{height:12px;background:var(--border);border-radius:100px;overflow:hidden;display:flex;margin-bottom:16px}
+.bar-p{background:#ff5722;height:100%}
+.bar-c{background:var(--accent);height:100%}
+.bar-f{background:var(--accent3);height:100%}
+.macros-legend{display:flex;gap:24px;flex-wrap:wrap}
+.ml-item{display:flex;flex-direction:column;gap:2px}
+.ml-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.ml-name{font-family:var(--font-m);font-size:11px;color:var(--muted);display:flex;align-items:center}
+.ml-g{font-family:var(--font-d);font-size:22px;font-weight:800}
+
+/* PAYWALL */
+.paywall-wrap{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:28px}
+.paywall-blur{filter:blur(6px);pointer-events:none;user-select:none;padding:24px}
+.paywall-cta{padding:60px 32px 40px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;background:linear-gradient(to bottom,transparent,var(--card) 50%)}
+.paywall-cta h3{font-family:var(--font-d);font-size:32px;font-weight:900;text-transform:uppercase}
+.paywall-cta p{font-size:14px;color:var(--muted2);max-width:400px;line-height:1.6}
+.price-tag{display:flex;align-items:flex-start;gap:4px}
+.price-tag .curr{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--muted2);margin-top:8px}
+.price-tag .amount{font-family:var(--font-d);font-size:64px;font-weight:900;color:var(--accent);line-height:1}
+.price-tag .cents{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--muted2);margin-top:8px}
+.price-old{font-size:13px;color:var(--muted);text-decoration:line-through}
+.btn-buy{background:var(--accent);color:#000;font-family:var(--font-d);font-size:20px;font-weight:800;text-transform:uppercase;padding:16px 48px;border-radius:4px;border:none;cursor:pointer;transition:.2s;width:100%;max-width:400px}
+.btn-buy:hover{background:#fff;transform:translateY(-2px);box-shadow:0 16px 48px rgba(200,255,0,.2)}
+.guarantees{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.guarantee{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)}
+.guarantee .g-check{color:var(--accent);font-size:14px}
+
+/* ── PLAN ── */
+#plan{padding:40px 24px 80px}
+.plan-inner{max-width:720px;width:100%}
+.plan-tag{font-family:var(--font-m);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.2em;margin-bottom:8px}
+.plan-h1{font-family:var(--font-d);font-size:clamp(36px,6vw,60px);font-weight:900;text-transform:uppercase;line-height:.95;margin-bottom:8px}
+.plan-meta{font-size:14px;color:var(--muted2);margin-bottom:48px}
+.plan-meta strong{color:var(--text)}
+.section{margin-bottom:48px}
+.sec-title{font-family:var(--font-d);font-size:26px;font-weight:900;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-title .dot{color:var(--accent)}
+.warmup-list{display:grid;gap:8px}
+.wu-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:4px}
+.wu-time{font-family:var(--font-m);font-size:12px;color:var(--accent);width:50px;flex-shrink:0}
+.wu-name{font-size:14px;font-weight:600}
+.wu-desc{font-size:12px;color:var(--muted2);margin-left:auto;text-align:right}
+.week-grid{display:grid;gap:12px}
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.day-card.rest-day{opacity:.5}
+.day-header{display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer;user-select:none}
+.day-name{font-family:var(--font-d);font-size:22px;font-weight:800;text-transform:uppercase;flex:1}
+.day-tag{font-family:var(--font-m);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px}
+.day-tag.tr{background:rgba(200,255,0,.1);color:var(--accent);border:1px solid rgba(200,255,0,.2)}
+.day-tag.rs{background:var(--bg3);color:var(--muted)}
+.day-chev{color:var(--muted);font-size:12px;transition:transform .2s}
+.day-chev.open{transform:rotate(180deg)}
+.ex-table{border-top:1px solid var(--border)}
+.ex-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;padding:10px 20px;font-family:var(--font-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;background:var(--bg2)}
+.ex-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;padding:14px 20px;border-top:1px solid var(--border);transition:background .15s}
+.ex-row:hover{background:var(--bg3)}
+.ex-name{font-size:14px;font-weight:600}
+.ex-muscle{font-size:11px;color:var(--muted2);margin-top:2px}
+.ex-cell{font-family:var(--font-m);font-size:13px;color:var(--muted2);display:flex;align-items:center}
+.ex-cell.hl{color:var(--accent);font-weight:600}
+.ex-tip{padding:12px 20px;background:rgba(200,255,0,.03);border-top:1px solid var(--border);font-size:12px;color:var(--muted2);display:flex;gap:8px}
+.rest-note{padding:12px 20px 16px;font-size:13px;color:var(--muted2)}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:24px}
+.prog-row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)}
+.prog-row:last-child{border-bottom:none}
+.prog-lbl{font-size:14px;font-weight:600;margin-bottom:4px}
+.prog-desc{font-size:12px;color:var(--muted2);max-width:360px;line-height:1.5}
+.prog-val{font-family:var(--font-d);font-size:20px;font-weight:800;color:var(--accent);white-space:nowrap;margin-left:16px}
+.nutri-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.nc{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px}
+.nc-day{font-family:var(--font-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.nc-kcal{font-family:var(--font-d);font-size:32px;font-weight:900;margin-bottom:12px}
+.nc-kcal span{font-size:14px;color:var(--muted2);margin-left:2px}
+.nc-macros{display:flex;gap:12px;flex-wrap:wrap}
+.nm{font-size:12px;color:var(--muted2)}
+.nm strong{color:var(--text)}
+.tips-grid{display:grid;gap:12px}
+.tip-item{display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px}
+.tip-num{font-family:var(--font-d);font-size:40px;font-weight:900;color:var(--border2);line-height:1;flex-shrink:0;width:40px}
+.tip-h{font-size:14px;font-weight:700;margin-bottom:4px}
+.tip-p{font-size:13px;color:var(--muted2);line-height:1.6}
+.plan-footer{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:16px}
+.plan-footer p{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--muted2);font-family:var(--font-d);font-size:15px;font-weight:700;text-transform:uppercase;padding:10px 24px;border-radius:4px;cursor:pointer;transition:.18s}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.site-footer{width:100%;border-top:1px solid var(--border);padding:28px 24px;text-align:center;position:relative;z-index:1}
+.site-footer p{font-size:12px;color:var(--muted)}
+.site-footer strong{color:var(--muted2)}
+.back-link{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;margin-top:14px;display:block;text-align:center}
+@media(max-width:600px){
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .opts.c3{grid-template-columns:1fr 1fr}
+  .steps-grid{grid-template-columns:1fr}
+  .nutri-grid{grid-template-columns:1fr}
+  .ex-head,.ex-row{grid-template-columns:2fr 1fr 1fr}
+  .ex-head>*:nth-child(4),.ex-head>*:nth-child(5),
+  .ex-row>*:nth-child(4),.ex-row>*:nth-child(5){display:none}
+  .wu-desc{display:none}
+  .hero-stats{gap:20px}
+}
+@media(max-width:400px){
+  .metrics-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div id="hero" class="screen active">
+  <div class="hero-inner">
+    <div class="badge"><span class="badge-dot"></span>System treningowy v2.0</div>
+    <h1 class="hero-h1">TWÓJ PLAN<em> TRENINGOWY</em><span class="hero-sub">oparty na nauce</span></h1>
+    <p class="hero-desc">Prawdziwy algorytm. Zero marketingu. Mifflin-St Jeor, periodyzacja blokowa, dobór splitu na podstawie Twoich danych — w 3 minuty.</p>
+    <div class="hero-stats">
+      <div class="hs"><strong>14</strong><span>Pytań</span></div>
+      <div class="hs"><strong>4 000+</strong><span>Kombinacji</span></div>
+      <div class="hs"><strong>6</strong><span>Algorytmów</span></div>
+    </div>
+    <button class="btn-cta" onclick="startQuiz()">Wygeneruj swój plan <span>→</span></button>
+  </div>
+  <div class="how-wrap">
+    <div class="sec-label">Jak to działa</div>
+    <div class="steps-grid">
+      <div class="step-card" data-n="01"><h3>Odpowiedz</h3><p>14 precyzyjnych pytań o Twoje ciało, cel, sprzęt i styl życia.</p></div>
+      <div class="step-card" data-n="02"><h3>Algorytm liczy</h3><p>BMR, TDEE, makra, split treningowy, objętość i progresję — czysta matematyka.</p></div>
+      <div class="step-card" data-n="03"><h3>Masz plan</h3><p>Tygodniowy harmonogram, ćwiczenia, serie, powtórzenia, RPE i wskazówki.</p></div>
+    </div>
+  </div>
+  <div class="site-footer"><p><strong>FormulaPlan.pl</strong> — Wszelkie prawa zastrzeżone © 2025</p></div>
+</div>
+
+<!-- ── QUIZ ── -->
+<div id="quiz" class="screen">
+  <div class="quiz-inner">
+    <div class="prog-label"><span id="prog-txt">Krok 1 z 14</span><span id="prog-pct">7%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:7%"></div></div>
+    <div id="q-container"></div>
+    <div class="quiz-nav">
+      <button class="btn-back" id="btn-back" onclick="prevQ()">← Wróć</button>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">Dalej →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ANALYZING ── -->
+<div id="analyzing" class="screen">
+  <div class="spin"></div>
+  <h2>Obliczam <span>Twój plan...</span></h2>
+  <div class="an-steps" id="an-steps"></div>
+</div>
+
+<!-- ── RESULTS ── -->
+<div id="results" class="screen">
+  <div class="res-inner" id="res-inner"></div>
+</div>
+
+<!-- ── PLAN ── -->
+<div id="plan" class="screen">
+  <div class="plan-inner" id="plan-inner"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const answers = {};
+let currentStep = 0;
+
+// ═══════════════════════════════════════════════════════════
+// QUESTIONS
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = [
+  { id:"sex", cat:"Dane podstawowe", text:"Kim jesteś?", hint:"Różnice hormonalne wpływają na BMR i strategie treningowe.", type:"opts", grid:"c2",
+    opts:[{v:"M",l:"Mężczyzna",s:""},{v:"F",l:"Kobieta",s:""}] },
+  { id:"age", cat:"Dane podstawowe", text:"Ile masz lat?", hint:"Wiek wpływa na regenerację, intensywność i objętość treningową.", type:"slider", min:14, max:70, def:25, unit:"lat" },
+  { id:"height", cat:"Dane podstawowe", text:"Twój wzrost?", hint:"Potrzebny do obliczenia BMI i idealnej masy ciała.", type:"slider", min:150, max:220, def:175, unit:"cm" },
+  { id:"weight", cat:"Dane podstawowe", text:"Aktualna waga?", hint:"Podstawa wszystkich obliczeń kalorycznych i białkowych.", type:"slider", min:45, max:150, def:75, unit:"kg" },
+  { id:"goal", cat:"Cel treningowy", text:"Twój główny cel?", hint:"Cel definiuje kalorykę, split treningowy i zakresy powtórzeń.", type:"opts", grid:"c2",
+    opts:[{v:"bulk",l:"Budowa masy",s:"Nadwyżka kaloryczna, 8-12 powtórzeń"},{v:"cut",l:"Redukcja tłuszczu",s:"Deficyt kaloryczny, wyższa objętość"},{v:"strength",l:"Siła maksymalna",s:"Ciężkie obciążenia, 3-6 powtórzeń"},{v:"recomp",l:"Rekompozyacja",s:"Masa + redukcja jednocześnie"}] },
+  { id:"experience", cat:"Doświadczenie", text:"Jak długo trenujesz?", hint:"Determinuje objętość, intensywność i dobór ćwiczeń.", type:"opts", grid:"c3",
+    opts:[{v:"beginner",l:"Początkujący",s:"Poniżej 1 roku"},{v:"intermediate",l:"Średniozaawansowany",s:"1–3 lata"},{v:"advanced",l:"Zaawansowany",s:"Ponad 3 lata"}] },
+  { id:"days", cat:"Harmonogram", text:"Ile dni w tygodniu?", hint:"Realistyczna liczba, którą utrzymasz przez miesiące.", type:"opts", grid:"c2",
+    opts:[{v:3,l:"3 dni",s:"Full Body — optymalny dla większości"},{v:4,l:"4 dni",s:"Upper/Lower — najlepszy split"},{v:5,l:"5 dni",s:"PPL — wyższa objętość"},{v:6,l:"6 dni",s:"PPL×2 — dla zaawansowanych"}] },
+  { id:"sessionTime", cat:"Harmonogram", text:"Czas na trening?", hint:"Pomaga dopasować liczbę ćwiczeń do realnego okna.", type:"opts", grid:"c3",
+    opts:[{v:45,l:"45 min",s:"Kompaktowy"},{v:60,l:"60 min",s:"Standardowy"},{v:90,l:"90 min",s:"Pełny"}] },
+  { id:"equipment", cat:"Sprzęt", text:"Dostępny sprzęt?", hint:"Determinuje dostępne ćwiczenia i metody.", type:"opts", grid:"c3",
+    opts:[{v:"full",l:"Pełna siłownia",s:"Sztangi, maszyny, wyciągi"},{v:"basic",l:"Podstawowa",s:"Sztangielki, ławka, drążek"},{v:"home",l:"Dom",s:"Ciężar własny, kettlebell"}] },
+  { id:"activity", cat:"Aktywność", text:"Styl życia poza siłownią?", hint:"Aktywność poza treningiem to nawet 30% wydatku energetycznego.", type:"opts", grid:"c2",
+    opts:[{v:"sedentary",l:"Siedząca",s:"Praca biurowa, mało ruchu"},{v:"light",l:"Lekko aktywna",s:"Sporo chodzenia"},{v:"moderate",l:"Umiarkowana",s:"Aktywna praca lub spacery"},{v:"active",l:"Aktywna",s:"Fizyczna praca lub sport"}] },
+  { id:"weakPoints", cat:"Sylwetka", text:"Najsłabsze partie?", hint:"Możesz wybrać kilka — plan zwiększy ich objętość.", type:"multi", grid:"c2",
+    opts:[{v:"chest",l:"Klatka piersiowa"},{v:"back",l:"Plecy"},{v:"shoulders",l:"Barki"},{v:"arms",l:"Ramiona"},{v:"legs",l:"Nogi"},{v:"glutes",l:"Pośladki"},{v:"core",l:"Brzuch/Core"},{v:"calves",l:"Łydki"}] },
+  { id:"sleep", cat:"Regeneracja", text:"Ile śpisz średnio?", hint:"Sen to jeden z najsilniejszych czynników hipertrofii. <7h redukuje syntezę białek mięśniowych o ~20%.", type:"opts", grid:"c2",
+    opts:[{v:"low",l:"Poniżej 6h",s:"Niewystarczający"},{v:"ok",l:"6–7 godzin",s:"Akceptowalny"},{v:"good",l:"7–8 godzin",s:"Optymalny"},{v:"great",l:"8+ godzin",s:"Idealny"}] },
+  { id:"injuries", cat:"Zdrowie", text:"Kontuzje lub ograniczenia?", hint:"Kluczowe dla bezpiecznego doboru ćwiczeń.", type:"opts", grid:"c2",
+    opts:[{v:"none",l:"Brak",s:"Pełna swoboda ruchowa"},{v:"lower_back",l:"Odcinek lędźwiowy",s:"Modyfikujemy deadlift i squat"},{v:"knees",l:"Kolana",s:"Modyfikujemy ćwiczenia nóg"},{v:"shoulders",l:"Barki",s:"Ostrożnie z wyciskaniem"}] },
+  { id:"targetWeight", cat:"Cel wagowy", text:"Docelowa waga?", hint:"Realnie: ~0.5–1 kg masy miesięcznie lub ~0.5–1% ciała tygodniowo w redukcji.", type:"slider", min:45, max:150, def:80, unit:"kg" },
+];
+
+// ═══════════════════════════════════════════════════════════
+// EXERCISE DATABASE
+// ═══════════════════════════════════════════════════════════
+const EX = {
+  bench:      {n:"Wyciskanie sztangi płaskie",        m:"Klatka piersiowa",          t:"Łopatki ściągnięte, nogi na podłodze. Opuszczaj 3 sekundy."},
+  incline:    {n:"Wyciskanie na ławce skośnej +30°",  m:"Górna klatka",              t:"Kąt 30° izoluje górę. Wyższy kąt = za duże zaangażowanie barków."},
+  dips:       {n:"Dipy na poręczach (klatka)",        m:"Klatka / triceps",          t:"Pochyl tułów ~30° do przodu, aby skupić obciążenie na klatce."},
+  cable_fly:  {n:"Krzyżowanie linek (cable crossover)",m:"Klatka — kontrakcja",      t:"Skrzyżuj dłonie na końcu ruchu — lepsze skupienie na środku klatki."},
+  deadlift:   {n:"Martwy ciąg klasyczny",             m:"Plecy / pośladki / nogi",   t:"Neutralny kręgosłup przez cały ruch. Bar BLISKO ciała. Kluczowy wzorzec."},
+  pullup:     {n:"Podciąganie na drążku (grip nachylony)",m:"Najszersze / biceps",   t:"Inicjuj cofnięciem łopatek. Nie szarpaj. Pełen zakres ruchu."},
+  row_bb:     {n:"Wiosłowanie sztangą w opadzie",     m:"Środkowe plecy",            t:"Tułów ~45°. Ściągaj łokcie wzdłuż ciała. Nie rozkładaj łokci."},
+  row_db:     {n:"Wiosłowanie sztangielką w podporze",m:"Najszersze / tylny bark",   t:"Pełna elongacja w dole, maksymalne cofnięcie łopatki na górze."},
+  lat_pull:   {n:"Ściąganie drążka do klatki",        m:"Najszersze",                t:"Chwyt nieco szerszy niż barki. Ściągaj do górnej klatki."},
+  face_pull:  {n:"Face pull (dwie linki na wyciągu)", m:"Tylny bark / stożek rotatorów",t:"Łokcie POWYŻEJ linii barków. Niezbędny dla zdrowia rotatorów."},
+  ohp:        {n:"Wyciskanie sztangi nad głowę (OHP)",m:"Barki / triceps",           t:"Rdzeń napięty, gluty ściśnięte. Bar przemieszcza się prosto w górę."},
+  db_press:   {n:"Wyciskanie sztangielek siedząc",    m:"Barki środkowe / przednie", t:"Zatrzymaj tuż przed pełnym prostowaniem — utrzymasz napięcie."},
+  lat_raise:  {n:"Lateral raise ze sztangielkami",    m:"Bark środkowy",             t:"Lekkie ugięcie łokcia. Wiodący mały palec, jak wylewasz wodę."},
+  rear_delt:  {n:"Odwrotne rozpiętki w opadzie",      m:"Tylny bark",                t:"Skup się na cofaniu łopatek, nie na sile ramion."},
+  arnold:     {n:"Wyciskanie Arnolda",                m:"Barki — 3 głowy",           t:"Rotacja nadgarstka angażuje wszystkie 3 głowy barku jednocześnie."},
+  bb_curl:    {n:"Uginanie sztangi stojąc (BB Curl)", m:"Biceps",                    t:"Łokcie przy tułowiu. Nie kołysz tułowiem. Tempo 2-1-2."},
+  hammer:     {n:"Hammer Curl (naprzemienne)",        m:"Biceps / brachialis",       t:"Chwyt neutralny buduje grubość ramienia. Kluczowy dla pełnych ramion."},
+  incline_curl:{n:"Uginanie na ławce skośnej (Incline)",m:"Biceps — rozciąganie",   t:"Skośna pozycja = dłuższy zakres ruchu = lepsza stymulacja."},
+  conc_curl:  {n:"Uginanie skoncentrowane",           m:"Szczyt bicepsa",            t:"Łokieć oparty o udo. Pełne skupienie na kontrakcji — bez pośpiechu."},
+  cgbp:       {n:"Wyciskanie wąskim chwytem (CGBP)",  m:"Triceps — długa głowa",    t:"Chwyt na szerokość barków — nie węższy. Ochrona nadgarstków."},
+  tri_dips:   {n:"Dipy na poręczach (triceps)",       m:"Triceps",                   t:"Tułów pionowy, łokcie ściśnięte do ciała przez cały ruch."},
+  skull:      {n:"Łamanie czaszki EZ (Skull Crusher)", m:"Triceps — długa głowa",   t:"Opuszczaj do czoła lub ZA głowę — maksymalne rozciąganie długiej głowy."},
+  pushdown:   {n:"Prostowanie na wyciągu (Pushdown)", m:"Triceps — głowa boczna",   t:"Łokcie przy tułowiu. Pełne wyprostowanie ramion w każdym powtórzeniu."},
+  oh_tri:     {n:"Prostowanie nad głową z liną",      m:"Triceps — długa głowa",    t:"Rozciąganie długiej głowy nad głową — kluczowy ruch na objętość."},
+  squat:      {n:"Przysiad ze sztangą (Back Squat)",  m:"Quady / pośladki / nogi",  t:"Kolana w linii stóp. Głębokość: poniżej równoległości. Ciężar przez całą stopę."},
+  rdl:        {n:"Rumuński martwy ciąg (RDL)",        m:"Tylne udo / pośladki",      t:"Bar BLISKO nóg. Biodra cofaj w tył, nie w dół. Poczuj rozciąganie hamstrings."},
+  leg_press:  {n:"Wyciskanie nogami (Leg Press)",     m:"Quady / pośladki",          t:"Wysoka pozycja nóg → pośladki. Niska → quady. Nie blokuj kolan na górze."},
+  lunges:     {n:"Wykroki ze sztangielkami",          m:"Quady / pośladki",          t:"Wystarczająco duży krok — tył kolana nie powinien uderzać o podłogę."},
+  leg_curl:   {n:"Uginanie nóg leżąc (Leg Curl)",    m:"Hamstrings",                t:"Powolne opuszczanie 3 sek. Ekscentryka = kluczowa dla hipertrofii hamstrings."},
+  calf_raise: {n:"Wspięcia na palce stojąc",         m:"Łydki (gastrocnemius)",     t:"Pełen zakres: do końca w górę i w dół. 15+ powtórzeń. Pauza na górze."},
+  hip_thrust: {n:"Hip Thrust ze sztangą",            m:"Pośladki",                  t:"Na szczycie: maksymalna kontrakcja pośladków. Biodra w pełni wypchnięte."},
+  goblet:     {n:"Goblet Squat z kettlebell",        m:"Quady / pośladki",          t:"Idealna rozgrzewka. Buduje wzorzec przysiadu dla początkujących."},
+  plank:      {n:"Deska (Plank)",                    m:"Core — stabilizacja",        t:"Napnij gluty I quady, nie tylko brzuch. Biodra w linii — nie uginaj."},
+  ab_wheel:   {n:"Rollout z kółkiem (Ab Wheel)",     m:"Core — całość",             t:"Zaawansowane. Plecy MUSZĄ być płaskie. Nie dopuść do przeprostu."},
+  cable_cr:   {n:"Spięcia brzucha na wyciągu",       m:"Mięśnie proste brzucha",    t:"Zginaj kręgosłup lędźwiowy — nie ciągnij za szyję."},
+  hang_raise: {n:"Unoszenie nóg w zwisie",           m:"Dolny brzuch / hip flexors",t:"Kontrolowane opuszczanie. Za trudne? Uginaj kolana zamiast prostować."},
+  dead_bug:   {n:"Dead Bug",                         m:"Core głęboki (stabilizacja)",t:"Kręgosłup lędźwiowy ZAWSZE dociskaj do podłogi. Wolne, kontrolowane."},
+};
+
+// ═══════════════════════════════════════════════════════════
+// ALGORITHM
+// ═══════════════════════════════════════════════════════════
+function calcBMR(w,h,a,s){
+  const b=10*w+6.25*h-5*a;
+  return s==='M'?b+5:b-161;
+}
+function calcTDEE(bmr,act){
+  const m={sedentary:1.2,light:1.375,moderate:1.55,active:1.725,veryActive:1.9};
+  return bmr*(m[act]||1.55);
+}
+function calcCal(tdee,goal){
+  const a={bulk:350,cut:-450,strength:200,recomp:0};
+  return Math.round(tdee+(a[goal]||0));
+}
+function calcMacros(cal,w,goal){
+  const pm=goal==='cut'?2.4:goal==='bulk'?2.0:2.2;
+  const prot=Math.round(w*pm);
+  const fat=Math.round((cal*(goal==='cut'?0.28:0.25))/9);
+  const carb=Math.round((cal-prot*4-fat*9)/4);
+  return{prot,fat,carb};
+}
+function calcBMI(w,h){return(w/((h/100)**2)).toFixed(1)}
+function idealW(h,s){
+  const b=s==='M'?50:45.5;
+  const e=2.3*((h-152.4)/2.54);
+  return Math.round(b+e);
+}
+function bmiStatus(b){
+  if(b<18.5)return"Niedobór masy ciała";
+  if(b<25)return"Prawidłowa masa ciała";
+  if(b<30)return"Nadwaga";
+  return"Otyłość";
+}
+
+function buildSplit(days,goal,exp){
+  const isB=exp==='beginner';
+  const rng=goal==='strength'?'3-5':goal==='bulk'?'8-12':goal==='cut'?'12-15':'6-10';
+  const rst=goal==='strength'?180:goal==='bulk'?90:60;
+  const vol=isB?3:exp==='advanced'?5:4;
+  const rpe=goal==='strength'?'RPE 8-9':'RPE 7-8';
+  const s=n=>String(vol+(n||0));
+  const R=n=>{const x=EX[n];return{...x,sets:s(0),reps:rng,rest:rst,rpe}};
+  const C=(n,ss,rr,rs,rp)=>{const x=EX[n];return{...x,sets:String(ss),reps:rr,rest:rs,rpe:rp}};
+
+  const ALL=['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
+
+  if(days===3){
+    return{name:'Full Body 3×/tydzień',days:[
+      {name:'Poniedziałek',label:'Full Body A',tr:true,ex:[R('squat'),R('bench'),R('row_bb'),C('ohp',3,'8-10',75,'RPE 7-8'),C('rdl',3,'8-10',90,'RPE 7-8'),C('plank',3,'45 sek',45,'-')]},
+      {name:'Wtorek',tr:false},{name:'Środa',label:'Full Body B',tr:true,ex:[C('deadlift',vol,'6-8',180,'RPE 8'),R('incline'),R('lat_pull'),C('db_press',3,'10-12',75,'RPE 7'),C('lunges',3,'10-12/noga',75,'RPE 7'),C('hang_raise',3,'12-15',45,'-')]},
+      {name:'Czwartek',tr:false},{name:'Piątek',label:'Full Body A',tr:true,ex:[R('squat'),R('bench'),R('row_bb'),C('ohp',3,'8-10',75,'RPE 7-8'),C('rdl',3,'8-10',90,'RPE 7-8'),C('dead_bug',3,'8/stronę',45,'-')]},
+      {name:'Sobota',tr:false},{name:'Niedziela',tr:false}
+    ]};
+  }
+  if(days===4){
+    return{name:'Upper / Lower 4×/tydzień',days:[
+      {name:'Poniedziałek',label:'Upper A — Push',tr:true,ex:[R('bench'),C('incline',3,'10-12',75,'RPE 7'),C('ohp',3,'10-12',75,'RPE 7-8'),C('lat_raise',3,'15-20',45,'RPE 8'),C('skull',3,'10-12',60,'RPE 7'),C('pushdown',3,'12-15',45,'RPE 7')]},
+      {name:'Wtorek',label:'Lower A — Quad dominant',tr:true,ex:[R('squat'),C('leg_press',3,'10-12',90,'RPE 7'),C('lunges',3,'10-12/noga',75,'RPE 7'),C('leg_curl',3,'12-15',60,'RPE 7'),C('calf_raise',4,'15-20',45,'RPE 8'),C('cable_cr',3,'15-20',45,'-')]},
+      {name:'Środa',tr:false},
+      {name:'Czwartek',label:'Upper B — Pull',tr:true,ex:[R('row_bb'),C('pullup',4,'6-10',90,'RPE 8'),C('face_pull',3,'15-20',45,'RPE 7'),C('incline_curl',3,'10-12',60,'RPE 7'),C('hammer',3,'12-15',45,'RPE 7'),C('rear_delt',3,'15-20',45,'RPE 7')]},
+      {name:'Piątek',label:'Lower B — Hip dominant',tr:true,ex:[C('deadlift',vol,goal==='strength'?'3-5':'6-8',180,'RPE 8'),C('rdl',3,'10-12',90,'RPE 7'),C('hip_thrust',4,'10-12',90,'RPE 8'),C('leg_curl',3,'10-12',60,'RPE 7'),C('calf_raise',4,'15-20',45,'RPE 8'),C('dead_bug',3,'8/stronę',45,'-')]},
+      {name:'Sobota',tr:false},{name:'Niedziela',tr:false}
+    ]};
+  }
+  if(days===5){
+    return{name:'Push / Pull / Legs 5×/tydzień',days:[
+      {name:'Poniedziałek',label:'Push — Klatka / Barki / Triceps',tr:true,ex:[R('bench'),C('incline',4,'8-12',90,'RPE 7'),C('ohp',3,'8-10',90,'RPE 7-8'),C('lat_raise',4,'15-20',45,'RPE 8'),C('skull',3,'10-12',60,'RPE 7'),C('pushdown',3,'12-15',45,'RPE 7')]},
+      {name:'Wtorek',label:'Pull — Plecy / Biceps',tr:true,ex:[C('deadlift',vol,'5-6',180,'RPE 8'),C('pullup',4,'6-10',90,'RPE 8'),C('lat_pull',3,'10-12',75,'RPE 7'),C('face_pull',3,'15-20',45,'RPE 7'),C('bb_curl',3,'10-12',60,'RPE 7'),C('hammer',3,'12-15',45,'RPE 7')]},
+      {name:'Środa',label:'Nogi',tr:true,ex:[R('squat'),C('rdl',4,'8-10',90,'RPE 7'),C('leg_press',3,'12-15',75,'RPE 7'),C('hip_thrust',3,'10-12',75,'RPE 7'),C('leg_curl',3,'12-15',60,'RPE 7'),C('calf_raise',4,'15-20',45,'RPE 8')]},
+      {name:'Czwartek',tr:false},
+      {name:'Piątek',label:'Push B — Objętość',tr:true,ex:[C('dips',4,'8-12',90,'RPE 8'),C('cable_fly',4,'12-15',60,'RPE 7'),C('db_press',4,'10-12',75,'RPE 7'),C('arnold',3,'10-12',75,'RPE 7'),C('oh_tri',3,'12-15',60,'RPE 7'),C('cgbp',3,'10-12',75,'RPE 7')]},
+      {name:'Sobota',label:'Pull B + Core',tr:true,ex:[C('row_db',4,'10-12/str.',75,'RPE 7-8'),C('lat_pull',4,'10-12',75,'RPE 7'),C('rear_delt',3,'15-20',45,'RPE 7'),C('incline_curl',3,'10-12',60,'RPE 7'),C('conc_curl',3,'10-12',45,'RPE 7'),C('hang_raise',4,'10-15',45,'-')]},
+      {name:'Niedziela',tr:false}
+    ]};
+  }
+  // 6 days PPL×2
+  return{name:'Push / Pull / Legs 6×/tydzień (PPL×2)',days:[
+    {name:'Poniedziałek',label:'Push A — Siła',tr:true,ex:[C('bench',5,'4-6',180,'RPE 8-9'),C('ohp',4,'5-7',150,'RPE 8'),C('incline',4,'6-8',120,'RPE 8'),C('lat_raise',4,'15-20',45,'RPE 8'),C('skull',3,'8-10',75,'RPE 7'),C('pushdown',3,'12-15',45,'RPE 7')]},
+    {name:'Wtorek',label:'Pull A — Siła',tr:true,ex:[C('deadlift',5,'3-5',240,'RPE 8-9'),C('pullup',4,'5-7',150,'RPE 8-9'),C('row_bb',4,'6-8',120,'RPE 8'),C('face_pull',3,'15-20',45,'RPE 7'),C('bb_curl',3,'8-10',75,'RPE 7'),C('hammer',3,'10-12',60,'RPE 7')]},
+    {name:'Środa',label:'Legs A — Quad dominant',tr:true,ex:[C('squat',5,'4-6',180,'RPE 8-9'),C('leg_press',4,'8-10',90,'RPE 7'),C('lunges',3,'8-10/noga',75,'RPE 7'),C('leg_curl',4,'10-12',60,'RPE 7'),C('calf_raise',4,'12-15',45,'RPE 8'),C('cable_cr',4,'15-20',45,'-')]},
+    {name:'Czwartek',label:'Push B — Objętość',tr:true,ex:[C('dips',4,'8-12',90,'RPE 8'),C('cable_fly',4,'12-15',60,'RPE 7'),C('db_press',4,'10-12',75,'RPE 7'),C('arnold',3,'10-12',60,'RPE 7'),C('oh_tri',3,'12-15',60,'RPE 7'),C('cgbp',3,'10-12',75,'RPE 7')]},
+    {name:'Piątek',label:'Pull B — Objętość',tr:true,ex:[C('row_db',4,'10-12/str.',75,'RPE 7'),C('lat_pull',4,'10-12',75,'RPE 7'),C('lat_pull',3,'12-15',60,'RPE 7'),C('rear_delt',3,'15-20',45,'RPE 7'),C('incline_curl',3,'10-12',60,'RPE 7'),C('conc_curl',3,'10-12',45,'RPE 7')]},
+    {name:'Sobota',label:'Legs B — Hip dominant + Core',tr:true,ex:[C('rdl',4,'8-10',120,'RPE 8'),C('hip_thrust',4,'10-12',90,'RPE 8'),C('leg_press',3,'12-15',75,'RPE 7'),C('leg_curl',3,'12-15',60,'RPE 7'),C('calf_raise',4,'15-20',45,'RPE 8'),C('hang_raise',4,'12-15',45,'-')]},
+    {name:'Niedziela',tr:false}
+  ]};
+}
+
+const WARMUP=[
+  {time:'3 min',name:'Kardio lekkie',desc:'Rower/bieżnia — puls do 120 uderzeń'},
+  {time:'1 min',name:'Rotacje ramion + kark',desc:'10 forward, 10 backward — luźne kręgi'},
+  {time:'1 min',name:'Leg swings',desc:'15×/stronę — przód-tył i na boki'},
+  {time:'1 min',name:'Hip circles',desc:'10 kółek/stronę — otwieranie bioder'},
+  {time:'2 min',name:'Goblet squat z przerwą',desc:'8 powt. × 3 sek hold w dole'},
+  {time:'2 min',name:'Band pull-aparts',desc:'20 powt. — aktywacja tylnych barków'},
+  {time:'2 min',name:'Serie rozgrzewkowe',desc:'50%×8, 70%×5, 85%×2 przed głównym ćwiczeniem'},
+];
+const PROG=[
+  {l:'Zasada podwójnej progresji',v:'+2.5 kg',d:'Kiedy osiągasz GÓRNY zakres powtórzeń w KAŻDEJ serii (np. 3×12 z 12) — dodaj 2.5 kg. Nie wcześniej.'},
+  {l:'Deload co 4–6 tygodni',v:'–40% obj.',d:'Zmniejsz ciężar o 40% lub objętość o połowę przez 1 tydzień. Kluczowe dla superkompensacji.'},
+  {l:'Nagraj swoje ćwiczenia',v:'Film z boku',d:'Błędy techniczne są niewidoczne "od środka". Film z boku ujawnia 90% problemów formy.'},
+  {l:'Periodyzacja 3:1',v:'3:1 ratio',d:'3 tygodnie wysokiej objętości → 1 tydzień wysokiej intensywności. Tak działa periodyzacja blokowa.'},
+  {l:'Skala RPE',v:'RPE 7–9',d:'RPE 10 = absolutne max. RPE 7–9 = mógłbyś zrobić jeszcze 1–3 powt. Trenuj w tym zakresie.'},
+];
+const TIPS=[
+  {h:'Białko: fundament hipertrofii',p:'2.0–2.4g białka na kg masy ciała — zakres potwierdzony badaniami dla maksymalnej syntezy białek mięśniowych. Więcej nie daje efektu.'},
+  {h:'Kalorie = paliwo mięśni',p:'Bez odpowiedniej kaloryczności nawet idealny trening nie daje wyniku. Ciało priorytetyzuje przeżycie nad wzrost mięśni.'},
+  {h:'Progresja ponad wszystko',p:'Jedna zmienna na raz: dodaj powtórzenie, serię lub ciężar. Jeśli obciążenie nie rośnie — mięśnie nie rosną. To prosta matematyka adaptacji.'},
+  {h:'Minimalny efektywny wolumen',p:'10–20 serii tygodniowo na partię. Poniżej 10 — za mało bodźca. Powyżej 20 — ryzyko przetrenowania bez proporcjonalnego zysku.'},
+  {h:'Pełny zakres ruchu',p:'Badania (McMahon 2014): pełny squat buduje quady lepiej niż półprzysiad na dwa razy większym ciężarze. Zakres ruchu = wynik.'},
+  {h:'Faza ekscentryczna',p:'Opuszczanie ciężaru (ekscentryka) jest anaboliczne. Opuszczaj 2–3 sekundy. Unoszenie: eksplozywne i kontrolowane.'},
+];
+
+// ═══════════════════════════════════════════════════════════
+// QUIZ LOGIC
+// ═══════════════════════════════════════════════════════════
+function startQuiz(){
+  show('quiz');
+  currentStep=0;
+  renderQ();
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function renderQ(){
+  const q=QUESTIONS[currentStep];
+  const total=QUESTIONS.length;
+  const pct=Math.round(((currentStep+1)/total)*100);
+  document.getElementById('prog-txt').textContent=`Krok ${currentStep+1} z ${total}`;
+  document.getElementById('prog-pct').textContent=`${pct}%`;
+  document.getElementById('prog-fill').style.width=`${pct}%`;
+
+  let html=`<div class="q-cat">${q.cat}</div><div class="q-text">${q.text}</div><div class="q-hint">${q.hint}</div>`;
+
+  if(q.type==='opts'){
+    html+=`<div class="opts ${q.grid}">`;
+    q.opts.forEach(o=>{
+      const sel=answers[q.id]===o.v?'sel':'';
+      html+=`<button class="opt ${sel}" data-qid="${q.id}" data-val="${o.v}" onclick="pickOpt(this)"><span class="opt-lbl">${o.l}</span>${o.s?`<span class="opt-sub">${o.s}</span>`:''}</button>`;
+    });
+    html+='</div>';
+  } else if(q.type==='slider'){
+    const val=answers[q.id]!==undefined?answers[q.id]:q.def;
+    html+=`<div class="slider-val" id="sv-${q.id}">${val}<span>${q.unit}</span></div>
+    <input type="range" min="${q.min}" max="${q.max}" value="${val}" oninput="setSlider('${q.id}',this.value)">
+    <div class="slider-mm"><span>${q.min} ${q.unit}</span><span>${q.max} ${q.unit}</span></div>`;
+    if(answers[q.id]===undefined) answers[q.id]=q.def;
+  } else if(q.type==='multi'){
+    html+=`<div class="multi-hint">Możesz wybrać kilka (opcjonalne)</div><div class="opts ${q.grid}">`;
+    q.opts.forEach(o=>{
+      const sel=(answers[q.id]||[]).includes(o.v)?'sel':'';
+      html+=`<button class="opt ${sel}" onclick="toggleMulti('${q.id}','${o.v}',this)"><span class="opt-lbl">${o.l}</span></button>`;
+    });
+    html+='</div>';
+  }
+
+  document.getElementById('q-container').innerHTML=html;
+  updateNextBtn();
+}
+function pickOpt(btn){
+  const id=btn.dataset.qid;
+  const raw=btn.dataset.val;
+  const val=isNaN(raw)?raw:parseInt(raw);
+  answers[id]=val;
+  renderQ();
+}
+function setSlider(id,val){
+  answers[id]=parseInt(val);
+  const el=document.getElementById('sv-'+id);
+  if(el){const q=QUESTIONS.find(x=>x.id===id);el.innerHTML=`${val}<span>${q.unit}</span>`;}
+  updateNextBtn();
+}
+function toggleMulti(id,val,btn){
+  if(!answers[id])answers[id]=[];
+  const i=answers[id].indexOf(val);
+  if(i>-1){answers[id].splice(i,1);btn.classList.remove('sel');}
+  else{answers[id].push(val);btn.classList.add('sel');}
+}
+function canNext(){
+  const q=QUESTIONS[currentStep];
+  if(q.type==='multi')return true;
+  if(q.type==='slider')return true;
+  return answers[q.id]!==undefined;
+}
+function updateNextBtn(){
+  document.getElementById('btn-next').disabled=!canNext();
+  document.getElementById('btn-next').textContent=currentStep===QUESTIONS.length-1?'Generuj plan →':'Dalej →';
+}
+function nextQ(){
+  if(!canNext())return;
+  if(currentStep<QUESTIONS.length-1){currentStep++;renderQ();}
+  else{startAnalyzing();}
+}
+function prevQ(){
+  if(currentStep>0){currentStep--;renderQ();}
+  else show('hero');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYZING
+// ═══════════════════════════════════════════════════════════
+function startAnalyzing(){
+  show('analyzing');
+  const steps=[
+    'Obliczanie BMR metodą Mifflin-St Jeor...',
+    'Kalibracja TDEE według poziomu aktywności...',
+    'Dobór splitu treningowego...',
+    'Generowanie programu ćwiczeń...',
+    'Optymalizacja progresji i periodyzacji...',
+    'Plan gotowy!'
+  ];
+  const container=document.getElementById('an-steps');
+  container.innerHTML=steps.map((s,i)=>`<div class="an-step" id="an-${i}"><span class="an-icon">○</span>${s}</div>`).join('');
+  let i=0;
+  const iv=setInterval(()=>{
+    const el=document.getElementById('an-'+i);
+    if(el){el.classList.add('done');el.querySelector('.an-icon').textContent='✓';}
+    i++;
+    if(i>=steps.length){clearInterval(iv);setTimeout(buildResults,600);}
+  },600);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+function buildResults(){
+  const A=answers;
+  const w=A.weight||75, h=A.height||175, a=A.age||25, s=A.sex||'M';
+  const goal=A.goal||'bulk', exp=A.experience||'intermediate';
+  const act=A.activity||'moderate';
+  const bmr=Math.round(calcBMR(w,h,a,s));
+  const tdee=Math.round(calcTDEE(bmr,act));
+  const cal=calcCal(tdee,goal);
+  const mac=calcMacros(cal,w,goal);
+  const bmi=calcBMI(w,h);
+  const iw=idealW(h,s);
+  const bs=bmiStatus(parseFloat(bmi));
+  const glabs={bulk:'Budowa masy',cut:'Redukcja tłuszczu',strength:'Siła maksymalna',recomp:'Rekompozyacja'};
+  const gcol={bulk:'var(--accent)',cut:'var(--accent2)',strength:'var(--accent3)',recomp:'#a78bfa'};
+  const pPct=Math.round((mac.prot*4/cal)*100);
+  const cPct=Math.round((mac.carb*4/cal)*100);
+  const fPct=Math.round((mac.fat*9/cal)*100);
+  const split=buildSplit(A.days||4,goal,exp);
+  const trDays=split.days.filter(d=>d.tr).length;
+
+  // Store globally for plan screen
+  window.__planData={cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,split,w,h};
+
+  const blurEx=split.days.filter(d=>d.tr).slice(0,2).map(day=>`
+    <div style="margin:16px 24px 0;padding:16px;background:var(--bg3);border-radius:6px">
+      <div style="font-family:var(--font-d);font-size:20px;font-weight:800">${day.name} — ${day.label}</div>
+      ${day.ex.slice(0,3).map(ex=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span>${ex.n}</span><span style="color:var(--muted)">${ex.sets}×${ex.reps}</span></div>`).join('')}
+    </div>`).join('');
+
+  const html=`
+  <div class="res-header">
+    <div class="res-tag">Twój plan jest gotowy</div>
+    <h2 class="res-h2">Analiza<br><span>Twojego ciała</span></h2>
+    <p class="res-sub">Na podstawie 6 algorytmów opartych na dowodach naukowych</p>
+  </div>
+  <div class="metrics-grid">
+    <div class="m-card"><div class="m-lbl">BMI</div><div class="m-val">${bmi}</div><div class="m-sub">${bs}</div></div>
+    <div class="m-card acc"><div class="m-lbl">Kalorie dziennie</div><div class="m-val green">${cal.toLocaleString()} <span class="u">kcal</span></div><div class="m-sub">${glabs[goal]}</div></div>
+    <div class="m-card"><div class="m-lbl">BMR (spoczynek)</div><div class="m-val">${bmr.toLocaleString()} <span class="u">kcal</span></div><div class="m-sub">Metabolizm bazowy</div></div>
+    <div class="m-card"><div class="m-lbl">TDEE (całkowite)</div><div class="m-val">${tdee.toLocaleString()} <span class="u">kcal</span></div><div class="m-sub">Przed korektą celu</div></div>
+    <div class="m-card"><div class="m-lbl">Idealna waga</div><div class="m-val">${iw} <span class="u">kg</span></div><div class="m-sub">Wzór Devine (${h}cm)</div></div>
+    <div class="m-card"><div class="m-lbl">Cel</div><div class="m-val" style="font-size:22px;color:${gcol[goal]}">${glabs[goal]}</div><div class="m-sub">${split.name}</div></div>
+  </div>
+  <div class="macros-card">
+    <div class="macros-title">Rozkład makroskładników</div>
+    <div class="macros-bar"><div class="bar-p" style="width:${pPct}%"></div><div class="bar-c" style="width:${cPct}%"></div><div class="bar-f" style="width:${fPct}%"></div></div>
+    <div class="macros-legend">
+      <div class="ml-item"><div class="ml-name"><span class="ml-dot" style="background:#ff5722"></span>Białko</div><div class="ml-g">${mac.prot}g</div></div>
+      <div class="ml-item"><div class="ml-name"><span class="ml-dot" style="background:var(--accent)"></span>Węglowodany</div><div class="ml-g">${mac.carb}g</div></div>
+      <div class="ml-item"><div class="ml-name"><span class="ml-dot" style="background:var(--accent3)"></span>Tłuszcze</div><div class="ml-g">${mac.fat}g</div></div>
+    </div>
+  </div>
+  <div class="paywall-wrap">
+    <div class="paywall-blur">
+      <div style="padding:24px 24px 0;font-family:var(--font-d);font-size:22px;font-weight:800">TWÓJ PLAN TRENINGOWY — ${split.name.toUpperCase()}</div>
+      ${blurEx}
+      <div style="height:120px"></div>
+    </div>
+    <div class="paywall-cta">
+      <h3>Odblokuj pełny plan</h3>
+      <p>Kompletny ${trDays}-dniowy harmonogram, wskazówki techniki dla każdego ćwiczenia, plan kaloryczny i pełny przewodnik po progresji.</p>
+      <div class="price-tag"><span class="curr">PLN</span><span class="amount">29</span><span class="cents">,90</span></div>
+      <div class="price-old">Regularna cena: 79,90 PLN</div>
+      <button class="btn-buy" onclick="openPlan()">Kup i odbierz plan →</button>
+      <div class="guarantees">
+        <div class="guarantee"><span class="g-check">✓</span> Płatność Stripe / BLIK</div>
+        <div class="guarantee"><span class="g-check">✓</span> Natychmiastowy dostęp</div>
+        <div class="guarantee"><span class="g-check">✓</span> 30-dniowa gwarancja zwrotu</div>
+      </div>
+    </div>
+  </div>
+  <button class="back-link" onclick="resetQuiz()">← Wróć i zmień odpowiedzi</button>`;
+
+  document.getElementById('res-inner').innerHTML=html;
+  show('results');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FULL PLAN
+// ═══════════════════════════════════════════════════════════
+function openPlan(){
+  const D=window.__planData;
+  if(!D)return;
+  const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,split,w,h}=D;
+
+  const warmupHtml=WARMUP.map(wu=>`
+    <div class="wu-item"><span class="wu-time">${wu.time}</span><span class="wu-name">${wu.name}</span><span class="wu-desc">${wu.desc}</span></div>`).join('');
+
+  const weekHtml=split.days.map((day,i)=>{
+    if(!day.tr) return `
+      <div class="day-card rest-day">
+        <div class="day-header"><span class="day-name">${day.name}</span><span class="day-tag rs">Odpoczynek</span></div>
+        <div class="rest-note">Aktywna regeneracja: spacer, pływanie, rozciąganie. Poruszaj się, ale nie obciążaj mięśni.</div>
+      </div>`;
+    const exHtml=day.ex.map(ex=>`
+      <div class="ex-row">
+        <div><div class="ex-name">${ex.n}</div><div class="ex-muscle">${ex.m}</div></div>
+        <div class="ex-cell hl">${ex.sets}</div>
+        <div class="ex-cell">${ex.reps}</div>
+        <div class="ex-cell">${ex.rest}s</div>
+        <div class="ex-cell">${ex.rpe}</div>
+      </div>
+      <div class="ex-tip">💡 ${ex.t}</div>`).join('');
+    return `
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay(${i})">
+          <span class="day-name">${day.name}</span>
+          <span class="day-tag tr">${day.label}</span>
+          <span class="day-chev open" id="chev-${i}">▼</span>
+        </div>
+        <div class="ex-table" id="day-${i}">
+          <div class="ex-head"><span>Ćwiczenie</span><span>Serie</span><span>Powtórzenia</span><span>Przerwa</span><span>RPE</span></div>
+          ${exHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  const nutHtml=`
+  <div class="nutri-grid">
+    <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div><div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div></div>
+    <div class="nc"><div class="nc-day">Dzień odpoczynku</div><div class="nc-kcal">${(cal-200).toLocaleString()} <span>kcal</span></div><div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${Math.round(mac.carb*.85)}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div></div>
+  </div>`;
+
+  const progHtml=`<div class="prog-card">${PROG.map(p=>`<div class="prog-row"><div><div class="prog-lbl">${p.l}</div><div class="prog-desc">${p.d}</div></div><div class="prog-val">${p.v}</div></div>`).join('')}</div>`;
+
+  const tipsHtml=`<div class="tips-grid">${TIPS.map((t,i)=>`<div class="tip-item"><div class="tip-num">${String(i+1).padStart(2,'0')}</div><div><div class="tip-h">${t.h}</div><div class="tip-p">${t.p}</div></div></div>`).join('')}</div>`;
+
+  const html=`
+  <div class="plan-tag">Twój indywidualny plan</div>
+  <h1 class="plan-h1">${split.name}</h1>
+  <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp; ${cal.toLocaleString()} kcal/dzień &nbsp;·&nbsp; Białko: ${mac.prot}g &nbsp;·&nbsp; Węgle: ${mac.carb}g &nbsp;·&nbsp; Tłuszcze: ${mac.fat}g</div>
+  <div class="section"><div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:13px;color:var(--muted);font-weight:400;text-transform:none">— przed każdym treningiem</span></div><div class="warmup-list">${warmupHtml}</div></div>
+  <div class="section"><div class="sec-title"><span class="dot">●</span> Tygodniowy harmonogram</div><div class="week-grid">${weekHtml}</div></div>
+  <div class="section"><div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>${nutHtml}</div>
+  <div class="section"><div class="sec-title"><span class="dot">●</span> Zasady progresji</div>${progHtml}</div>
+  <div class="section"><div class="sec-title"><span class="dot">●</span> Wiedza eksperta</div>${tipsHtml}</div>
+  <div class="plan-footer">
+    <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> &nbsp;·&nbsp; Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010) protein guidelines, Schoenfeld (2010) hypertrophy mechanisms, Helms, Aragon &amp; Fitschen (2014) evidence-based recommendations.</p>
+    <button class="btn-ghost" onclick="resetQuiz()">← Wróć na stronę główną</button>
+  </div>`;
+
+  document.getElementById('plan-inner').innerHTML=html;
+  show('plan');
+}
+
+function toggleDay(i){
+  const el=document.getElementById('day-'+i);
+  const ch=document.getElementById('chev-'+i);
+  if(!el)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'block':'none';
+  ch.classList.toggle('open',hidden);
+}
+
+function resetQuiz(){
+  Object.keys(answers).forEach(k=>delete answers[k]);
+  currentStep=0;
+  show('hero');
+}
+</script>
+</body>
+</html>
