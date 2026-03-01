@@ -296,6 +296,104 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   .opts.c2,.opts.c3{grid-template-columns:1fr}
   .day-header{padding:14px 16px}
 }
+/* ── TIMER ── */
+.timer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;backdrop-filter:blur(8px)}
+.timer-overlay.open{display:flex}
+.timer-ring{position:relative;width:180px;height:180px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:var(--border);stroke-width:4}
+.timer-ring-fill{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .9s linear;stroke-dasharray:502;stroke-dashoffset:0}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:64px;font-weight:900;color:var(--accent)}
+.timer-label{font-family:var(--fm);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.2em}
+.timer-ex{font-family:var(--fd);font-size:22px;font-weight:800;text-transform:uppercase;text-align:center;max-width:320px}
+.timer-skip{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:var(--fd);font-size:15px;font-weight:700;text-transform:uppercase;padding:10px 28px;border-radius:4px;cursor:pointer;transition:.15s;margin-top:8px}
+.timer-skip:hover{border-color:var(--text);color:var(--text)}
+/* ── CAL LOG ── */
+.cal-fab{position:fixed;bottom:24px;left:24px;z-index:500;background:var(--bg2);border:1px solid var(--border2);color:var(--accent);font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;border-radius:100px;padding:12px 20px;cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:.2s;display:none}
+.cal-fab:hover{background:var(--bg3);transform:translateY(-2px)}
+.cal-fab.visible{display:block}
+.cal-panel{position:fixed;bottom:80px;left:24px;z-index:499;width:min(340px,calc(100vw - 48px));background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(16px);opacity:0;pointer-events:none;transition:.25s cubic-bezier(.4,0,.2,1)}
+.cal-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
+.cal-panel-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cal-panel-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase}
+.cal-panel-close{background:none;border:none;color:var(--muted2);font-size:17px;cursor:pointer}
+.cal-panel-body{padding:14px 20px 18px;display:flex;flex-direction:column;gap:10px}
+.cal-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cal-s{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:10px}
+.cal-s-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px}
+.cal-s-val{font-family:var(--fd);font-size:22px;font-weight:800}
+.cal-s-val.ok{color:var(--accent)}
+.cal-s-val.over{color:var(--accent2)}
+.cal-bar-wrap{height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+.cal-bar-fill{height:100%;border-radius:100px;background:var(--accent);transition:width .3s}
+.cal-bar-fill.over{background:var(--accent2)}
+.cal-entries{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.cal-entry{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border-radius:4px;font-size:13px}
+.cal-entry-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px}
+.cal-entry-del:hover{color:var(--accent2)}
+.cal-add-row{display:flex;gap:8px}
+.cal-input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;outline:none;transition:.15s}
+.cal-input:focus{border-color:var(--accent)}
+.cal-input.name{flex:1}
+.cal-input.kcal{width:76px}
+.btn-cal-add{background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:14px;font-weight:800;padding:8px 14px;border-radius:4px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-cal-add:hover{background:#fff}
+/* ── SHARE BAR ── */
+.share-bar{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.share-label{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;flex-shrink:0}
+.share-url{background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);font-family:var(--fm);font-size:11px;padding:8px 12px;border-radius:4px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.btn-copy{background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:13px;font-weight:800;padding:8px 16px;border-radius:4px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-copy:hover{background:#fff}
+.btn-copy.copied{background:#00d4ff;color:#000}
+/* ── FAQ ── */
+.faq-wrap{max-width:720px;width:100%;padding:0 24px 60px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;gap:12px;user-select:none}
+.faq-q:hover{color:var(--accent)}
+.faq-ico{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--muted);transition:.2s;flex-shrink:0}
+.faq-a{font-size:13px;color:var(--muted2);line-height:1.7;padding:0 0 16px;display:none}
+.faq-a.open{display:block}
+/* ── POLICY MODAL ── */
+.policy-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;align-items:flex-end;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.policy-modal.open{display:flex}
+.policy-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px 10px 0 0;max-width:720px;width:100%;max-height:80vh;overflow-y:auto;padding:32px 32px 40px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.policy-box h2{font-family:var(--fd);font-size:28px;font-weight:900;text-transform:uppercase;margin-bottom:20px}
+.policy-box h3{font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;margin:20px 0 8px;color:var(--accent)}
+.policy-box p{font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:10px}
+.policy-close{float:right;background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase}
+.policy-close:hover{color:var(--text)}
+/* ── COMPARE ── */
+.compare-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:20px}
+.compare-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compare-col{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:12px}
+.compare-col-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.compare-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
+.compare-row:last-child{border:none}
+.compare-row span:last-child{font-weight:700}
+.compare-row .up{color:var(--accent)}
+.compare-row .down{color:var(--accent2)}
+/* ── AI FOOD SEARCH ── */
+.cal-ai-row{display:flex;gap:8px;margin-bottom:8px}
+.cal-ai-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;outline:none;transition:.15s}
+.cal-ai-input:focus{border-color:var(--accent)}
+.cal-ai-input::placeholder{color:var(--muted)}
+.btn-ai-estimate{background:var(--bg3);border:1px solid var(--accent);color:var(--accent);font-family:var(--fd);font-size:13px;font-weight:800;padding:8px 12px;border-radius:4px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-ai-estimate:hover{background:rgba(200,255,0,.1)}
+.btn-ai-estimate.loading{border-color:var(--muted);color:var(--muted);pointer-events:none}
+.cal-ai-result{background:rgba(200,255,0,.05);border:1px solid rgba(200,255,0,.2);border-radius:4px;padding:10px 12px;font-size:12px;display:none}
+.cal-ai-result.show{display:block}
+.cal-ai-result-name{font-weight:700;color:var(--text);margin-bottom:4px}
+.cal-ai-result-kcal{font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent);line-height:1}
+.cal-ai-result-note{color:var(--muted2);font-size:11px;margin-top:4px;line-height:1.5}
+.cal-ai-result-actions{display:flex;gap:8px;margin-top:10px}
+.btn-ai-add{flex:1;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:14px;font-weight:800;padding:8px;border-radius:4px;cursor:pointer;transition:.15s}
+.btn-ai-add:hover{background:#fff}
+.btn-ai-edit{background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);font-family:var(--fd);font-size:12px;font-weight:700;padding:8px 12px;border-radius:4px;cursor:pointer;transition:.15s}
+.btn-ai-edit:hover{color:var(--text)}
+.cal-manual-row{display:none}
+.cal-manual-row.show{display:flex;gap:8px}
 </style>
 </head>
 <body>
@@ -313,6 +411,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     </div>
     <button class="btn-cta" onclick="startQuiz()">Wygeneruj swój plan →</button>
   </div>
+
   <div class="how-wrap">
     <div class="sec-label">Jak to działa</div>
     <div class="steps-grid">
@@ -321,8 +420,25 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
       <div class="step-card" data-n="03"><h3>Masz plan</h3><p>Pełny harmonogram z możliwością zamiany ćwiczeń i edycji danych.</p></div>
     </div>
   </div>
-  <div class="site-footer"><p><strong>FormulaPlan.pl</strong> — Wszelkie prawa zastrzeżone © 2025</p></div>
+
+  <div class="faq-wrap">
+    <div class="sec-label">Najczęstsze pytania</div>
+    <div id="faq-list">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(0)"><span>Czy plan naprawdę jest oparty na nauce?</span><span class="faq-ico" id="faq-ico-0">+</span></div><div class="faq-a" id="faq-a-0">Tak. Kalorie obliczamy wzorem Mifflin-St Jeor (1990) — najdokładniejszym dostępnym. TDEE to Harris-Benedict z korektą aktywności. Makra bazują na metaanalizie Helms, Aragon i Fitschen (2014). Split treningowy oparty na badaniach Schoenfelda (2010) dotyczących częstości treningu a hipertrofii.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(1)"><span>Ile czasu zajmie wygenerowanie planu?</span><span class="faq-ico" id="faq-ico-1">+</span></div><div class="faq-a" id="faq-a-1">Około 3 minut na odpowiedzenie na 15 pytań. Algorytm liczy w kilka sekund. Plan jest gotowy natychmiast po zakupie.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(2)"><span>Czy mogę zmienić ćwiczenia w planie?</span><span class="faq-ico" id="faq-ico-2">+</span></div><div class="faq-a" id="faq-a-2">Tak — każde ćwiczenie ma przycisk 🔄 zamiany na alternatywę z tej samej grupy mięśniowej. Plan automatycznie zachowuje zestawy, powtórzenia i RPE oryginalnego ćwiczenia.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(3)"><span>Co jeśli mam kontuzję lub ograniczony sprzęt?</span><span class="faq-ico" id="faq-ico-3">+</span></div><div class="faq-a" id="faq-a-3">Algorytm automatycznie zamienia ćwiczenia niedostępne przy danym sprzęcie lub niebezpieczne przy wybranej kontuzji. Pytamy o to w formularzu — to nie jest czysto marketingowe.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(4)"><span>Jak działa 30-dniowa gwarancja?</span><span class="faq-ico" id="faq-ico-4">+</span></div><div class="faq-a" id="faq-a-4">Jeśli w ciągu 30 dni od zakupu uznasz, że plan nie spełnia Twoich oczekiwań, napisz na kontakt@formulaplan.pl — zwrot bez pytań. Płatność przez Stripe, więc proces jest automatyczny.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(5)"><span>Czy plan można wydrukować lub zapisać?</span><span class="faq-ico" id="faq-ico-5">+</span></div><div class="faq-a" id="faq-a-5">Tak — w planie dostępny jest przycisk drukowania (PDF przez okno druku przeglądarki) oraz link do udostępnienia planu z zachowanymi odpowiedziami.</div></div>
+    </div>
+  </div>
+
+  <div class="site-footer">
+    <p><strong>FormulaPlan.pl</strong> — Wszelkie prawa zastrzeżone © 2026 &nbsp;·&nbsp; <button onclick="openPolicyModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Polityka prywatności</button> &nbsp;·&nbsp; <button onclick="openPolicyModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Regulamin</button></p>
+  </div>
 </div>
+
+
 
 <!-- QUIZ -->
 <div id="quiz" class="screen">
@@ -354,13 +470,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   <div class="plan-inner" id="plan-inner"></div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div id="modal-content"></div>
-  </div>
-</div>
-
 <!-- STATS FAB -->
 <button class="stats-fab" id="stats-fab" onclick="toggleStats()">📊 Twoje dane</button>
 <div class="stats-panel" id="stats-panel">
@@ -369,6 +478,59 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <button class="sp-close" onclick="toggleStats()">✕</button>
   </div>
   <div class="sp-body" id="sp-body"></div>
+</div>
+
+<!-- TIMER OVERLAY -->
+<div class="timer-overlay" id="timer-overlay">
+  <div class="timer-label">PRZERWA MIĘDZY SERIAMI</div>
+  <div class="timer-ex" id="timer-ex-name"></div>
+  <div class="timer-ring">
+    <svg width="180" height="180" viewBox="0 0 180 180">
+      <circle class="timer-ring-bg" cx="90" cy="90" r="80"/>
+      <circle class="timer-ring-fill" id="timer-ring-fill" cx="90" cy="90" r="80"/>
+    </svg>
+    <div class="timer-num" id="timer-num">90</div>
+  </div>
+  <button class="timer-skip" onclick="skipTimer()">Pomiń →</button>
+</div>
+
+<!-- CAL LOG FAB -->
+<button class="cal-fab" id="cal-fab" onclick="toggleCalLog()">🍽 Dziennik</button>
+<div class="cal-panel" id="cal-panel">
+  <div class="cal-panel-header">
+    <div class="cal-panel-title">Dziennik kalorii</div>
+    <button class="cal-panel-close" onclick="toggleCalLog()">✕</button>
+  </div>
+  <div class="cal-panel-body" id="cal-panel-body"></div>
+</div>
+
+<!-- POLICY MODAL -->
+<div class="policy-modal" id="policy-modal" onclick="closePolicyModal()">
+  <div class="policy-box" onclick="event.stopPropagation()">
+    <button class="policy-close" onclick="closePolicyModal()">Zamknij ✕</button>
+    <h2>Polityka prywatności</h2>
+    <h3>Administrator danych</h3>
+    <p>Administratorem danych osobowych jest FormulaPlan.pl Dane kontaktowe: kontakt@formulaplan.pl</p>
+    <h3>Jakie dane zbieramy</h3>
+    <p>Zbieramy wyłącznie dane podane przez użytkownika podczas wypełniania formularza (waga, wzrost, wiek, cel treningowy). Dane te są przechowywane lokalnie w przeglądarce (localStorage) i nie są przesyłane na zewnętrzne serwery bez zgody użytkownika.</p>
+    <h3>Cel przetwarzania</h3>
+    <p>Dane służą wyłącznie do wygenerowania spersonalizowanego planu treningowego i żywieniowego. Nie są sprzedawane ani udostępniane osobom trzecim.</p>
+    <h3>Pliki cookie</h3>
+    <p>Strona może korzystać z technicznych plików cookie niezbędnych do prawidłowego działania. Nie używamy cookie reklamowych ani śledzących.</p>
+    <h3>Prawa użytkownika</h3>
+    <p>Masz prawo do dostępu, sprostowania i usunięcia swoich danych. Aby usunąć dane zapisane lokalnie, wyczyść localStorage przeglądarki lub skontaktuj się z nami.</p>
+    <h3>Płatności</h3>
+    <p>Płatności są przetwarzane przez Stripe Inc. — podmiot zewnętrzny. FormulaPlan.pl nie przechowuje danych kart płatniczych.</p>
+    <h3>Zmiany polityki</h3>
+    <p>Polityka prywatności może być aktualizowana. Aktualna wersja zawsze dostępna na tej stronie. Ostatnia aktualizacja: 01.01.2025.</p>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div id="modal-content"></div>
+  </div>
 </div>
 
 <script>
@@ -503,19 +665,55 @@ const EX = {
   dead_bug:  {n:"Dead Bug",                             m:"Core głęboki / stabilizacja",g:"core", t:"Kręgosłup lędźwiowy ZAWSZE przy podłodze. Bez wyjątku.",
     steps:["Połóż się na plecach. Ramiona pionowo w górze. Nogi: uda pionowo, kolana pod kątem 90°.","Jednocześnie opuszczaj przeciwne ramię i nogę (prawa ręka + lewa noga).","Kręgosłup lędźwiowy przez cały czas PRZY PODŁODZE — to jest sedno ćwiczenia.","Wróć do pozycji wyjściowej i zmień strony."],
     mistakes:["Lędźwia odrywają się od podłogi (ćwiczenie traci sens)","Zbyt szybkie tempo","Wstrzymywanie oddechu"]},
+  tri_dips:  {n:"Dipy na poręczach (triceps)",         m:"Triceps",                g:"triceps",  t:"Tułów PIONOWY. Łokcie cofają się prosto w tył, nie na boki.",
+    steps:["Stań na poręczach, tułów całkowicie pionowy przez cały set — to jest kluczowe dla izolacji tricepsa.","Opuszczaj powoli, łokcie idą prosto w tył. Zatrzymaj przy kącie 90° w łokciach.","Wypchnij eksplozywnie w górę do pełnego wyprostu."],
+    mistakes:["Pochylenie tułowia do przodu (aktywujesz klatkę, nie tricepsa)","Łokcie rozchylają się na boki","Zbyt głębokie zejście przy słabych łokciach"]},
+  sumo_dl:   {n:"Martwy ciąg sumo",                    m:"Pośladki / przywodziciele",g:"legs",   t:"Szeroki rozkrok, stopy na zewnątrz. Plecy bardziej pionowe niż w klasycznym.",
+    steps:["Stopy szeroko — 1.5x szerokość barków. Palce skierowane na zewnątrz pod kątem 45°.","Chwyt wewnętrzny (między nogami). Biodra nisko, klatka wysoko, plecy neutralne.","Pchaj podłogę stopami NA ZEWNĄTRZ — to aktywuje pośladki i przywodziciele.","Wypchnij biodra do przodu na górze. Pełny wyprost."],
+    mistakes:["Pięty odrywają się (za krótkie ścięgna Achillesa — rozciągaj)","Kolana 'wchodzą do środka' (pchaj je na zewnątrz aktywnie)","Zaokrąglenie pleców — klasyczny błąd jak w każdym DL"]},
+  t_bar_row: {n:"Wiosłowanie T-bar",                   m:"Środkowe plecy / najszersze",g:"back", t:"Klatka na podkładce, ściągaj łokcie wzdłuż ciała. Pełna kontrakcja na górze.",
+    steps:["Ułóż się na maszynie T-bar (lub użyj kąta siłowni ze sztangą w rogu).","Klatka dociska do podkładki przez cały ruch — nie odrywaj jej.","Chwyt neutralny. Ściągaj drążek do klatki, łokcie wzdłuż ciała.","Na górze: pauza 1 sek, ściśnij łopatki. Powolne opuszczanie."],
+    mistakes:["Odbijanie klatki od podkładki (używanie bezwładności)","Łokcie rozchylają się na boki","Zbyt duży ciężar — brak pełnego zakresu"]},
+  chest_press:{n:"Wyciskanie na maszynie (klatka)",    m:"Klatka piersiowa",        g:"chest",   t:"Maszyna = bezpieczna izolacja. Idealna na koniec treningu lub dla początkujących.",
+    steps:["Ustaw siedzisko tak, żeby uchwyty były na wysokości dolnej klatki.","Łopatki ściągnięte i dociśnięte do oparcia — cały ruch.","Wypchnij równomiernie do przodu. Nie blokuj łokci na końcu.","Powolny powrót — 3 sek. ekscentryczna."],
+    mistakes:["Siedzisko za wysokie lub za niskie (zły kąt = barki zamiast klatki)","Odrywanie łopatek od oparcia","Zbyt szybkie tempo — tracisz kontrolę"]},
+  pec_deck:  {n:"Pec Deck (maszyna do rozpiętki)",     m:"Klatka — kontrakcja",     g:"chest",   t:"Najlepsza izolacja środkowej klatki. Skup się na splocie, nie sile.",
+    steps:["Usiądź, łokcie na wałkach lub dłonie na uchwytach. Plecy przy oparciu.","Złącz przedramiona przed sobą łukiem — myśl 'obejmuję drzewo'.","Na środku: pełna kontrakcja klatki. Pauza 1 sek. Poczuj to.","Powrót kontrolowany — nie pozwól się wyrwać maszynie."],
+    mistakes:["Używanie siły rąk zamiast klatki","Brak pauzy na kontrakcji (tracisz najlepszą fazę)","Zbyt szeroki zakres — ryzyko dla rotatorów"]},
+  front_raise:{n:"Unoszenie ramion przodem",           m:"Bark przedni",            g:"shoulder",t:"Izoluje przedni bark. Nie unoś wyżej niż do linii barków.",
+    steps:["Stój, sztangielki przed udami, chwyt pronacyjny (dłonie w dół).","Unoś ramię/ramiona prosto przed siebie do wysokości barków. Nie wyżej.","Lekkie ugięcie łokcia przez cały ruch. Tułów nieruchomy.","Opuszczaj 2–3 sekundy z kontrolą."],
+    mistakes:["Unoszenie powyżej linii barków (niepotrzebne przeciążenie)","Kołysanie tułowiem","Chwyt zbyt wąski — nadgarstki pod napięciem"]},
+  leg_ext:   {n:"Prostowanie nóg (Leg Extension)",     m:"Mięsień czworogłowy",     g:"legs",    t:"Izolacja quada. Pauza na górze, powolne opuszczanie = klucz.",
+    steps:["Usiądź na maszynie, wałek nad kostkami. Plecy przy oparciu.","Wyprostuj nogi do pełnego zakresu — pełna kontrakcja quada.","Pauza 1–2 sek na górze. Poczuj palące napięcie czworogłowego.","Opuszczaj przez 3–4 sekundy. To jest trudniejsza i ważniejsza faza."],
+    mistakes:["Odbijanie ciężaru od dołu (balistyczne powtórzenia — brak efektu)","Brak pełnego wyprostu na górze","Zbyt duże obciążenie = brak kontroli w dole ruchu"]},
+  seated_calf:{n:"Wspięcia na palce siedząc (Seated Calf)",m:"Łydki (soleus)",      g:"legs",    t:"Ugięte kolana = soleus. Kluczowe dla pełnych łydek — inna głowa niż standing.",
+    steps:["Usiądź na maszynie lub ławce z ciężarem na udach. Kolana ugięte pod 90°.","Pięty w dół maksymalnie — poczuj rozciąganie głębokiej łydki.","Wspij się maksymalnie na palce. Pauza 2 sek.","Powolne opuszczanie. Łydki nie tolerują szybkich, urywanych powtórzeń."],
+    mistakes:["Zbyt szybkie, sprężynujące tempo","Brak pełnego zakresu (za mały efekt)","Pomijanie tego ćwiczenia — soleus to 60% masy łydki"]},
+  glute_kick:{n:"Odpychanie nogi w tył (Glute Kickback)",m:"Pośladki",             g:"legs",    t:"Ćwiczenie izolacyjne — używaj przy słabych pośladkach lub jako finisher.",
+    steps:["Stań przy maszynie cable lub klęknij na macie. Utrzymaj tułów w poziomie.","Noga wyprostowana, pchaj ją w tył i lekko w górę przez kontrakcję pośladka.","Na górze: 2 sek squeeze. Biodro musi być w pełni wyprostowane.","Powrót z kontrolą. Nie kołysz biodrami."],
+    mistakes:["Ruch z biodra zamiast z pośladka","Brak pełnego wyprostu w biodrze","Zbyt duże obciążenie — łydki i plecy przejmują ruch"]},
+  russian_twist:{n:"Russian Twist (obciążony)",         m:"Skośne mięśnie brzucha", g:"core",   t:"Wolne tempo + pełna rotacja = efekt. Nie śpiesz się.",
+    steps:["Usiądź, kolana ugięte, stopy lekko uniesione (lub na podłodze dla łatwiejszej wersji). Tułów pod kątem ~45°.","Trzymaj ciężar (talerz/sztangielka) oburącz przed sobą.","Obracaj tułów na bok, nie tylko rękami — to jest sedno ćwiczenia. Łopatka dotyka do podłogi lub blisko niej.","Wróć do środka i obróć na drugą stronę. Kontroluj oddech."],
+    mistakes:["Ruch tylko ramionami (zamiast rotacji tułowia)","Zbyt szybkie tempo — brak aktywacji skośnych","Brak kontroli nóg (latają = łatwiej ale mniej efektywnie)"]},
+  mountain_climber:{n:"Wspinacz (Mountain Climber)",   m:"Core / cardio",           g:"core",   t:"Plecy proste jak deska. Kąt ramion prosty. Kolano do klatki, nie boku.",
+    steps:["Zacznij w pozycji pompki. Ręce pod barkami, ciało w linii prostej.","Przyciągnij jedno kolano do klatki, drugie prostuje się jednocześnie.","Utrzymuj rytm — im szybciej, tym wyższe tętno. Lub powoli = głębsza praca core.","Biodra NIE UNOSZĄ SIĘ i NIE OPADAJĄ przez cały czas."],
+    mistakes:["Biodra w górze (zamiast linii prostej)","Kolano idzie na bok zamiast do klatki","Wstrzymywanie oddechu"]},
+  pull_over: {n:"Pullover ze sztangielką",             m:"Najszersze / klatka",     g:"back",   t:"Unikalne ćwiczenie — rozciąga klatkę I angażuje najszersze jednocześnie.",
+    steps:["Połóż się prostopadle na ławce (tylko łopatki na ławce, biodra w dół).","Trzymaj jedną sztangielkę oburącz, ramiona wyprostowane nad klatką.","Opuszczaj sztangielkę za głowę łukiem, lekko uginając łokcie. Poczuj rozciąganie.","Wróć łukiem do pozycji startowej poprzez kontrakcję najszerszych."],
+    mistakes:["Zbyt duże obciążenie — utrata kontroli za głową","Biodra lecą w górę (zrób mostek zamiast przysiadu)","Zbyt szybkie tempo — tracisz rozciąganie"]},
 };
 
 // ═══════════════════════════════════════════════════════════
 // ALTERNATIVES BY MUSCLE GROUP
 // ═══════════════════════════════════════════════════════════
 const GROUP_ALTS = {
-  chest:    ['bench','incline','dips','cable_fly','pushup'],
-  back:     ['deadlift','pullup','row_bb','row_db','lat_pull','face_pull'],
-  shoulder: ['ohp','db_press','lat_raise','rear_delt','arnold'],
+  chest:    ['bench','incline','dips','cable_fly','pushup','chest_press','pec_deck'],
+  back:     ['deadlift','pullup','row_bb','row_db','lat_pull','face_pull','t_bar_row','pull_over'],
+  shoulder: ['ohp','db_press','lat_raise','rear_delt','arnold','front_raise'],
   biceps:   ['bb_curl','hammer','incline_curl','conc_curl'],
   triceps:  ['cgbp','skull','pushdown','oh_tri','tri_dips'],
-  legs:     ['squat','rdl','leg_press','lunges','leg_curl','calf_raise','hip_thrust','goblet'],
-  core:     ['plank','ab_wheel','cable_cr','hang_raise','dead_bug'],
+  legs:     ['squat','rdl','leg_press','lunges','leg_curl','calf_raise','hip_thrust','goblet','sumo_dl','leg_ext','seated_calf','glute_kick'],
+  core:     ['plank','ab_wheel','cable_cr','hang_raise','dead_bug','russian_twist','mountain_climber'],
 };
 // Map each exercise to its group alternatives (flatten for easy lookup)
 function getAlts(exKey){
@@ -523,6 +721,32 @@ function getAlts(exKey){
     if(keys.includes(exKey)) return keys.filter(k=>k!==exKey && EX[k]);
   }
   return [];
+}
+
+// ═══════════════════════════════════════════════════════════
+// INJURY & EQUIPMENT MODIFIERS
+// ═══════════════════════════════════════════════════════════
+const INJURY_SWAPS={
+  lower_back:{deadlift:'leg_press',squat:'goblet',row_bb:'row_db',rdl:'leg_curl',hip_thrust:'glute_kick'},
+  knees:{squat:'leg_press',lunges:'leg_curl',goblet:'leg_press',leg_press:'leg_curl'},
+  shoulders:{ohp:'lat_raise',bench:'cable_fly',cgbp:'pushdown',incline:'cable_fly',dips:'pushdown',arnold:'lat_raise'}
+};
+const EQUIP_SWAPS={
+  basic:{bench:'incline',squat:'goblet',deadlift:'rdl',row_bb:'row_db',ohp:'db_press',
+         cgbp:'pushdown',skull:'oh_tri',bb_curl:'hammer',cable_fly:'pushup',cable_cr:'dead_bug',
+         face_pull:'rear_delt',hip_thrust:'rdl',leg_press:'lunges'},
+  home: {bench:'pushup',squat:'goblet',deadlift:'rdl',row_bb:'row_db',ohp:'lat_raise',
+         cgbp:'pushup',skull:'oh_tri',bb_curl:'hammer',cable_fly:'pushup',cable_cr:'dead_bug',
+         face_pull:'rear_delt',hip_thrust:'rdl',leg_press:'lunges',leg_curl:'rdl',
+         lat_pull:'pullup',incline:'pushup',calf_raise:'calf_raise',dips:'pushup'}
+};
+function applyMods(exKey){
+  const inj=answers.injuries||'none';
+  const eq=answers.equipment||'full';
+  let k=exKey;
+  if(eq!=='full'&&EQUIP_SWAPS[eq]&&EQUIP_SWAPS[eq][k]) k=EQUIP_SWAPS[eq][k];
+  if(inj!=='none'&&INJURY_SWAPS[inj]&&INJURY_SWAPS[inj][k]) k=INJURY_SWAPS[inj][k];
+  return EX[k]?k:exKey; // fallback jeśli zamiennik nie istnieje
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -563,18 +787,33 @@ function calcBMR(w,h,a,s){const b=10*w+6.25*h-5*a;return s==='M'?b+5:b-161;}
 function calcTDEE(bmr,act){const m={sedentary:1.2,light:1.375,moderate:1.55,active:1.725};return bmr*(m[act]||1.55);}
 function calcCal(tdee,goal,weeklyChange){
   const wc=parseFloat(weeklyChange)||0.25;
-  const surplusPerKg=7700/7; // ~1100 kcal per kg per week
-  if(goal==='bulk')return Math.round(tdee+wc*surplusPerKg);
-  if(goal==='cut')return Math.round(tdee-wc*surplusPerKg);
-  if(goal==='strength')return Math.round(tdee+200);
-  return Math.round(tdee);
+  if(goal==='bulk'){
+    // Lean bulk: max 500 kcal nadwyżki — realistyczne tempo bez nadmiaru tłuszczu
+    const surplus=Math.min(Math.round(wc*800),500);
+    return Math.round(tdee+surplus);
+  }
+  if(goal==='cut'){
+    // Deficyt max 25% TDEE lub 750 kcal — ochrona mięśni
+    const deficit=Math.min(Math.round(wc*700),Math.round(tdee*0.25),750);
+    return Math.round(tdee-deficit);
+  }
+  if(goal==='strength') return Math.round(tdee+150);
+  return Math.round(tdee); // recomp = TDEE
 }
 function calcMacros(cal,w,goal){
-  const pm=goal==='cut'?2.4:goal==='bulk'?2.0:2.2;
+  // Białko: 2.4g/kg w deficycie (ochrona mięśni), 2.0g/kg w masie, 2.2g/kg w sile
+  const pm=goal==='cut'?2.4:goal==='strength'?2.0:goal==='bulk'?1.9:2.2;
   const prot=Math.round(w*pm);
-  const fat=Math.round((cal*(goal==='cut'?0.28:0.25))/9);
-  const carb=Math.round((cal-prot*4-fat*9)/4);
-  return{prot,fat,carb:Math.max(carb,50)};
+  const protKcal=prot*4;
+  // Tłuszcze: min 0.8g/kg dla zdrowia hormonalnego, max 35% kalorii
+  const fatMin=Math.round(w*0.8);
+  const fatFromPct=Math.round((cal*(goal==='cut'?0.27:0.25))/9);
+  const fat=Math.max(fatMin,fatFromPct);
+  const fatKcal=fat*9;
+  // Węglowodany: reszta kalorii
+  const carbKcal=cal-protKcal-fatKcal;
+  const carb=Math.max(Math.round(carbKcal/4),50);
+  return{prot,fat,carb};
 }
 function calcBMI(w,h){return(w/((h/100)**2)).toFixed(1);}
 function idealW(h,s){const b=s==='M'?50:45.5,e=2.3*((h-152.4)/2.54);return Math.round(b+e);}
@@ -590,7 +829,7 @@ function buildSplit(days,goal,exp){
   const vol=isB?3:isA?5:4;
   const rpe=goal==='strength'?'RPE 8-9':'RPE 7-8';
   const s=()=>String(vol);
-  const E=(k,ss,rr,rs,rp)=>{const x=EX[k];return{key:k,...x,sets:String(ss),reps:rr,rest:rs,rpe:rp};};
+  const E=(k,ss,rr,rs,rp)=>{const mk=applyMods(k);const x=EX[mk];return{key:mk,...x,sets:String(ss),reps:rr,rest:rs,rpe:rp};};
   const R=(k)=>E(k,vol,rng,rst,rpe);
 
   if(days===3){return{name:'Full Body 3×/tydzień',days:[
@@ -663,6 +902,7 @@ function show(id){
   // Show/hide stats FAB
   const fab=document.getElementById('stats-fab');
   fab.classList.toggle('visible', id==='results'||id==='plan');
+  document.getElementById('cal-fab').classList.toggle('visible', id==='plan');
 }
 function renderQ(){
   const q=QUESTIONS[currentStep];
@@ -777,6 +1017,10 @@ function getComputed(ans){
 // RESULTS
 // ═══════════════════════════════════════════════════════════
 function buildResults(){
+  try{
+    const prev=localStorage.getItem('fp_answers');
+    if(prev) localStorage.setItem('fp_prev_answers',prev);
+  }catch(e){}
   const D=getComputed();
   const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,exp,wc}=D;
   const split=buildSplit(answers.days||4,goal,exp);
@@ -867,6 +1111,7 @@ function renderPlan(){
         <div class="ex-cell ex-rpe">${ex.rpe}</div>
         <div class="ex-actions">
           <button class="btn-ex info" title="Jak wykonać?" data-di="${di}" data-ei="${ei}" onclick="showExInfo(this)">📋</button>
+          <button class="btn-ex" title="Timer przerwy" data-rest="${ex.rest}" data-name="${ex.n}" onclick="startRestTimer(parseInt(this.dataset.rest)||90,this.dataset.name)">⏱</button>
           <button class="btn-ex swap" title="Zamień ćwiczenie" data-di="${di}" data-ei="${ei}" onclick="showSwap(this)">🔄</button>
         </div>
       </div>
@@ -887,6 +1132,8 @@ function renderPlan(){
 
   document.getElementById('plan-inner').innerHTML=`
   <div class="plan-tag">Twój indywidualny plan</div>
+  ${buildShareBar()}
+  ${buildCompareCard()}
   <h1 class="plan-h1">${split.name}</h1>
   <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp; <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp; Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp; Węgle: <strong>${mac.carb}g</strong> &nbsp;·&nbsp; Tłuszcze: <strong>${mac.fat}g</strong> &nbsp;·&nbsp; Tempo: <strong>${wc} kg/tydz</strong></div>
   <div class="section"><div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none">— przed każdym treningiem (12 min)</span></div>
@@ -1044,6 +1291,301 @@ function applyStatsChanges(){
   const meta=document.querySelector('.plan-meta');
   if(meta){meta.style.transition='opacity .3s';meta.style.opacity='0';setTimeout(()=>meta.style.opacity='1',300);}
 }
+// ═══════════════════════════════════════════════════════════
+// TIMER PRZERW
+// ═══════════════════════════════════════════════════════════
+let timerInterval=null;
+let timerTotal=90;
+function startRestTimer(seconds,exName){
+  timerTotal=seconds;
+  let remaining=seconds;
+  document.getElementById('timer-num').textContent=remaining;
+  document.getElementById('timer-ex-name').textContent='Następne: '+exName;
+  const ring=document.getElementById('timer-ring-fill');
+  const circumference=502;
+  ring.style.strokeDashoffset=0;
+  document.getElementById('timer-overlay').classList.add('open');
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    remaining--;
+    document.getElementById('timer-num').textContent=remaining;
+    const progress=1-(remaining/timerTotal);
+    ring.style.strokeDashoffset=circumference*progress;
+    if(remaining<=0){skipTimer();playBeep();}
+  },1000);
+}
+function skipTimer(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  document.getElementById('timer-overlay').classList.remove('open');
+}
+function playBeep(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,150,300].forEach(delay=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;g.gain.value=.3;
+      o.start(ctx.currentTime+delay/1000);
+      o.stop(ctx.currentTime+delay/1000+0.1);
+    });
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// DZIENNIK KALORII
+// ═══════════════════════════════════════════════════════════
+let calLog=[];
+let calLogOpen=false;
+try{const s=localStorage.getItem('fp_callog');if(s)calLog=JSON.parse(s);}catch(e){}
+
+function toggleCalLog(){
+  calLogOpen=!calLogOpen;
+  document.getElementById('cal-panel').classList.toggle('open',calLogOpen);
+  if(calLogOpen) renderCalLog();
+}
+function saveCalLog(){try{localStorage.setItem('fp_callog',JSON.stringify(calLog));}catch(e){}}
+function renderCalLog(){
+  const D=getComputed();
+  const target=D.cal;
+  const eaten=calLog.reduce((s,e)=>s+e.kcal,0);
+  const remaining=target-eaten;
+  const pct=Math.min(Math.round((eaten/target)*100),100);
+  const over=eaten>target;
+  document.getElementById('cal-panel-body').innerHTML=`
+    <div class="cal-summary">
+      <div class="cal-s"><div class="cal-s-lbl">Cel dzienny</div><div class="cal-s-val">${target.toLocaleString()} kcal</div></div>
+      <div class="cal-s"><div class="cal-s-lbl">${over?'Przekroczone o':'Pozostało'}</div><div class="cal-s-val ${over?'over':'ok'}">${Math.abs(remaining).toLocaleString()} kcal</div></div>
+    </div>
+    <div class="cal-bar-wrap"><div class="cal-bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
+    <div class="cal-entries" id="cal-entries">
+      ${calLog.length===0
+        ?'<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px">Brak wpisów na dziś</div>'
+        :calLog.map((e,i)=>`
+          <div class="cal-entry">
+            <span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</span>
+            <span style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <strong>${e.kcal} kcal</strong>
+              <button class="cal-entry-del" onclick="delCalEntry(${i})">✕</button>
+            </span>
+          </div>`).join('')}
+    </div>
+    <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Wpisz co zjadłeś — AI oszacuje kalorie</div>
+    <div class="cal-ai-row">
+      <input class="cal-ai-input" id="cal-ai-input" type="text" placeholder="np. dwie kanapki z masłem i szynką" onkeydown="if(event.key==='Enter')estimateCalories()">
+      <button class="btn-ai-estimate" id="btn-ai-est" onclick="estimateCalories()">✨ Szacuj</button>
+    </div>
+    <div class="cal-ai-result" id="cal-ai-result">
+      <div class="cal-ai-result-name" id="cal-ai-name"></div>
+      <div class="cal-ai-result-kcal" id="cal-ai-kcal"></div>
+      <div class="cal-ai-result-note" id="cal-ai-note"></div>
+      <div class="cal-ai-result-actions">
+        <button class="btn-ai-add" onclick="addCalFromAI()">+ Dodaj do dziennika</button>
+        <button class="btn-ai-edit" onclick="toggleManualEdit()">Edytuj kcal</button>
+      </div>
+    </div>
+    <div class="cal-manual-row" id="cal-manual-row">
+      <input class="cal-input name" id="cal-manual-name" type="text" placeholder="Nazwa">
+      <input class="cal-input kcal" id="cal-manual-kcal" type="number" placeholder="kcal" min="1">
+      <button class="btn-cal-add" onclick="addCalManual()">+</button>
+    </div>
+    <button onclick="clearCalLog()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:6px">Wyczyść dzisiejszy dzień</button>`;
+}
+function addCalEntry(){
+  const name=document.getElementById('cal-name').value.trim();
+  const kcal=parseInt(document.getElementById('cal-kcal').value);
+  if(!name||!kcal||kcal<1) return;
+  calLog.push({name,kcal,ts:Date.now()});
+  saveCalLog();
+  document.getElementById('cal-name').value='';
+  document.getElementById('cal-kcal').value='';
+  renderCalLog();
+}
+function delCalEntry(i){calLog.splice(i,1);saveCalLog();renderCalLog();}
+function clearCalLog(){calLog=[];saveCalLog();renderCalLog();}
+
+// ═══════════════════════════════════════════════════════════
+// ZAPISYWANIE PLANU PRZEZ URL
+// ═══════════════════════════════════════════════════════════
+function buildShareBar(){
+  const url=getPlanUrl();
+  return `<div class="share-bar">
+    <span class="share-label">Udostępnij plan</span>
+    <div class="share-url" id="share-url-display" onclick="copyPlanUrl()">${url}</div>
+    <button class="btn-copy" id="btn-copy-url" onclick="copyPlanUrl()">Kopiuj</button>
+    <button class="btn-copy" onclick="printPlan()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted2)">🖨 Drukuj</button>
+  </div>`;
+}
+function getPlanUrl(){
+  try{
+    const data=btoa(encodeURIComponent(JSON.stringify(answers)));
+    return window.location.origin+window.location.pathname+'#plan='+data;
+  }catch(e){return window.location.href;}
+}
+function copyPlanUrl(){
+  const url=getPlanUrl();
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=document.getElementById('btn-copy-url');
+    if(btn){btn.textContent='Skopiowano ✓';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Kopiuj';btn.classList.remove('copied');},2000);}
+  }).catch(()=>{prompt('Skopiuj link:',url);});
+}
+function loadFromUrl(){
+  try{
+    const hash=window.location.hash;
+    if(!hash.startsWith('#plan=')) return false;
+    const data=JSON.parse(decodeURIComponent(atob(hash.slice(6))));
+    if(data&&typeof data==='object'){
+      answers=data;
+      saveAnswers();
+      window.__split=buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate');
+      renderPlan();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+// Auto-load z URL przy starcie
+window.addEventListener('load',()=>{ loadFromUrl(); });
+
+function printPlan(){
+  window.print();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PORÓWNANIE Z POPRZEDNIM PLANEM
+// ═══════════════════════════════════════════════════════════
+function buildCompareCard(){
+  try{
+    const prev=JSON.parse(localStorage.getItem('fp_prev_answers')||'null');
+    if(!prev) return '';
+    const D=getComputed();
+    const P=getComputed(prev);
+    const rows=[
+      ['Kalorie',P.cal+' kcal',D.cal+' kcal',D.cal>P.cal],
+      ['Białko',P.mac.prot+'g',D.mac.prot+'g',D.mac.prot>=P.mac.prot],
+      ['Waga',P.w+' kg',D.w+' kg',null],
+      ['Cel',P.glabs[P.goal],D.glabs[D.goal],null],
+    ];
+    return `<div class="compare-card">
+      <div class="compare-title">📊 Porównanie z poprzednim planem</div>
+      <div class="compare-grid">
+        <div class="compare-col"><div class="compare-col-lbl">Poprzedni plan</div>
+          ${rows.map(r=>`<div class="compare-row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')}
+        </div>
+        <div class="compare-col"><div class="compare-col-lbl">Aktualny plan</div>
+          ${rows.map(r=>`<div class="compare-row"><span>${r[0]}</span><span class="${r[3]===true?'up':r[3]===false?'down':''}">${r[2]}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }catch(e){return '';}
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI SZACOWANIE KALORII
+// ═══════════════════════════════════════════════════════════
+let aiLastResult=null;
+
+async function estimateCalories(){
+  const input=document.getElementById('cal-ai-input');
+  const btn=document.getElementById('btn-ai-est');
+  const resultBox=document.getElementById('cal-ai-result');
+  if(!input||!input.value.trim()) return;
+  const query=input.value.trim();
+
+  btn.textContent='Szacuję...';
+  btn.classList.add('loading');
+  resultBox.classList.remove('show');
+
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system:`Jesteś ekspertem od żywienia. Szacujesz kalorie polskich i popularnych posiłków.
+Odpowiadasz WYŁĄCZNIE poprawnym JSON bez żadnego dodatkowego tekstu, bez markdown.
+Format: {"name":"opisowa polska nazwa posiłku","kcal":liczba_całkowita,"note":"krótkie wyjaśnienie porcji i składników"}
+Bądź realistyczny — podaj środkowy zakres kalorii dla typowej porcji domowej.`,
+        messages:[{role:'user',content:`Oszacuj kalorie dla: ${query}`}]
+      })
+    });
+    const data=await response.json();
+    const text=data.content?.map(c=>c.text||'').join('').trim();
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+
+    aiLastResult={name:parsed.name||query,kcal:Math.round(parsed.kcal)||0};
+
+    document.getElementById('cal-ai-name').textContent=parsed.name||query;
+    document.getElementById('cal-ai-kcal').textContent=`~${Math.round(parsed.kcal)} kcal`;
+    document.getElementById('cal-ai-note').textContent=parsed.note||'';
+    resultBox.classList.add('show');
+
+  }catch(err){
+    // Fallback: pokaż formularz ręczny z nazwą
+    aiLastResult=null;
+    document.getElementById('cal-ai-name').textContent='Nie udało się oszacować';
+    document.getElementById('cal-ai-kcal').textContent='Wpisz kcal ręcznie';
+    document.getElementById('cal-ai-note').textContent='Sprawdź połączenie internetowe';
+    resultBox.classList.add('show');
+    toggleManualEdit();
+  }finally{
+    btn.textContent='✨ Szacuj';
+    btn.classList.remove('loading');
+  }
+}
+
+function addCalFromAI(){
+  if(!aiLastResult) return;
+  calLog.push({name:aiLastResult.name,kcal:aiLastResult.kcal,ts:Date.now()});
+  saveCalLog();
+  aiLastResult=null;
+  document.getElementById('cal-ai-input').value='';
+  document.getElementById('cal-ai-result').classList.remove('show');
+  document.getElementById('cal-manual-row').classList.remove('show');
+  renderCalLog();
+}
+
+function toggleManualEdit(){
+  const row=document.getElementById('cal-manual-row');
+  const isShow=row.classList.toggle('show');
+  if(isShow&&aiLastResult){
+    const nameEl=document.getElementById('cal-manual-name');
+    const kcalEl=document.getElementById('cal-manual-kcal');
+    if(nameEl) nameEl.value=aiLastResult.name||'';
+    if(kcalEl) kcalEl.value=aiLastResult.kcal||'';
+  }
+}
+
+function addCalManual(){
+  const name=document.getElementById('cal-manual-name')?.value.trim();
+  const kcal=parseInt(document.getElementById('cal-manual-kcal')?.value);
+  if(!name||!kcal||kcal<1) return;
+  calLog.push({name,kcal,ts:Date.now()});
+  saveCalLog();
+  aiLastResult=null;
+  document.getElementById('cal-ai-input').value='';
+  document.getElementById('cal-ai-result').classList.remove('show');
+  document.getElementById('cal-manual-row').classList.remove('show');
+  renderCalLog();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FAQ
+// ═══════════════════════════════════════════════════════════
+function toggleFaq(i){
+  const a=document.getElementById('faq-a-'+i);
+  const ico=document.getElementById('faq-ico-'+i);
+  if(!a) return;
+  const open=a.classList.toggle('open');
+  if(ico) ico.textContent=open?'−':'+';
+}
+
+// ═══════════════════════════════════════════════════════════
+// POLITYKA
+// ═══════════════════════════════════════════════════════════
+function openPolicyModal(){document.getElementById('policy-modal').classList.add('open');}
+function closePolicyModal(){document.getElementById('policy-modal').classList.remove('open');}
 </script>
 </body>
 </html>
