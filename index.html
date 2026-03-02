@@ -451,15 +451,16 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .orm-zone{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center}
 .orm-zone-pct{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase}
 .orm-zone-val{font-family:var(--fd);font-size:18px;font-weight:800}
-/* ── BOTTOM NAV (tylko mobile) ── */
-.bottom-nav{display:none!important}
+/* ── NAV (mobile bottom + desktop sidebar) ── */
+.bottom-nav{display:none}
+/* MOBILE */
 @media(max-width:768px){
   .bottom-nav{
-    display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:600;
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:600;
     background:var(--bg2);border-top:1px solid var(--border2);
     padding:8px 4px calc(8px + env(safe-area-inset-bottom));
     gap:2px;align-items:center;justify-content:space-around;
-    box-shadow:0 -8px 32px rgba(0,0,0,.4);
+    box-shadow:0 -8px 32px rgba(0,0,0,.5);
   }
   .bottom-nav.hidden{display:none!important}
   .bn-btn{
@@ -468,33 +469,58 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.08em;
     padding:6px 8px;border-radius:8px;transition:.15s;flex:1;min-width:0;
   }
-  .bn-btn:active{color:var(--accent)}
+  .bn-btn:active,.bn-btn.act{color:var(--accent)}
   .bn-btn .bn-ico{font-size:20px;line-height:1}
   .bn-btn.center-btn{
     background:var(--accent);color:#000;border-radius:50%;
     width:54px;height:54px;flex:none;padding:0;
     display:flex;align-items:center;justify-content:center;
-    box-shadow:0 4px 20px rgba(200,255,0,.4);
-    margin-bottom:6px;
+    box-shadow:0 4px 20px rgba(200,255,0,.4);margin-bottom:4px;
   }
-  .bn-btn.center-btn .bn-ico{font-size:24px}
-  .bn-btn.center-btn span:last-child{display:none}
+  .bn-btn.center-btn .bn-ico{font-size:22px}
+  .bn-btn.center-btn>span:last-child{display:none}
   .cal-fab,.stats-fab{display:none!important}
   #plan,#results,#hero,#quiz{padding-bottom:90px!important}
+  .desktop-sidebar{display:none!important}
+}
+/* DESKTOP */
+@media(min-width:769px){
+  .bottom-nav{display:none!important}
+  .desktop-sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:72px;z-index:500;
+    background:var(--bg2);border-right:1px solid var(--border2);
+    display:none;flex-direction:column;align-items:center;padding:20px 0;
+    gap:4px;box-shadow:4px 0 20px rgba(0,0,0,.3);
+  }
+  .desktop-sidebar.visible{display:flex}
+  .dsb-btn{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:none;border:none;color:var(--muted2);cursor:pointer;
+    font-family:var(--fm);font-size:8px;text-transform:uppercase;letter-spacing:.08em;
+    padding:10px 8px;border-radius:8px;transition:.15s;width:64px;
+  }
+  .dsb-btn:hover,.dsb-btn.act{color:var(--accent);background:rgba(200,255,0,.06)}
+  .dsb-btn .dsb-ico{font-size:22px;line-height:1}
+  .dsb-btn.center-btn{
+    background:var(--accent);color:#000;border-radius:10px;
+    padding:10px;margin:4px 0;width:52px;
+  }
+  .dsb-btn.center-btn:hover{background:#fff;color:#000}
+  .dsb-divider{width:40px;height:1px;background:var(--border);margin:6px 0}
+  /* przesunięcie zawartości gdy sidebar widoczny */
+  #plan.with-sidebar .plan-inner,
+  #results.with-sidebar .res-inner{margin-left:72px}
 }
 /* Mobile settings panel */
 .mobile-settings{
   position:fixed;bottom:0;left:0;right:0;z-index:700;
-  background:var(--bg2);border-top:1px solid var(--border2);
-  border-radius:16px 16px 0 0;
-  padding:20px 24px calc(90px + env(safe-area-inset-bottom));
+  background:var(--bg2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;
+  padding:20px 24px calc(80px + env(safe-area-inset-bottom));
   transform:translateY(100%);opacity:0;pointer-events:none;
   transition:.3s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 -20px 60px rgba(0,0,0,.6);
-  max-height:80vh;overflow-y:auto;
+  box-shadow:0 -20px 60px rgba(0,0,0,.6);max-height:80vh;overflow-y:auto;
 }
 .mobile-settings.open{transform:translateY(0);opacity:1;pointer-events:all}
-@media(min-width:769px){.mobile-settings{display:none!important}}
 .ms-handle{width:40px;height:4px;background:var(--border2);border-radius:100px;margin:0 auto 20px}
 .ms-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;margin-bottom:20px}
 .ms-section{margin-bottom:18px}
@@ -504,6 +530,17 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .ms-goal-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;padding:10px 8px;border-radius:4px;cursor:pointer;transition:.15s;text-align:center}
 .ms-goal-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,.07)}
 .btn-ms-apply{width:100%;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;padding:14px;border-radius:4px;cursor:pointer;margin-top:8px}
+/* Desktop settings panel */
+.desktop-settings-panel{
+  position:fixed;left:72px;top:0;bottom:0;width:320px;z-index:499;
+  background:var(--bg2);border-right:1px solid var(--border2);
+  padding:24px 20px;overflow-y:auto;
+  transform:translateX(-100%);opacity:0;pointer-events:none;
+  transition:.25s cubic-bezier(.4,0,.2,1);
+  box-shadow:4px 0 20px rgba(0,0,0,.3);display:none;
+}
+.desktop-settings-panel.open{transform:translateX(0);opacity:1;pointer-events:all}
+@media(min-width:769px){.desktop-settings-panel{display:block}}
 /* ── EXERCISE LOG ── */
 .exlog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2500;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
 .exlog-overlay.open{display:flex}
@@ -684,11 +721,43 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <span class="bn-ico">📊</span>
     <span>Dane</span>
   </button>
+
+<!-- DESKTOP SIDEBAR -->
+<div class="desktop-sidebar" id="desktop-sidebar">
+  <button class="dsb-btn" onclick="openDesktopSettings()" title="Ustawienia">
+    <span class="dsb-ico">⚙️</span>
+    <span>Ustaw.</span>
+  </button>
+  <button class="dsb-btn" onclick="openFoodSearch()" title="Dziennik kalorii">
+    <span class="dsb-ico">🍽</span>
+    <span>Kalorie</span>
+  </button>
+  <button class="dsb-btn center-btn" onclick="openExLogMenu()" title="Dziennik treningu">
+    <span class="dsb-ico">📓</span>
+    <span>Trening</span>
+  </button>
+  <div class="dsb-divider"></div>
+  <button class="dsb-btn" onclick="toggleStats()" title="Twoje dane">
+    <span class="dsb-ico">📊</span>
+    <span>Dane</span>
+  </button>
+</div>
+
+<!-- DESKTOP SETTINGS PANEL -->
+<div class="desktop-settings-panel" id="desktop-settings-panel" onclick="event.stopPropagation()">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase">Ustawienia</div>
+    <button onclick="closeDesktopSettings()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);border-radius:4px;cursor:pointer;font-size:14px;padding:6px 10px">✕</button>
+  </div>
+  <div id="desktop-settings-body"></div>
+</div>
+
 </nav>
 
 <!-- MOBILE SETTINGS PANEL -->
 <div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
   <div class="ms-handle"></div>
+  <div id="mobile-settings-body"></div>
   <div class="ms-title">Ustawienia</div>
 
   <div class="ms-section">
@@ -992,21 +1061,48 @@ const INJURY_SWAPS={
   shoulders:{ohp:'lat_raise',bench:'cable_fly',cgbp:'pushdown',incline:'cable_fly',dips:'pushdown',arnold:'lat_raise'}
 };
 const EQUIP_SWAPS={
-  basic:{bench:'incline',squat:'goblet',deadlift:'rdl',row_bb:'row_db',ohp:'db_press',
-         cgbp:'pushdown',skull:'oh_tri',bb_curl:'hammer',cable_fly:'pushup',cable_cr:'dead_bug',
-         face_pull:'rear_delt',hip_thrust:'rdl',leg_press:'lunges'},
-  home: {bench:'pushup',squat:'goblet',deadlift:'rdl',row_bb:'row_db',ohp:'lat_raise',
-         cgbp:'pushup',skull:'oh_tri',bb_curl:'hammer',cable_fly:'pushup',cable_cr:'dead_bug',
-         face_pull:'rear_delt',hip_thrust:'rdl',leg_press:'lunges',leg_curl:'rdl',
-         lat_pull:'pullup',incline:'pushup',calf_raise:'calf_raise',dips:'pushup'}
+  basic:{
+    bench:'chest_press',squat:'goblet',deadlift:'rdl',row_bb:'row_db',
+    ohp:'db_press',cgbp:'pushdown',skull:'oh_tri',bb_curl:'hammer',
+    cable_fly:'pec_deck',cable_cr:'dead_bug',face_pull:'rear_delt',
+    hip_thrust:'rdl',leg_press:'lunges',lat_pull:'lat_pull',
+    hang_raise:'dead_bug',t_bar_row:'row_db',sumo_dl:'rdl'
+  },
+  home:{
+    bench:'pushup',squat:'goblet',deadlift:'rdl',row_bb:'row_db',
+    ohp:'lat_raise',cgbp:'pushup',skull:'oh_tri',bb_curl:'hammer',
+    cable_fly:'pushup',cable_cr:'dead_bug',face_pull:'rear_delt',
+    hip_thrust:'rdl',leg_press:'lunges',leg_curl:'rdl',
+    lat_pull:'pullup',incline:'pushup',calf_raise:'calf_raise',
+    dips:'pushup',chest_press:'pushup',pec_deck:'pushup',
+    t_bar_row:'row_db',sumo_dl:'rdl',hang_raise:'dead_bug',
+    conc_curl:'hammer',incline_curl:'hammer',ab_wheel:'plank',
+    cable_cr:'plank',russian_twist:'dead_bug',leg_ext:'lunges',
+    seated_calf:'calf_raise',glute_kick:'rdl',hip_thrust:'rdl',
+    lat_raise:'lat_raise',front_raise:'lat_raise',arnold:'lat_raise',
+    db_press:'lat_raise'
+  }
 };
 function applyMods(exKey){
   const inj=answers.injuries||'none';
   const eq=answers.equipment||'full';
+  const exp=answers.experience||'intermediate';
   let k=exKey;
+  // Sprzęt
   if(eq!=='full'&&EQUIP_SWAPS[eq]&&EQUIP_SWAPS[eq][k]) k=EQUIP_SWAPS[eq][k];
+  // Kontuzja
   if(inj!=='none'&&INJURY_SWAPS[inj]&&INJURY_SWAPS[inj][k]) k=INJURY_SWAPS[inj][k];
-  return EX[k]?k:exKey; // fallback jeśli zamiennik nie istnieje
+  // Dla początkujących: usuń zaawansowane ćwiczenia
+  if(exp==='beginner'){
+    const beginnerSwaps={
+      deadlift:'rdl',squat:'goblet',ohp:'db_press',
+      dips:'pushup',pullup:'lat_pull',skull:'pushdown',
+      cgbp:'pushdown',ab_wheel:'plank',hang_raise:'dead_bug',
+      sumo_dl:'rdl',t_bar_row:'row_db',hip_thrust:'rdl'
+    };
+    if(beginnerSwaps[k]) k=beginnerSwaps[k];
+  }
+  return EX[k]?k:exKey;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1395,8 +1491,6 @@ function renderPlan(){
   <div class="plan-tag">Twój indywidualny plan</div>
   ${buildShareBar()}
   ${buildCompareCard()}
-  <div id="weight-widget"></div>
-  ${buildWeeklySummary()}
   <h1 class="plan-h1">${split.name}</h1>
   <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp; <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp; Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp; Węgle: <strong>${mac.carb}g</strong> &nbsp;·&nbsp; Tłuszcze: <strong>${mac.fat}g</strong> &nbsp;·&nbsp; Tempo: <strong>${wc} kg/tydz</strong></div>
   <div class="section"><div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none">— przed każdym treningiem (12 min)</span></div>
@@ -1419,7 +1513,6 @@ function renderPlan(){
     <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010), Schoenfeld (2010), Helms, Aragon &amp; Fitschen (2014).</p>
     <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
   </div>`;
-  setTimeout(renderWeightWidget, 50);
   show('plan');
 }
 
@@ -2090,69 +2183,110 @@ function delExSession(idx){
 }
 
 // ═══════════════════════════════════════════════════════════
-// BOTTOM NAV — MOBILE
+// NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function _updateBottomNav(){
-  if(window.innerWidth>768) return;
-  const active=document.querySelector('.screen.active');
-  const nav=document.getElementById('bottom-nav');
-  if(!nav) return;
-  const show=active&&(active.id==='plan'||active.id==='results');
-  nav.classList.toggle('hidden',!show);
-}
-
-// Patch funkcji show()
 const __origShow=window.show;
 window.show=function(id){
   __origShow(id);
-  setTimeout(_updateBottomNav,10);
+  _updateNav(id);
 };
-window.addEventListener('resize',_updateBottomNav);
+window.addEventListener('resize',()=>{
+  const a=document.querySelector('.screen.active');
+  if(a) _updateNav(a.id);
+});
 
-// ── MOBILE SETTINGS ──
-let _mobileSettingsOpen=false;
+function _updateNav(screenId){
+  const onPlan=screenId==='plan';
+  // mobile
+  const mNav=document.getElementById('bottom-nav');
+  if(mNav) mNav.classList.toggle('hidden',!onPlan);
+  // desktop sidebar
+  const dSide=document.getElementById('desktop-sidebar');
+  if(dSide) dSide.classList.toggle('visible',onPlan);
+  // padding na plan
+  const planEl=document.getElementById('plan');
+  if(planEl) planEl.classList.toggle('with-sidebar',onPlan&&window.innerWidth>768);
+}
 
-function openMobileSettings(){
-  const panel=document.getElementById('mobile-settings');
-  if(!panel) return;
+// ═══════════════════════════════════════════════════════════
+// SETTINGS — SHARED RENDERER
+// ═══════════════════════════════════════════════════════════
+function _buildSettingsHTML(){
+  const D=getComputed();
   const wc=answers.weeklyChange||0.25;
-  const slider=document.getElementById('ms-wc-slider');
-  const wVal=document.getElementById('ms-wc-val');
-  const wInput=document.getElementById('ms-weight');
-  if(slider) slider.value=wc;
-  if(wVal) wVal.textContent=wc.toFixed(2)+' kg/tydz';
-  if(wInput) wInput.value=answers.weight||75;
-  document.querySelectorAll('#ms-goal-grid .ms-goal-btn').forEach(b=>{
-    b.classList.toggle('sel',b.dataset.goal===(answers.goal||'bulk'));
-  });
-  document.querySelectorAll('[data-days]').forEach(b=>{
-    b.classList.toggle('sel',parseInt(b.dataset.days)===(answers.days||4));
-  });
-  _mobileSettingsOpen=true;
-  panel.classList.add('open');
+  const goalLabels={bulk:'Masa',cut:'Redukcja',strength:'Siła',recomp:'Rekomp'};
+  const daysOpts=[3,4,5,6];
+  return `
+    <div class="ms-section">
+      <div class="ms-lbl">Aktualna waga</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="sp-input" type="number" id="cfg-weight" min="40" max="200" step="0.5"
+          value="${answers.weight||75}" style="width:90px">
+        <span style="font-family:var(--fm);font-size:11px;color:var(--muted)">kg</span>
+      </div>
+    </div>
+    <div class="ms-section">
+      <div class="ms-lbl">Tempo zmiany wagi <span class="ms-lbl-val" id="cfg-wc-val">${wc.toFixed(2)} kg/tydz</span></div>
+      <input type="range" min="0.1" max="1.5" step="0.05" value="${wc}" id="cfg-wc-slider"
+        oninput="document.getElementById('cfg-wc-val').textContent=parseFloat(this.value).toFixed(2)+' kg/tydz'">
+      <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted)">
+        <span>0.10 (spokojnie)</span><span>1.50 (agresywnie)</span>
+      </div>
+    </div>
+    <div class="ms-section">
+      <div class="ms-lbl">Cel treningowy</div>
+      <div class="ms-goal-grid" id="cfg-goal-grid">
+        ${Object.entries(goalLabels).map(([v,l])=>`
+          <button class="ms-goal-btn${answers.goal===v?' sel':''}" data-goal="${v}" onclick="selectCfgGoal(this)">${l}</button>
+        `).join('')}
+      </div>
+    </div>
+    <div class="ms-section">
+      <div class="ms-lbl">Dni treningowe</div>
+      <div style="display:flex;gap:8px">
+        ${daysOpts.map(d=>`
+          <button class="ms-goal-btn${(answers.days||4)===d?' sel':''}" data-days="${d}"
+            onclick="selectCfgDays(this)" style="flex:1">${d} dni</button>
+        `).join('')}
+      </div>
+    </div>
+    <div class="ms-section" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px">
+      <div class="ms-lbl" style="margin-bottom:6px">Twoje makra (przeliczone)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">
+          <div style="font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent)">${D.cal.toLocaleString()}</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">kcal/dzień</div>
+        </div>
+        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">
+          <div style="font-family:var(--fd);font-size:24px;font-weight:900;color:#ff5722">${D.mac.prot}g</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">białko</div>
+        </div>
+        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">
+          <div style="font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent3)">${D.mac.carb}g</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">węgle</div>
+        </div>
+        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">
+          <div style="font-family:var(--fd);font-size:24px;font-weight:900">${D.mac.fat}g</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">tłuszcze</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-ms-apply" onclick="applySettings()">Zastosuj i przelicz →</button>`;
 }
 
-function closeMobileSettings(){
-  document.getElementById('mobile-settings')?.classList.remove('open');
-  _mobileSettingsOpen=false;
-  // nav zostaje widoczny
-  _updateBottomNav();
+function selectCfgGoal(btn){
+  document.querySelectorAll('#cfg-goal-grid .ms-goal-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
 }
-
-function selectMsGoal(btn){
-  document.querySelectorAll('#ms-goal-grid .ms-goal-btn').forEach(b=>b.classList.remove('sel'));
+function selectCfgDays(btn){
+  btn.closest('.ms-section').querySelectorAll('[data-days]').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
 }
 
-function selectMsDays(btn){
-  document.querySelectorAll('[data-days]').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-
-function applyMobileSettings(){
-  const wc=parseFloat(document.getElementById('ms-wc-slider')?.value)||0.25;
-  const w=parseFloat(document.getElementById('ms-weight')?.value)||75;
-  const goalBtn=document.querySelector('#ms-goal-grid .ms-goal-btn.sel');
+function applySettings(){
+  const wc=parseFloat(document.getElementById('cfg-wc-slider')?.value)||0.25;
+  const w=parseFloat(document.getElementById('cfg-weight')?.value)||75;
+  const goalBtn=document.querySelector('#cfg-goal-grid .ms-goal-btn.sel');
   const daysBtn=document.querySelector('[data-days].sel');
   if(w>=40&&w<=200) answers.weight=w;
   if(wc>=0.1&&wc<=1.5) answers.weeklyChange=wc;
@@ -2161,13 +2295,44 @@ function applyMobileSettings(){
   saveAnswers();
   window.__split=buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate');
   closeMobileSettings();
+  closeDesktopSettings();
   renderPlan();
 }
 
+// ── MOBILE SETTINGS ──
+let _mobileSettingsOpen=false;
+function openMobileSettings(){
+  const panel=document.getElementById('mobile-settings');
+  if(!panel) return;
+  document.getElementById('mobile-settings-body').innerHTML=_buildSettingsHTML();
+  _mobileSettingsOpen=true;
+  panel.classList.add('open');
+}
+function closeMobileSettings(){
+  document.getElementById('mobile-settings')?.classList.remove('open');
+  _mobileSettingsOpen=false;
+}
 document.addEventListener('click',e=>{
-  if(_mobileSettingsOpen&&!e.target.closest('.mobile-settings')&&!e.target.closest('.bottom-nav')){
+  if(_mobileSettingsOpen&&!e.target.closest('.mobile-settings')&&!e.target.closest('.bottom-nav'))
     closeMobileSettings();
-  }
+});
+
+// ── DESKTOP SETTINGS ──
+let _desktopSettingsOpen=false;
+function openDesktopSettings(){
+  const panel=document.getElementById('desktop-settings-panel');
+  if(!panel) return;
+  document.getElementById('desktop-settings-body').innerHTML=_buildSettingsHTML();
+  _desktopSettingsOpen=!_desktopSettingsOpen;
+  panel.classList.toggle('open',_desktopSettingsOpen);
+}
+function closeDesktopSettings(){
+  document.getElementById('desktop-settings-panel')?.classList.remove('open');
+  _desktopSettingsOpen=false;
+}
+document.addEventListener('click',e=>{
+  if(_desktopSettingsOpen&&!e.target.closest('.desktop-settings-panel')&&!e.target.closest('.desktop-sidebar'))
+    closeDesktopSettings();
 });
 
 function openFoodSearch(){
@@ -2181,56 +2346,23 @@ function openFoodSearch(){
 // ═══════════════════════════════════════════════════════════
 // DZIENNIK ĆWICZEŃ
 // ═══════════════════════════════════════════════════════════
-let _exLogKey=null;
-let _exLogName='';
+let _exLogKey=null,_exLogName='',_exViewDate=null;
 
-// Otwiera listę ćwiczeń z wyszukiwarką
 function openExLogMenu(){
+  _exViewDate=null;
   document.getElementById('exlog-title').textContent='Wybierz ćwiczenie';
   document.getElementById('exlog-sub').textContent='Wyszukaj lub wybierz z planu';
   document.getElementById('exlog-body').innerHTML=buildExSearchUI();
   document.getElementById('exlog-overlay').classList.add('open');
-}
-
-function buildExSearchUI(filter){
-  const exercises=[];
-  if(window.__split){
-    window.__split.days.forEach((day,di)=>{
-      if(!day.tr) return;
-      day.ex.forEach((ex,ei)=>{
-        const key=ex.key||'ex'+di+'_'+ei;
-        if(!exercises.find(e=>e.key===key)){
-          const sessions=getExData(key);
-          let pr=0;
-          sessions.forEach(s=>s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
-          exercises.push({key,name:ex.n,day:day.name,pr});
-        }
-      });
-    });
-  }
-  const q=(filter||'').toLowerCase();
-  const filtered=q?exercises.filter(e=>e.name.toLowerCase().includes(q)||e.day.toLowerCase().includes(q)):exercises;
-
-  const listHtml=filtered.length===0
-    ?'<div class="exlog-empty">Brak ćwiczeń — najpierw wygeneruj plan</div>'
-    :filtered.map(ex=>`
-      <div class="exlog-ex-item" onclick="openExLogForKey('${ex.key}','${ex.name.replace(/'/g,'&#39;')}')">
-        <div class="exlog-ex-item-name">${ex.name}</div>
-        <div class="exlog-ex-item-day">${ex.day}</div>
-        ${ex.pr>0?`<div class="exlog-ex-item-pr">🏆 PR: ${ex.pr} kg</div>`:''}
-      </div>`).join('');
-
-  return `
-    <input class="exlog-search-input" type="text" placeholder="Szukaj ćwiczenia..."
-      oninput="document.getElementById('exlog-body').innerHTML=buildExSearchUI(this.value)" value="${filter||''}">
-    <div class="exlog-ex-list">${listHtml}</div>`;
+  setTimeout(()=>document.getElementById('exlog-search-inp')?.focus(),100);
 }
 
 function openExLogForKey(key,name){
   _exLogKey=key;
   _exLogName=name;
+  _exViewDate=null;
   document.getElementById('exlog-title').textContent=name;
-  document.getElementById('exlog-sub').textContent='Kliknij datę aby zobaczyć szczegóły';
+  document.getElementById('exlog-sub').textContent='Historia serii i ciężarów';
   renderExLogBody();
 }
 
@@ -2242,107 +2374,117 @@ function closeExLog(){
 function getExData(key){try{return JSON.parse(localStorage.getItem('fp_ex_'+key)||'[]');}catch(e){return[];}}
 function saveExData(key,d){try{localStorage.setItem('fp_ex_'+key,JSON.stringify(d));}catch(e){}}
 
-let _exViewDate=null; // null = dziś
-
 function renderExLogBody(){
   const sessions=getExData(_exLogKey);
   const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
   const viewDate=_exViewDate||today;
+  const isToday=viewDate===today;
 
   let pr=0;
   sessions.forEach(s=>s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
   const last=sessions[sessions.length-1];
   const lastSet=last?.sets?.[last.sets.length-1];
 
-  // Daty z sesjami + dzisiaj
-  const dates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
-    const pa=a.split('.'),pb=b.split('.');
-    return new Date(`${pb[2]}-${pb[1]}-${pb[0]}`)-new Date(`${pa[2]}-${pa[1]}-${pa[0]}`);
+  // Wszystkie daty malejąco + dziś zawsze jest
+  const allDates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
+    const [da,ma,ya]=a.split('.'),[db,mb,yb]=b.split('.');
+    return new Date(`${yb}-${mb}-${db}`)-new Date(`${ya}-${ma}-${da}`);
   });
-  const viewIdx=dates.indexOf(viewDate);
-  const canPrev=viewIdx<dates.length-1;
+  const viewIdx=allDates.indexOf(viewDate);
+  const canPrev=viewIdx<allDates.length-1;
   const canNext=viewIdx>0;
 
   const viewSession=sessions.find(s=>s.date===viewDate);
-  const isToday=viewDate===today;
 
-  // Historia dla wybranego dnia
+  // Sety dla wybranego dnia
   let dayHtml='';
   if(viewSession&&viewSession.sets.length>0){
+    const sessIsPR=viewSession.sets.some(s=>(s.w||0)>=pr&&pr>0)&&sessions[sessions.length-1]===viewSession;
     const setsHtml=viewSession.sets.map((st,si)=>`
       <div class="exlog-set-row">
         <span class="exlog-set-num">S${si+1}</span>
-        <span class="exlog-set-val">${st.w||'—'}<span class="u"> kg</span></span>
-        <span class="exlog-set-val">${st.r||'—'}<span class="u"> powt</span></span>
+        <span class="exlog-set-val">${st.w||'BW'}<span class="u">${st.w?' kg':''}</span></span>
+        <span class="exlog-set-val">${st.r||'—'}<span class="u"> rp</span></span>
         <span class="exlog-set-val" style="font-size:11px;color:var(--muted2)">${st.rpe?'RPE '+st.rpe:''}</span>
         ${st.note?`<div class="exlog-set-note">${st.note}</div>`:''}
       </div>`).join('');
-    const sessIdx=sessions.findIndex(s=>s.date===viewDate);
-    const sessIsPR=viewSession.sets.some(s=>(s.w||0)>=pr&&pr>0)&&sessions.indexOf(viewSession)===sessions.length-1;
+    const sessIdx=sessions.indexOf(viewSession);
     dayHtml=`<div class="exlog-session">
       <div class="exlog-sess-head">
         <span class="exlog-sess-date">${viewDate}${sessIsPR?'<span class="exlog-pr">🏆 PR</span>':''}</span>
-        ${isToday?`<button class="exlog-sess-del" onclick="delExSession(${sessIdx})">usuń</button>`:''}
+        ${isToday?`<button class="exlog-sess-del" onclick="delExSession(${sessIdx})">usuń dzień</button>`:''}
       </div>
       <div class="exlog-sets">${setsHtml}</div>
     </div>`;
   }else{
-    dayHtml=`<div class="exlog-empty">${isToday?'Brak serii na dziś — dodaj poniżej':'Brak treningu w tym dniu'}</div>`;
+    dayHtml=`<div class="exlog-empty">${isToday?'Brak serii dziś — dodaj poniżej':'Brak treningu w tym dniu'}</div>`;
   }
 
-  // Formularz tylko dla dzisiaj
   const formHtml=isToday?`
     <div class="exlog-form">
-      <div class="exlog-form-lbl">Dodaj serię${pr>0?` · <span style="color:var(--accent)">PR: ${pr} kg</span>`:''}</div>
+      <div class="exlog-form-lbl">Nowa seria${pr>0?` &nbsp;<span style="color:var(--accent)">🏆 PR: ${pr} kg</span>`:''}</div>
       <div class="exlog-inputs">
-        <div class="exlog-field"><label>Ciężar kg</label><input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" placeholder="0" value="${lastSet?.w||''}"></div>
-        <div class="exlog-field"><label>Powtórzenia</label><input class="exlog-input" id="exl-r" type="number" min="1" placeholder="0" value="${lastSet?.r||''}"></div>
-        <div class="exlog-field"><label>RPE</label><input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10" placeholder="—"></div>
+        <div class="exlog-field"><label>Ciężar kg</label>
+          <input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" placeholder="0" value="${lastSet?.w||''}">
+        </div>
+        <div class="exlog-field"><label>Powtórzenia</label>
+          <input class="exlog-input" id="exl-r" type="number" min="1" placeholder="0" value="${lastSet?.r||''}">
+        </div>
+        <div class="exlog-field"><label>RPE (opcja)</label>
+          <input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10" placeholder="—">
+        </div>
       </div>
-      <textarea class="exlog-notes-input" id="exl-note" placeholder="Notatka: pas, straps, ból..."></textarea>
+      <textarea class="exlog-notes-input" id="exl-note" placeholder="Notatka: pas, straps, kontuzja..."></textarea>
       <button class="btn-exlog-save" onclick="saveExSet()">+ Zapisz serię</button>
     </div>`:'';
 
   // 1RM kalkulator
   const ormHtml=`
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px">
-      <div class="exlog-hist-lbl">🏆 Kalkulator 1RM (Brzycki)</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" style="width:80px;font-size:20px" value="${pr>0?pr:''}">
-        <span style="font-family:var(--fm);font-size:10px;color:var(--muted)">×</span>
-        <input class="exlog-input" id="orm-r" type="number" min="1" max="36" placeholder="powt" style="width:80px;font-size:20px" value="${lastSet?.r||''}">
-        <button onclick="calc1RM()" style="flex:1;background:var(--bg);border:1px solid var(--accent);color:var(--accent);font-family:var(--fd);font-size:14px;font-weight:800;padding:10px;border-radius:4px;cursor:pointer">Oblicz</button>
+      <div class="exlog-hist-lbl">🏋️ Kalkulator 1RM — Brzycki</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+        <div style="flex:1;min-width:70px">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">CIĘŻAR KG</div>
+          <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" value="${pr>0?pr:''}">
+        </div>
+        <div style="font-family:var(--fd);font-size:20px;color:var(--muted);padding-top:16px">×</div>
+        <div style="flex:1;min-width:70px">
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">POWTÓRZENIA</div>
+          <input class="exlog-input" id="orm-r" type="number" min="1" max="36" placeholder="rp" value="${lastSet?.r||''}">
+        </div>
+        <button onclick="calc1RM()" style="flex:none;margin-top:16px;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 16px;border-radius:4px;cursor:pointer">= 1RM</button>
       </div>
-      <div class="orm-result" id="orm-result"></div>
+      <div id="orm-result"></div>
     </div>`;
 
   document.getElementById('exlog-body').innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
-      <button class="exlog-date-btn" onclick="exNavDate(1)" ${!canPrev?'disabled style="opacity:.3"':''}>‹</button>
-      <div style="text-align:center">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <button class="exlog-date-btn" onclick="exNavDate(1)" ${!canPrev?'disabled style="opacity:.3;cursor:default"':''}>‹</button>
+      <div style="text-align:center;flex:1">
         <div class="exlog-date-label">${isToday?'Dziś':viewDate}</div>
         <div style="font-family:var(--fm);font-size:9px;color:var(--muted)">${sessions.length} treningów łącznie</div>
       </div>
-      <button class="exlog-date-btn" onclick="exNavDate(-1)" ${!canNext?'disabled style="opacity:.3"':''}>›</button>
+      <button class="exlog-date-btn" onclick="exNavDate(-1)" ${!canNext?'disabled style="opacity:.3;cursor:default"':''}>›</button>
     </div>
     ${dayHtml}
     ${formHtml}
     ${ormHtml}
-    <button onclick="openExLogMenu()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;width:100%">← Wróć do listy ćwiczeń</button>`;
+    <button onclick="openExLogMenu()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;width:100%;padding:4px 0">← Lista ćwiczeń</button>`;
 }
 
 function exNavDate(dir){
   const sessions=getExData(_exLogKey);
   const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const dates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
-    const pa=a.split('.'),pb=b.split('.');
-    return new Date(`${pb[2]}-${pb[1]}-${pb[0]}`)-new Date(`${pa[2]}-${pa[1]}-${pa[0]}`);
+  const allDates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
+    const [da,ma,ya]=a.split('.'),[db,mb,yb]=b.split('.');
+    return new Date(`${yb}-${mb}-${db}`)-new Date(`${ya}-${ma}-${da}`);
   });
-  const viewDate=_exViewDate||today;
-  const idx=dates.indexOf(viewDate);
+  const cur=_exViewDate||today;
+  const idx=allDates.indexOf(cur);
   const newIdx=idx+dir;
-  if(newIdx>=0&&newIdx<dates.length){
-    _exViewDate=dates[newIdx]===today?null:dates[newIdx];
+  if(newIdx>=0&&newIdx<allDates.length){
+    const nd=allDates[newIdx];
+    _exViewDate=nd===today?null:nd;
     renderExLogBody();
   }
 }
@@ -2359,7 +2501,7 @@ function saveExSet(){
   if(!sess){sess={date:today,sets:[]};sessions.push(sess);}
   sess.sets.push({w,r,rpe,note});
   saveExData(_exLogKey,sessions);
-  _exViewDate=null; // wróć do dziś
+  _exViewDate=null;
   renderExLogBody();
 }
 
