@@ -452,38 +452,37 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .orm-zone-pct{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase}
 .orm-zone-val{font-family:var(--fd);font-size:18px;font-weight:800}
 /* ── BOTTOM NAV (tylko mobile) ── */
-.bottom-nav{display:none}
+.bottom-nav{display:none!important}
 @media(max-width:768px){
   .bottom-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:600;
+    display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:600;
     background:var(--bg2);border-top:1px solid var(--border2);
     padding:8px 4px calc(8px + env(safe-area-inset-bottom));
     gap:2px;align-items:center;justify-content:space-around;
     box-shadow:0 -8px 32px rgba(0,0,0,.4);
   }
+  .bottom-nav.hidden{display:none!important}
   .bn-btn{
     display:flex;flex-direction:column;align-items:center;gap:3px;
     background:none;border:none;color:var(--muted2);cursor:pointer;
     font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.08em;
-    padding:6px 10px;border-radius:8px;transition:.15s;flex:1;min-width:0;
+    padding:6px 8px;border-radius:8px;transition:.15s;flex:1;min-width:0;
   }
-  .bn-btn:hover,.bn-btn.active{color:var(--accent)}
+  .bn-btn:active{color:var(--accent)}
   .bn-btn .bn-ico{font-size:20px;line-height:1}
   .bn-btn.center-btn{
     background:var(--accent);color:#000;border-radius:50%;
-    width:52px;height:52px;flex:none;padding:0;
-    justify-content:center;font-size:22px;
+    width:54px;height:54px;flex:none;padding:0;
+    display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 20px rgba(200,255,0,.4);
-    margin-bottom:4px;
+    margin-bottom:6px;
   }
-  .bn-btn.center-btn .bn-ico{font-size:22px}
-  .bn-btn.center-btn span{display:none}
-  /* ukryj stare FABy na mobile */
+  .bn-btn.center-btn .bn-ico{font-size:24px}
+  .bn-btn.center-btn span:last-child{display:none}
   .cal-fab,.stats-fab{display:none!important}
-  /* padding na dole strony żeby nav nie zasłaniał */
   #plan,#results,#hero,#quiz{padding-bottom:90px!important}
 }
-/* Settings panel mobilny */
+/* Mobile settings panel */
 .mobile-settings{
   position:fixed;bottom:0;left:0;right:0;z-index:700;
   background:var(--bg2);border-top:1px solid var(--border2);
@@ -495,7 +494,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   max-height:80vh;overflow-y:auto;
 }
 .mobile-settings.open{transform:translateY(0);opacity:1;pointer-events:all}
-@media(min-width:769px){.mobile-settings{display:none}}
+@media(min-width:769px){.mobile-settings{display:none!important}}
 .ms-handle{width:40px;height:4px;background:var(--border2);border-radius:100px;margin:0 auto 20px}
 .ms-title{font-family:var(--fd);font-size:22px;font-weight:900;text-transform:uppercase;margin-bottom:20px}
 .ms-section{margin-bottom:18px}
@@ -505,7 +504,55 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .ms-goal-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;padding:10px 8px;border-radius:4px;cursor:pointer;transition:.15s;text-align:center}
 .ms-goal-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,.07)}
 .btn-ms-apply{width:100%;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;padding:14px;border-radius:4px;cursor:pointer;margin-top:8px}
-
+/* ── EXERCISE LOG ── */
+.exlog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2500;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
+.exlog-overlay.open{display:flex}
+.exlog-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;width:min(520px,100%);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+.exlog-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--bg2);z-index:1}
+.exlog-title{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;line-height:1.1}
+.exlog-sub{font-family:var(--fm);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin-top:3px}
+.exlog-close{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);border-radius:4px;cursor:pointer;font-size:16px;padding:6px 10px;line-height:1;flex-shrink:0}
+.exlog-body{padding:16px 20px 24px;display:flex;flex-direction:column;gap:14px}
+/* Search */
+.exlog-search-input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:14px;padding:10px 14px;border-radius:6px;outline:none;transition:.15s}
+.exlog-search-input:focus{border-color:var(--accent)}
+.exlog-ex-list{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto}
+.exlog-ex-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 16px;cursor:pointer;transition:.15s}
+.exlog-ex-item:hover,.exlog-ex-item:active{border-color:var(--accent);background:rgba(200,255,0,.04)}
+.exlog-ex-item-name{font-size:14px;font-weight:600}
+.exlog-ex-item-day{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px}
+.exlog-ex-item-pr{font-family:var(--fd);font-size:13px;color:var(--accent);margin-top:2px}
+/* Log form */
+.exlog-form{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px}
+.exlog-form-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.exlog-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.exlog-field{display:flex;flex-direction:column;gap:4px}
+.exlog-field label{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.exlog-input{background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:24px;font-weight:800;padding:8px 10px;border-radius:4px;outline:none;transition:.15s;text-align:center;width:100%}
+.exlog-input:focus{border-color:var(--accent)}
+.exlog-notes-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:12px;padding:8px 12px;border-radius:4px;outline:none;resize:none;height:44px;transition:.15s}
+.exlog-notes-input:focus{border-color:var(--accent)}
+.btn-exlog-save{width:100%;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;padding:11px;border-radius:4px;cursor:pointer;transition:.15s;margin-top:8px}
+.btn-exlog-save:hover{background:#fff}
+/* History */
+.exlog-hist-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.exlog-date-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.exlog-date-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-size:18px;width:36px;height:36px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.exlog-date-btn:hover{color:var(--text)}
+.exlog-date-label{font-family:var(--fd);font-size:16px;font-weight:800}
+.exlog-session{background:var(--bg3);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:8px}
+.exlog-sess-head{padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.exlog-sess-date{font-family:var(--fm);font-size:11px;color:var(--accent)}
+.exlog-sess-del{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline}
+.exlog-sets{padding:8px 14px}
+.exlog-set-row{display:grid;grid-template-columns:26px 1fr 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid var(--border);align-items:center}
+.exlog-set-row:last-child{border-bottom:none}
+.exlog-set-num{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.exlog-set-val{font-family:var(--fd);font-size:16px;font-weight:800;text-align:center}
+.exlog-set-val .u{font-size:10px;color:var(--muted);font-family:var(--fm);font-weight:400}
+.exlog-set-note{grid-column:1/-1;font-size:11px;color:var(--muted2);padding:2px 0 4px;font-style:italic}
+.exlog-empty{font-size:12px;color:var(--muted);text-align:center;padding:16px 0}
+.exlog-pr{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:9px;background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--accent);padding:2px 7px;border-radius:100px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -1784,6 +1831,7 @@ function buildCompareCard(){
   }catch(e){return '';}
 }
 
+
 // ═══════════════════════════════════════════════════════════
 // SKANER JEDZENIA (kamera + Claude Vision)
 // ═══════════════════════════════════════════════════════════
@@ -2017,83 +2065,7 @@ function buildWeeklySummary(){
   </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════
-// DZIENNIK ĆWICZEŃ
-// ═══════════════════════════════════════════════════════════
-let _exLogKey=null;
 
-function openExLog(key,name){
-  _exLogKey=key;
-  document.getElementById('exlog-title').textContent=name;
-  document.getElementById('exlog-sub').textContent='Historia serii i ciężarów';
-  renderExLogBody();
-  document.getElementById('exlog-overlay').classList.add('open');
-}
-
-function closeExLog(){
-  document.getElementById('exlog-overlay')?.classList.remove('open');
-  _exLogKey=null;
-}
-
-function getExData(key){try{return JSON.parse(localStorage.getItem('fp_ex_'+key)||'[]');}catch(e){return[];}}
-function saveExData(key,d){try{localStorage.setItem('fp_ex_'+key,JSON.stringify(d));}catch(e){}}
-
-function renderExLogBody(){
-  const sessions=getExData(_exLogKey);
-  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  let pr=0;
-  sessions.forEach(s=>s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
-  const last=sessions[sessions.length-1];
-  const lastSet=last?.sets?.[last.sets.length-1];
-
-  const histHtml=sessions.length===0
-    ?`<div class="exlog-empty">Brak historii — dodaj pierwszą serię poniżej</div>`
-    :sessions.slice().reverse().map((sess,ri)=>{
-      const realIdx=sessions.length-1-ri;
-      const isPR=ri===0&&sess.sets.some(s=>(s.w||0)>=pr&&pr>0);
-      const setsHtml=sess.sets.map((st,si)=>`
-        <div class="exlog-set-row">
-          <span class="exlog-set-num">S${si+1}</span>
-          <span class="exlog-set-val">${st.w||'—'}<span class="u"> kg</span></span>
-          <span class="exlog-set-val">${st.r||'—'}<span class="u"> powt</span></span>
-          <span class="exlog-set-val" style="font-size:12px;color:var(--muted2)">${st.rpe?'RPE '+st.rpe:''}</span>
-          ${st.note?`<div class="exlog-set-note">${st.note}</div>`:''}
-        </div>`).join('');
-      return `<div class="exlog-session">
-        <div class="exlog-sess-head">
-          <span class="exlog-sess-date">${sess.date}${isPR?`<span class="exlog-pr">🏆 PR: ${pr}kg</span>`:''}</span>
-          <button class="exlog-sess-del" onclick="delExSession(${realIdx})">usuń</button>
-        </div>
-        <div class="exlog-sets">${setsHtml}</div>
-      </div>`;
-    }).join('');
-
-  document.getElementById('exlog-body').innerHTML=`
-    <div class="exlog-form">
-      <div class="exlog-form-lbl">Dodaj serię — ${today}${pr>0?` · <span style="color:var(--accent)">PR: ${pr} kg</span>`:''}</div>
-      <div class="exlog-inputs">
-        <div class="exlog-field"><label>Ciężar kg</label><input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" placeholder="0" value="${lastSet?.w||''}"></div>
-        <div class="exlog-field"><label>Powtórzenia</label><input class="exlog-input" id="exl-r" type="number" min="1" placeholder="0" value="${lastSet?.r||''}"></div>
-        <div class="exlog-field"><label>RPE</label><input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10" placeholder="—"></div>
-      </div>
-      <textarea class="exlog-notes-input" id="exl-note" placeholder="Notatka: pas, straps, ból..."></textarea>
-      <button class="btn-exlog-save" onclick="saveExSet()">+ Zapisz serię</button>
-    </div>
-    <div>
-      <div class="exlog-hist-lbl">Historia treningów</div>
-      ${histHtml}
-    </div>
-    <div style="margin-top:16px">
-      <div class="exlog-hist-lbl">🏆 Kalkulator 1RM (Brzycki)</div>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" style="width:80px;font-size:20px" value="${pr>0?pr:''}">
-        <span style="font-family:var(--fm);font-size:10px;color:var(--muted)">kg ×</span>
-        <input class="exlog-input" id="orm-r" type="number" min="1" max="36" placeholder="powt" style="width:80px;font-size:20px" value="${lastSet?.r||''}">
-        <button onclick="calc1RM()" style="background:var(--bg3);border:1px solid var(--accent);color:var(--accent);font-family:var(--fd);font-size:14px;font-weight:800;padding:10px 14px;border-radius:4px;cursor:pointer">Oblicz</button>
-      </div>
-      <div class="orm-result" id="orm-result"></div>
-    </div>`;
-}
 
 function saveExSet(){
   const w=parseFloat(document.getElementById('exl-w')?.value)||0;
@@ -2120,28 +2092,22 @@ function delExSession(idx){
 // ═══════════════════════════════════════════════════════════
 // BOTTOM NAV — MOBILE
 // ═══════════════════════════════════════════════════════════
-function showBottomNav(visible){
+function _updateBottomNav(){
+  if(window.innerWidth>768) return;
+  const active=document.querySelector('.screen.active');
   const nav=document.getElementById('bottom-nav');
   if(!nav) return;
-  // tylko mobile
-  if(window.innerWidth<=768) nav.style.display=visible?'flex':'none';
-  else nav.style.display='none';
+  const show=active&&(active.id==='plan'||active.id==='results');
+  nav.classList.toggle('hidden',!show);
 }
 
-// Pokaż nav tylko na ekranach plan/results
-const _origShow=window.show;
+// Patch funkcji show()
+const __origShow=window.show;
 window.show=function(id){
-  _origShow(id);
-  showBottomNav(id==='plan'||id==='results');
+  __origShow(id);
+  setTimeout(_updateBottomNav,10);
 };
-
-window.addEventListener('resize',()=>{
-  const active=document.querySelector('.screen.active');
-  if(active){
-    const id=active.id;
-    showBottomNav(id==='plan'||id==='results');
-  }
-});
+window.addEventListener('resize',_updateBottomNav);
 
 // ── MOBILE SETTINGS ──
 let _mobileSettingsOpen=false;
@@ -2149,7 +2115,6 @@ let _mobileSettingsOpen=false;
 function openMobileSettings(){
   const panel=document.getElementById('mobile-settings');
   if(!panel) return;
-  // Wypełnij aktualne wartości
   const wc=answers.weeklyChange||0.25;
   const slider=document.getElementById('ms-wc-slider');
   const wVal=document.getElementById('ms-wc-val');
@@ -2157,11 +2122,9 @@ function openMobileSettings(){
   if(slider) slider.value=wc;
   if(wVal) wVal.textContent=wc.toFixed(2)+' kg/tydz';
   if(wInput) wInput.value=answers.weight||75;
-  // zaznacz aktualny cel
   document.querySelectorAll('#ms-goal-grid .ms-goal-btn').forEach(b=>{
     b.classList.toggle('sel',b.dataset.goal===(answers.goal||'bulk'));
   });
-  // zaznacz dni
   document.querySelectorAll('[data-days]').forEach(b=>{
     b.classList.toggle('sel',parseInt(b.dataset.days)===(answers.days||4));
   });
@@ -2172,6 +2135,8 @@ function openMobileSettings(){
 function closeMobileSettings(){
   document.getElementById('mobile-settings')?.classList.remove('open');
   _mobileSettingsOpen=false;
+  // nav zostaje widoczny
+  _updateBottomNav();
 }
 
 function selectMsGoal(btn){
@@ -2199,16 +2164,13 @@ function applyMobileSettings(){
   renderPlan();
 }
 
-// Kliknięcie tła zamyka settings
 document.addEventListener('click',e=>{
   if(_mobileSettingsOpen&&!e.target.closest('.mobile-settings')&&!e.target.closest('.bottom-nav')){
     closeMobileSettings();
   }
 });
 
-// ── FOOD SEARCH przez bottom nav ──
 function openFoodSearch(){
-  // Otwórz panel kalorii z focusem na wyszukiwarkę
   if(!calLogOpen) toggleCalLog();
   setTimeout(()=>{
     const input=document.getElementById('food-search-input');
@@ -2216,38 +2178,196 @@ function openFoodSearch(){
   },300);
 }
 
-// ── EXERCISE LOG MENU (lista ćwiczeń z planu) ──
-function openExLogMenu(){
-  if(!window.__split) return;
-  // Zbierz wszystkie ćwiczenia z planu
-  const exercises=[];
-  window.__split.days.forEach((day,di)=>{
-    if(!day.tr) return;
-    day.ex.forEach((ex,ei)=>{
-      exercises.push({key:ex.key||'ex'+di+'_'+ei,name:ex.n,day:day.name});
-    });
-  });
-  // Usuń duplikaty po kluczu
-  const unique=exercises.filter((e,i,a)=>a.findIndex(x=>x.key===e.key)===i);
+// ═══════════════════════════════════════════════════════════
+// DZIENNIK ĆWICZEŃ
+// ═══════════════════════════════════════════════════════════
+let _exLogKey=null;
+let _exLogName='';
 
-  // Pokaż modal z listą
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-header">
-      <div><div class="modal-title">Wybierz ćwiczenie</div><div class="modal-muscle">Dziennik serii i ciężarów</div></div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:8px">
-        ${unique.map(ex=>`
-          <button onclick="openExLog('${ex.key}','${ex.name.replace(/'/g,'')}');closeModal()"
-            style="background:var(--bg3);border:1px solid var(--border);padding:12px 16px;border-radius:6px;cursor:pointer;text-align:left;transition:.15s"
-            onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-            <div style="font-size:14px;font-weight:600">${ex.name}</div>
-            <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px">${ex.day}</div>
-          </button>`).join('')}
+// Otwiera listę ćwiczeń z wyszukiwarką
+function openExLogMenu(){
+  document.getElementById('exlog-title').textContent='Wybierz ćwiczenie';
+  document.getElementById('exlog-sub').textContent='Wyszukaj lub wybierz z planu';
+  document.getElementById('exlog-body').innerHTML=buildExSearchUI();
+  document.getElementById('exlog-overlay').classList.add('open');
+}
+
+function buildExSearchUI(filter){
+  const exercises=[];
+  if(window.__split){
+    window.__split.days.forEach((day,di)=>{
+      if(!day.tr) return;
+      day.ex.forEach((ex,ei)=>{
+        const key=ex.key||'ex'+di+'_'+ei;
+        if(!exercises.find(e=>e.key===key)){
+          const sessions=getExData(key);
+          let pr=0;
+          sessions.forEach(s=>s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
+          exercises.push({key,name:ex.n,day:day.name,pr});
+        }
+      });
+    });
+  }
+  const q=(filter||'').toLowerCase();
+  const filtered=q?exercises.filter(e=>e.name.toLowerCase().includes(q)||e.day.toLowerCase().includes(q)):exercises;
+
+  const listHtml=filtered.length===0
+    ?'<div class="exlog-empty">Brak ćwiczeń — najpierw wygeneruj plan</div>'
+    :filtered.map(ex=>`
+      <div class="exlog-ex-item" onclick="openExLogForKey('${ex.key}','${ex.name.replace(/'/g,'&#39;')}')">
+        <div class="exlog-ex-item-name">${ex.name}</div>
+        <div class="exlog-ex-item-day">${ex.day}</div>
+        ${ex.pr>0?`<div class="exlog-ex-item-pr">🏆 PR: ${ex.pr} kg</div>`:''}
+      </div>`).join('');
+
+  return `
+    <input class="exlog-search-input" type="text" placeholder="Szukaj ćwiczenia..."
+      oninput="document.getElementById('exlog-body').innerHTML=buildExSearchUI(this.value)" value="${filter||''}">
+    <div class="exlog-ex-list">${listHtml}</div>`;
+}
+
+function openExLogForKey(key,name){
+  _exLogKey=key;
+  _exLogName=name;
+  document.getElementById('exlog-title').textContent=name;
+  document.getElementById('exlog-sub').textContent='Kliknij datę aby zobaczyć szczegóły';
+  renderExLogBody();
+}
+
+function closeExLog(){
+  document.getElementById('exlog-overlay')?.classList.remove('open');
+  _exLogKey=null;
+}
+
+function getExData(key){try{return JSON.parse(localStorage.getItem('fp_ex_'+key)||'[]');}catch(e){return[];}}
+function saveExData(key,d){try{localStorage.setItem('fp_ex_'+key,JSON.stringify(d));}catch(e){}}
+
+let _exViewDate=null; // null = dziś
+
+function renderExLogBody(){
+  const sessions=getExData(_exLogKey);
+  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const viewDate=_exViewDate||today;
+
+  let pr=0;
+  sessions.forEach(s=>s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
+  const last=sessions[sessions.length-1];
+  const lastSet=last?.sets?.[last.sets.length-1];
+
+  // Daty z sesjami + dzisiaj
+  const dates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
+    const pa=a.split('.'),pb=b.split('.');
+    return new Date(`${pb[2]}-${pb[1]}-${pb[0]}`)-new Date(`${pa[2]}-${pa[1]}-${pa[0]}`);
+  });
+  const viewIdx=dates.indexOf(viewDate);
+  const canPrev=viewIdx<dates.length-1;
+  const canNext=viewIdx>0;
+
+  const viewSession=sessions.find(s=>s.date===viewDate);
+  const isToday=viewDate===today;
+
+  // Historia dla wybranego dnia
+  let dayHtml='';
+  if(viewSession&&viewSession.sets.length>0){
+    const setsHtml=viewSession.sets.map((st,si)=>`
+      <div class="exlog-set-row">
+        <span class="exlog-set-num">S${si+1}</span>
+        <span class="exlog-set-val">${st.w||'—'}<span class="u"> kg</span></span>
+        <span class="exlog-set-val">${st.r||'—'}<span class="u"> powt</span></span>
+        <span class="exlog-set-val" style="font-size:11px;color:var(--muted2)">${st.rpe?'RPE '+st.rpe:''}</span>
+        ${st.note?`<div class="exlog-set-note">${st.note}</div>`:''}
+      </div>`).join('');
+    const sessIdx=sessions.findIndex(s=>s.date===viewDate);
+    const sessIsPR=viewSession.sets.some(s=>(s.w||0)>=pr&&pr>0)&&sessions.indexOf(viewSession)===sessions.length-1;
+    dayHtml=`<div class="exlog-session">
+      <div class="exlog-sess-head">
+        <span class="exlog-sess-date">${viewDate}${sessIsPR?'<span class="exlog-pr">🏆 PR</span>':''}</span>
+        ${isToday?`<button class="exlog-sess-del" onclick="delExSession(${sessIdx})">usuń</button>`:''}
       </div>
+      <div class="exlog-sets">${setsHtml}</div>
     </div>`;
-  document.getElementById('modal-overlay').classList.add('open');
+  }else{
+    dayHtml=`<div class="exlog-empty">${isToday?'Brak serii na dziś — dodaj poniżej':'Brak treningu w tym dniu'}</div>`;
+  }
+
+  // Formularz tylko dla dzisiaj
+  const formHtml=isToday?`
+    <div class="exlog-form">
+      <div class="exlog-form-lbl">Dodaj serię${pr>0?` · <span style="color:var(--accent)">PR: ${pr} kg</span>`:''}</div>
+      <div class="exlog-inputs">
+        <div class="exlog-field"><label>Ciężar kg</label><input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" placeholder="0" value="${lastSet?.w||''}"></div>
+        <div class="exlog-field"><label>Powtórzenia</label><input class="exlog-input" id="exl-r" type="number" min="1" placeholder="0" value="${lastSet?.r||''}"></div>
+        <div class="exlog-field"><label>RPE</label><input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10" placeholder="—"></div>
+      </div>
+      <textarea class="exlog-notes-input" id="exl-note" placeholder="Notatka: pas, straps, ból..."></textarea>
+      <button class="btn-exlog-save" onclick="saveExSet()">+ Zapisz serię</button>
+    </div>`:'';
+
+  // 1RM kalkulator
+  const ormHtml=`
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px">
+      <div class="exlog-hist-lbl">🏆 Kalkulator 1RM (Brzycki)</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" style="width:80px;font-size:20px" value="${pr>0?pr:''}">
+        <span style="font-family:var(--fm);font-size:10px;color:var(--muted)">×</span>
+        <input class="exlog-input" id="orm-r" type="number" min="1" max="36" placeholder="powt" style="width:80px;font-size:20px" value="${lastSet?.r||''}">
+        <button onclick="calc1RM()" style="flex:1;background:var(--bg);border:1px solid var(--accent);color:var(--accent);font-family:var(--fd);font-size:14px;font-weight:800;padding:10px;border-radius:4px;cursor:pointer">Oblicz</button>
+      </div>
+      <div class="orm-result" id="orm-result"></div>
+    </div>`;
+
+  document.getElementById('exlog-body').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+      <button class="exlog-date-btn" onclick="exNavDate(1)" ${!canPrev?'disabled style="opacity:.3"':''}>‹</button>
+      <div style="text-align:center">
+        <div class="exlog-date-label">${isToday?'Dziś':viewDate}</div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted)">${sessions.length} treningów łącznie</div>
+      </div>
+      <button class="exlog-date-btn" onclick="exNavDate(-1)" ${!canNext?'disabled style="opacity:.3"':''}>›</button>
+    </div>
+    ${dayHtml}
+    ${formHtml}
+    ${ormHtml}
+    <button onclick="openExLogMenu()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;width:100%">← Wróć do listy ćwiczeń</button>`;
+}
+
+function exNavDate(dir){
+  const sessions=getExData(_exLogKey);
+  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const dates=[...new Set([...sessions.map(s=>s.date),today])].sort((a,b)=>{
+    const pa=a.split('.'),pb=b.split('.');
+    return new Date(`${pb[2]}-${pb[1]}-${pb[0]}`)-new Date(`${pa[2]}-${pa[1]}-${pa[0]}`);
+  });
+  const viewDate=_exViewDate||today;
+  const idx=dates.indexOf(viewDate);
+  const newIdx=idx+dir;
+  if(newIdx>=0&&newIdx<dates.length){
+    _exViewDate=dates[newIdx]===today?null:dates[newIdx];
+    renderExLogBody();
+  }
+}
+
+function saveExSet(){
+  const w=parseFloat(document.getElementById('exl-w')?.value)||0;
+  const r=parseInt(document.getElementById('exl-r')?.value)||0;
+  const rpe=parseFloat(document.getElementById('exl-rpe')?.value)||null;
+  const note=document.getElementById('exl-note')?.value.trim()||'';
+  if(!r) return;
+  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const sessions=getExData(_exLogKey);
+  let sess=sessions.find(s=>s.date===today);
+  if(!sess){sess={date:today,sets:[]};sessions.push(sess);}
+  sess.sets.push({w,r,rpe,note});
+  saveExData(_exLogKey,sessions);
+  _exViewDate=null; // wróć do dziś
+  renderExLogBody();
+}
+
+function delExSession(idx){
+  const sessions=getExData(_exLogKey);
+  sessions.splice(idx,1);
+  saveExData(_exLogKey,sessions);
+  renderExLogBody();
 }
 
 // ═══════════════════════════════════════════════════════════
