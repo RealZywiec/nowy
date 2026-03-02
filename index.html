@@ -456,7 +456,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 /* MOBILE */
 @media(max-width:768px){
   .bottom-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:600;
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:800;
     background:var(--bg2);border-top:1px solid var(--border2);
     padding:8px 4px calc(8px + env(safe-area-inset-bottom));
     gap:2px;align-items:center;justify-content:space-around;
@@ -485,7 +485,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 }
 /* DESKTOP */
 @media(min-width:769px){
-  .bottom-nav{display:none!important}
+  .stats-fab,.cal-fab{display:none!important}
   .desktop-sidebar{
     position:fixed;left:0;top:0;bottom:0;width:72px;z-index:500;
     background:var(--bg2);border-right:1px solid var(--border2);
@@ -592,6 +592,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .exlog-pr{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:9px;background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--accent);padding:2px 7px;border-radius:100px;margin-left:6px}
 .day-card.drag-over{border-color:var(--accent)!important;background:rgba(200,255,0,.05)!important}
 .day-card[draggable]{user-select:none}
+.day-card.dragging{opacity:.4;border-color:var(--accent)!important}
+.day-card.drag-over{border-color:var(--accent)!important;background:rgba(200,255,0,.06)!important;transform:scale(1.01)}
+.day-card{transition:border-color .15s,background .15s,transform .15s}
 </style>
 </head>
 <body>
@@ -668,16 +671,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   <div class="plan-inner" id="plan-inner"></div>
 </div>
 
-<!-- STATS FAB -->
-<button class="stats-fab" id="stats-fab" onclick="toggleStats()">📊 Twoje dane</button>
-<div class="stats-panel" id="stats-panel">
-  <div class="sp-header">
-    <div class="sp-title">Twoje dane</div>
-    <button class="sp-close" onclick="toggleStats()">✕</button>
-  </div>
-  <div class="sp-body" id="sp-body"></div>
-</div>
-
 <!-- TIMER OVERLAY -->
 <div class="timer-overlay" id="timer-overlay">
   <div class="timer-label">PRZERWA MIĘDZY SERIAMI</div>
@@ -701,6 +694,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   </div>
   <div class="cal-panel-body" id="cal-panel-body"></div>
 </div>
+</nav>
 
 <!-- BOTTOM NAV — mobile only -->
 <nav class="bottom-nav" id="bottom-nav">
@@ -723,9 +717,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <span class="bn-ico">📊</span>
     <span>Dane</span>
   </button>
-</nav>
-
-</nav>
 
 <!-- DESKTOP SIDEBAR -->
 <div class="desktop-sidebar" id="desktop-sidebar">
@@ -757,6 +748,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 <div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
   <div class="ms-handle"></div>
   <div id="mobile-settings-body"></div>
+</div>
   <div class="ms-title">Ustawienia</div>
 
   <div class="ms-section">
@@ -1512,7 +1504,12 @@ function renderPlan(){
     <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010), Schoenfeld (2010), Helms, Aragon &amp; Fitschen (2014).</p>
     <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
   </div>`;
-  setTimeout(initDayDrag, 100);
+  const wasOnPlan=document.getElementById('plan').classList.contains('active');
+  const savedScroll=wasOnPlan?window.scrollY:0;
+  if(!wasOnPlan) show('plan');
+  else _updateNav('plan');
+  if(wasOnPlan) requestAnimationFrame(()=>window.scrollTo(0,savedScroll));
+  setTimeout(initDayDrag,50);
   show('plan');
 }
 
@@ -1579,7 +1576,7 @@ function doSwap(btn){
   const newEx=EX[k];
   day.ex[ei]={key:k,...newEx,sets:old.sets,reps:old.reps,rest:old.rest,rpe:old.rpe};
   closeModal();
-  renderPlan();
+  renderPlan(); // nie scrolluje bo plan już aktywny
 }
 
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
@@ -1602,41 +1599,92 @@ function toggleDay(i){
 let _dragDayIdx=null;
 
 function initDayDrag(){
+  let _touchDragIdx=null;
+  let _touchClone=null;
+
   document.querySelectorAll('.day-card').forEach((card,idx)=>{
+    // --- DESKTOP DRAG ---
     card.setAttribute('draggable','true');
-    card.style.cursor='grab';
     card.addEventListener('dragstart',e=>{
       _dragDayIdx=idx;
-      card.style.opacity='0.5';
+      setTimeout(()=>card.classList.add('dragging'),0);
       e.dataTransfer.effectAllowed='move';
     });
     card.addEventListener('dragend',()=>{
-      card.style.opacity='1';
+      card.classList.remove('dragging');
       document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('drag-over'));
       _dragDayIdx=null;
     });
     card.addEventListener('dragover',e=>{
       e.preventDefault();
-      e.dataTransfer.dropEffect='move';
-      if(_dragDayIdx!==null&&_dragDayIdx!==idx) card.classList.add('drag-over');
+      if(_dragDayIdx!==null&&_dragDayIdx!==idx){
+        document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('drag-over'));
+        card.classList.add('drag-over');
+      }
     });
-    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('dragleave',e=>{
+      if(!card.contains(e.relatedTarget)) card.classList.remove('drag-over');
+    });
     card.addEventListener('drop',e=>{
       e.preventDefault();
       card.classList.remove('drag-over');
       if(_dragDayIdx===null||_dragDayIdx===idx) return;
-      // Zamień dwie daty (nazwy dni zostają, zamieniamy label, tr, ex)
-      const days=window.__split.days;
-      const a=days[_dragDayIdx], b=days[idx];
-      // Zamień tylko zawartość treningu (nie nazwę dnia)
-      const tmp={label:a.label, tr:a.tr, ex:a.ex};
-      a.label=b.label; a.tr=b.tr; a.ex=b.ex;
-      b.label=tmp.label; b.tr=tmp.tr; b.ex=tmp.ex;
-      renderPlan();
-      // Toast
-      showToast(`Zamieniono: ${days[_dragDayIdx].name} ↔ ${days[idx].name}`);
+      _swapDays(_dragDayIdx,idx);
+    });
+
+    // --- MOBILE TOUCH DRAG ---
+    let _touchStartY=0,_touchStartX=0,_touchMoved=false;
+    card.addEventListener('touchstart',e=>{
+      _touchDragIdx=idx;
+      _touchStartY=e.touches[0].clientY;
+      _touchStartX=e.touches[0].clientX;
+      _touchMoved=false;
+      card.style.transition='none';
+    },{passive:true});
+
+    card.addEventListener('touchmove',e=>{
+      const dy=e.touches[0].clientY-_touchStartY;
+      const dx=e.touches[0].clientX-_touchStartX;
+      if(!_touchMoved&&Math.abs(dy)<8&&Math.abs(dx)<8) return;
+      _touchMoved=true;
+      // Podświetl kartę pod palcem
+      const el=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
+      const target=el?.closest('.day-card');
+      document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('drag-over'));
+      if(target&&target!==card){
+        target.classList.add('drag-over');
+      }
+    },{passive:true});
+
+    card.addEventListener('touchend',e=>{
+      card.style.transition='';
+      document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('drag-over'));
+      if(!_touchMoved){_touchDragIdx=null;return;}
+      const el=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      const target=el?.closest('.day-card');
+      if(target&&target!==card){
+        const cards=[...document.querySelectorAll('.day-card')];
+        const targetIdx=cards.indexOf(target);
+        if(targetIdx>=0&&targetIdx!==idx) _swapDays(idx,targetIdx);
+      }
+      _touchDragIdx=null;
+      _touchMoved=false;
     });
   });
+}
+
+function _swapDays(aIdx,bIdx){
+  const days=window.__split.days;
+  if(!days[aIdx]||!days[bIdx]) return;
+  const tmp={label:days[aIdx].label,tr:days[aIdx].tr,ex:days[aIdx].ex};
+  days[aIdx].label=days[bIdx].label;
+  days[aIdx].tr=days[bIdx].tr;
+  days[aIdx].ex=days[bIdx].ex;
+  days[bIdx].label=tmp.label;
+  days[bIdx].tr=tmp.tr;
+  days[bIdx].ex=tmp.ex;
+  showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
+  renderPlan();
 }
 
 function showToast(msg){
@@ -2313,21 +2361,19 @@ window.addEventListener('resize',()=>{
 
 function _updateNav(screenId){
   const onPlan=screenId==='plan';
-  // mobile bottom nav
+  const mob=window.innerWidth<=768;
   const mNav=document.getElementById('bottom-nav');
   if(mNav){
-    if(window.innerWidth<=768){
-      mNav.style.display=onPlan?'':'none';
-    } else {
+    // Na mobile pokazuj nav jeśli jesteśmy na planie — niezależnie od stanu paneli
+    mNav.style.removeProperty('display');
+    if(!onPlan||!mob){
       mNav.style.display='none';
     }
   }
-  // desktop sidebar
   const dSide=document.getElementById('desktop-sidebar');
-  if(dSide) dSide.classList.toggle('visible', onPlan && window.innerWidth>768);
-  // content offset
+  if(dSide) dSide.classList.toggle('visible',onPlan&&!mob);
   const planEl=document.getElementById('plan');
-  if(planEl) planEl.classList.toggle('with-sidebar', onPlan && window.innerWidth>768);
+  if(planEl) planEl.classList.toggle('with-sidebar',onPlan&&!mob);
 }
 // ═══════════════════════════════════════════════════════════
 // SETTINGS — SHARED RENDERER
