@@ -473,7 +473,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 /* MOBILE */
 @media(max-width:768px){
   .bottom-nav{
-    display:flex!important;
+    display:flex;
     position:fixed;bottom:0;left:0;right:0;z-index:800;
     background:var(--bg2);border-top:1px solid var(--border2);
     padding:6px 0 calc(6px + env(safe-area-inset-bottom));
@@ -747,6 +747,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <span class="bn-ico">📊</span>
     <span>Dane</span>
   </button>
+</nav>
 
 <!-- DESKTOP SIDEBAR -->
 <div class="desktop-sidebar" id="desktop-sidebar">
@@ -774,46 +775,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   <div id="desktop-settings-body"></div>
 </div>
 
-<!-- MOBILE SETTINGS PANEL -->
-<div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
-  <div class="ms-handle"></div>
-  <div id="mobile-settings-body"></div>
-</div>
-  <div class="ms-title">Ustawienia</div>
 
-  <div class="ms-section">
-    <div class="ms-lbl">Tempo zmiany wagi <span class="ms-lbl-val" id="ms-wc-val">0.25 kg/tydz</span></div>
-    <input type="range" min="0.1" max="1.5" step="0.05" value="0.25" id="ms-wc-slider"
-      oninput="document.getElementById('ms-wc-val').textContent=parseFloat(this.value).toFixed(2)+' kg/tydz'">
-  </div>
-
-  <div class="ms-section">
-    <div class="ms-lbl">Aktualna waga</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input class="sp-input" type="number" id="ms-weight" min="40" max="200" step="0.5" style="width:100px" placeholder="75">
-      <span style="font-family:var(--fm);font-size:11px;color:var(--muted)">kg</span>
-    </div>
-  </div>
-
-  <div class="ms-section">
-    <div class="ms-lbl">Cel treningowy</div>
-    <div class="ms-goal-grid" id="ms-goal-grid">
-      <button class="ms-goal-btn" data-goal="bulk" onclick="selectMsGoal(this)">Masa</button>
-      <button class="ms-goal-btn" data-goal="cut" onclick="selectMsGoal(this)">Redukcja</button>
-      <button class="ms-goal-btn" data-goal="strength" onclick="selectMsGoal(this)">Siła</button>
-      <button class="ms-goal-btn" data-goal="recomp" onclick="selectMsGoal(this)">Rekomp</button>
-    </div>
-  </div>
-
-  <div class="ms-section">
-    <div class="ms-lbl">Dni treningowe w tygodniu</div>
-    <div style="display:flex;gap:8px">
-      ${[3,4,5,6].map(d=>`<button class="ms-goal-btn" data-days="${d}" onclick="selectMsDays(this)" style="flex:1">${d}</button>`).join('')}
-    </div>
-  </div>
-
-  <button class="btn-ms-apply" onclick="applyMobileSettings()">Zastosuj i przelicz →</button>
-</div>
 
 <!-- EXERCISE LOG OVERLAY -->
 <div class="exlog-overlay" id="exlog-overlay" onclick="closeExLog()">
@@ -1550,7 +1512,6 @@ function renderPlan(){
   }
 
   setTimeout(initDayDrag,80);
-  show('plan');
 }
 
 
@@ -2387,7 +2348,7 @@ function _updateNav(screenId){
       mNav.style.removeProperty('display');
       mNav.classList.remove('hidden');
     } else {
-      mNav.style.display='none';
+      mNav.classList.add('hidden');
     }
   }
 
@@ -2923,6 +2884,51 @@ function calc1RM(){
     <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin:4px 0 8px">Na podstawie: ${w}kg × ${r} powt</div>
     <div class="orm-zones" style="grid-template-columns:repeat(5,1fr)">${zonesHtml}</div>`;
   el.classList.add('show');
+}
+
+function buildExSearchUI(){
+  if(!window.__split) return '';
+  const allEx=[];
+  window.__split.days.forEach(day=>{
+    if(!day.tr||!day.ex) return;
+    day.ex.forEach(ex=>{
+      allEx.push({key:ex.key||ex.n,name:ex.n,day:day.name,label:day.label||''});
+    });
+  });
+  const listHtml=allEx.map(ex=>{
+    const prData=getExData(ex.key);
+    let pr=0;
+    prData.forEach(s=>s.sets&&s.sets.forEach(st=>{if((st.w||0)>pr)pr=st.w;}));
+    return `<div class="exlog-ex-item" onclick="openExLogForKey('${ex.key.replace(/'/g,"\\'")}','${ex.name.replace(/'/g,"\\'")}')">
+      <div class="exlog-ex-item-name">${ex.name}</div>
+      <div class="exlog-ex-item-day">${ex.day}${ex.label?' — '+ex.label:''}</div>
+      ${pr>0?`<div class="exlog-ex-item-pr">🏆 PR: ${pr} kg</div>`:''}
+    </div>`;
+  }).join('');
+  return `<input class="exlog-search-input" id="exlog-search-inp" type="text"
+    placeholder="Szukaj ćwiczenia..." oninput="filterExSearch(this.value)" autocomplete="off">
+    <div class="exlog-ex-list" id="exlog-ex-list">${listHtml}</div>`;
+}
+
+function filterExSearch(q){
+  document.querySelectorAll('.exlog-ex-item').forEach(item=>{
+    const name=item.querySelector('.exlog-ex-item-name')?.textContent.toLowerCase()||'';
+    item.style.display=name.includes(q.toLowerCase())?'':'none';
+  });
+}
+
+function _swapDays(aIdx,bIdx){
+  const days=window.__split.days;
+  if(!days[aIdx]||!days[bIdx]) return;
+  const tmp={label:days[aIdx].label,tr:days[aIdx].tr,ex:days[aIdx].ex};
+  days[aIdx].label=days[bIdx].label;
+  days[aIdx].tr=days[bIdx].tr;
+  days[aIdx].ex=days[bIdx].ex;
+  days[bIdx].label=tmp.label;
+  days[bIdx].tr=tmp.tr;
+  days[bIdx].ex=tmp.ex;
+  showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
+  renderPlan();
 }
 
 // ═══════════════════════════════════════════════════════════
