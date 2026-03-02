@@ -590,6 +590,8 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .exlog-set-note{grid-column:1/-1;font-size:11px;color:var(--muted2);padding:2px 0 4px;font-style:italic}
 .exlog-empty{font-size:12px;color:var(--muted);text-align:center;padding:16px 0}
 .exlog-pr{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:9px;background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--accent);padding:2px 7px;border-radius:100px;margin-left:6px}
+.day-card.drag-over{border-color:var(--accent)!important;background:rgba(200,255,0,.05)!important}
+.day-card[draggable]{user-select:none}
 </style>
 </head>
 <body>
@@ -701,7 +703,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </div>
 
 <!-- BOTTOM NAV — mobile only -->
-<nav class="bottom-nav" id="bottom-nav" style="display:none">
+<nav class="bottom-nav" id="bottom-nav">
   <button class="bn-btn" onclick="openMobileSettings()">
     <span class="bn-ico">⚙️</span>
     <span>Ustawienia</span>
@@ -721,25 +723,24 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <span class="bn-ico">📊</span>
     <span>Dane</span>
   </button>
+</nav>
+
+</nav>
 
 <!-- DESKTOP SIDEBAR -->
 <div class="desktop-sidebar" id="desktop-sidebar">
   <button class="dsb-btn" onclick="openDesktopSettings()" title="Ustawienia">
-    <span class="dsb-ico">⚙️</span>
-    <span>Ustaw.</span>
+    <span class="dsb-ico">⚙️</span><span>Ustaw.</span>
   </button>
   <button class="dsb-btn" onclick="openFoodSearch()" title="Dziennik kalorii">
-    <span class="dsb-ico">🍽</span>
-    <span>Kalorie</span>
+    <span class="dsb-ico">🍽</span><span>Kalorie</span>
   </button>
   <button class="dsb-btn center-btn" onclick="openExLogMenu()" title="Dziennik treningu">
-    <span class="dsb-ico">📓</span>
-    <span>Trening</span>
+    <span class="dsb-ico">📓</span><span>Trening</span>
   </button>
   <div class="dsb-divider"></div>
   <button class="dsb-btn" onclick="toggleStats()" title="Twoje dane">
-    <span class="dsb-ico">📊</span>
-    <span>Dane</span>
+    <span class="dsb-ico">📊</span><span>Dane</span>
   </button>
 </div>
 
@@ -751,8 +752,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   </div>
   <div id="desktop-settings-body"></div>
 </div>
-
-</nav>
 
 <!-- MOBILE SETTINGS PANEL -->
 <div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
@@ -1513,6 +1512,7 @@ function renderPlan(){
     <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010), Schoenfeld (2010), Helms, Aragon &amp; Fitschen (2014).</p>
     <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
   </div>`;
+  setTimeout(initDayDrag, 100);
   show('plan');
 }
 
@@ -1594,6 +1594,63 @@ function toggleDay(i){
   const hidden=el.style.display==='none';
   el.style.display=hidden?'block':'none';
   if(ch)ch.classList.toggle('open',hidden);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DRAG & DROP — zamiana dni treningowych
+// ═══════════════════════════════════════════════════════════
+let _dragDayIdx=null;
+
+function initDayDrag(){
+  document.querySelectorAll('.day-card').forEach((card,idx)=>{
+    card.setAttribute('draggable','true');
+    card.style.cursor='grab';
+    card.addEventListener('dragstart',e=>{
+      _dragDayIdx=idx;
+      card.style.opacity='0.5';
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.style.opacity='1';
+      document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('drag-over'));
+      _dragDayIdx=null;
+    });
+    card.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      if(_dragDayIdx!==null&&_dragDayIdx!==idx) card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if(_dragDayIdx===null||_dragDayIdx===idx) return;
+      // Zamień dwie daty (nazwy dni zostają, zamieniamy label, tr, ex)
+      const days=window.__split.days;
+      const a=days[_dragDayIdx], b=days[idx];
+      // Zamień tylko zawartość treningu (nie nazwę dnia)
+      const tmp={label:a.label, tr:a.tr, ex:a.ex};
+      a.label=b.label; a.tr=b.tr; a.ex=b.ex;
+      b.label=tmp.label; b.tr=tmp.tr; b.ex=tmp.ex;
+      renderPlan();
+      // Toast
+      showToast(`Zamieniono: ${days[_dragDayIdx].name} ↔ ${days[idx].name}`);
+    });
+  });
+}
+
+function showToast(msg){
+  let t=document.getElementById('fp-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='fp-toast';
+    t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;font-family:var(--fd);font-size:15px;font-weight:800;padding:10px 20px;border-radius:4px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';
+  clearTimeout(t._to);
+  t._to=setTimeout(()=>t.style.opacity='0',2500);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1746,9 +1803,6 @@ function renderCalLog(){
       </div>
     </div>
     <div class="cal-entries">${entries}</div>
-    <button onclick="openScanner()" style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;padding:10px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:.15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted2)'">
-      📷 Skanuj jedzenie aparatem
-    </button>
     <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">Wyszukaj produkt</div>
     <div style="position:relative">
       <input style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:13px;padding:9px 12px;border-radius:4px;outline:none" id="food-search-input" type="text"
@@ -1779,35 +1833,92 @@ function renderCalLog(){
   _selFood=null;
 }
 
-function onFoodSearch(val){
+async function onFoodSearch(val){
   const sugg=document.getElementById('food-suggestions');
   const notF=document.getElementById('food-not-found');
   const area=document.getElementById('food-sel-area');
-  if(!sugg||val.length<2){if(sugg)sugg.style.display='none';return;}
-  const {qty,mode}=parseQty(val);
-  const cleanQ=val.replace(/\d+(?:[.,]\d+)?\s*(?:g|gram|gramów|ml)?/gi,'').trim()||val;
-  const results=searchFood(cleanQ.length>1?cleanQ:val);
-  if(results.length===0){
-    sugg.style.display='none';
-    if(notF)notF.style.display='block';
-    if(area)area.style.display='none';
-  }else{
-    if(notF)notF.style.display='none';
-    sugg.innerHTML=results.map(f=>{
-      const m=macrosFor(f,qty,mode);
-      const ps=mode==='g'?`${qty}g`:`${qty}× ${f.pn}`;
-      return `<div class="food-sug-item" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:.12s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="selectFood(${JSON.stringify(f).replace(/"/g,"'")},${qty},'${mode}')">
-        <div style="font-size:13px;font-weight:600">${f.n}</div>
-        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px">~${m.kcal} kcal · B:${m.p}g W:${m.c}g T:${m.f}g · <span style="color:var(--accent)">${ps}</span></div>
-      </div>`;
-    }).join('');
-    sugg.style.display='block';
+  if(!sugg||val.length<2){
+    if(sugg)sugg.style.display='none';
+    return;
   }
+  // Lokalna baza najpierw
+  const {qty,mode}=parseQty(val);
+  const cleanQ=val.replace(/(\d+(?:[.,]\d+)?\s*(?:g|gram|gramów|ml)?)/gi,'').trim()||val;
+  const localResults=searchFood(cleanQ.length>1?cleanQ:val);
+
+  if(localResults.length>0){
+    if(notF)notF.style.display='none';
+    renderFoodSuggestions(localResults,qty,mode,sugg);
+    sugg.style.display='block';
+  } else {
+    // Brak lokalnie — szukaj w Open Food Facts
+    sugg.innerHTML='<div style="padding:10px 14px;font-family:var(--fm);font-size:11px;color:var(--muted)">Szukam w bazie produktów...</div>';
+    sugg.style.display='block';
+    try {
+      const results=await searchOpenFoodFacts(cleanQ.length>1?cleanQ:val);
+      if(results.length>0){
+        if(notF)notF.style.display='none';
+        renderFoodSuggestions(results,qty,mode,sugg);
+      } else {
+        sugg.style.display='none';
+        if(notF)notF.style.display='block';
+        if(area)area.style.display='none';
+      }
+    } catch(e){
+      sugg.style.display='none';
+      if(notF)notF.style.display='block';
+    }
+  }
+}
+
+async function searchOpenFoodFacts(query){
+  try {
+    const url=`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=8&fields=product_name,nutriments,serving_size,brands`;
+    const r=await fetch(url);
+    const data=await r.json();
+    if(!data.products||!data.products.length) return [];
+    return data.products
+      .filter(p=>p.product_name&&p.nutriments&&p.nutriments['energy-kcal_100g']>0)
+      .slice(0,6)
+      .map(p=>{
+        const n=p.nutriments;
+        // Normalizuj do per 100g
+        return {
+          n: (p.product_name+(p.brands?` (${p.brands.split(',')[0].trim()})`:'')),
+          kcal: Math.round(n['energy-kcal_100g']||0),
+          p:    Math.round((n['proteins_100g']||0)*10)/10,
+          c:    Math.round((n['carbohydrates_100g']||0)*10)/10,
+          f:    Math.round((n['fat_100g']||0)*10)/10,
+          s:    100,
+          pn:   '100g',
+          _off: true // flaga że to z Open Food Facts
+        };
+      });
+  } catch(e){ return []; }
+}
+
+function renderFoodSuggestions(results,qty,mode,container){
+  container.innerHTML=results.map(f=>{
+    const m=macrosFor(f,qty,mode);
+    const ps=mode==='g'?`${qty}g`:`${qty}× ${f.pn}`;
+    const src=f._off?'<span style="color:var(--muted);font-size:9px"> · OFF</span>':'';
+    const fStr=JSON.stringify({n:f.n,kcal:f.kcal,p:f.p,c:f.c,f:f.f,s:f.s,pn:f.pn}).replace(/"/g,"'");
+    return `<div class="food-sug-item" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:.12s"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''"
+      onclick="selectFood(${fStr},${qty},'${mode}')">
+      <div style="font-size:13px;font-weight:600">${f.n}${src}</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px">
+        ~${m.kcal} kcal &nbsp;B:${m.p}g &nbsp;W:${m.c}g &nbsp;T:${m.f}g
+        <span style="color:var(--accent)"> · ${ps}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function selectFood(food,qty,mode){
   _selFood=food;_selQty=qty;_selMode=mode;
   document.getElementById('food-suggestions').style.display='none';
+  document.getElementById('food-search-input').value=food.n;
   const area=document.getElementById('food-sel-area');
   const qtyEl=document.getElementById('food-qty');
   const unitEl=document.getElementById('food-qty-unit');
@@ -1992,7 +2103,12 @@ async function analyzeFood(dataUrl){
   try{
     const response=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+  'Content-Type':'application/json',
+  'x-api-key':'TWOJ_KLUCZ_API',
+  'anthropic-version':'2023-06-01',
+  'anthropic-dangerous-direct-browser-access':'true',
+      },
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:600,
@@ -2197,17 +2313,22 @@ window.addEventListener('resize',()=>{
 
 function _updateNav(screenId){
   const onPlan=screenId==='plan';
-  // mobile
+  // mobile bottom nav
   const mNav=document.getElementById('bottom-nav');
-  if(mNav) mNav.classList.toggle('hidden',!onPlan);
+  if(mNav){
+    if(window.innerWidth<=768){
+      mNav.style.display=onPlan?'':'none';
+    } else {
+      mNav.style.display='none';
+    }
+  }
   // desktop sidebar
   const dSide=document.getElementById('desktop-sidebar');
-  if(dSide) dSide.classList.toggle('visible',onPlan);
-  // padding na plan
+  if(dSide) dSide.classList.toggle('visible', onPlan && window.innerWidth>768);
+  // content offset
   const planEl=document.getElementById('plan');
-  if(planEl) planEl.classList.toggle('with-sidebar',onPlan&&window.innerWidth>768);
+  if(planEl) planEl.classList.toggle('with-sidebar', onPlan && window.innerWidth>768);
 }
-
 // ═══════════════════════════════════════════════════════════
 // SETTINGS — SHARED RENDERER
 // ═══════════════════════════════════════════════════════════
@@ -2510,6 +2631,205 @@ function delExSession(idx){
   sessions.splice(idx,1);
   saveExData(_exLogKey,sessions);
   renderExLogBody();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BAZA ŻYWNOŚCI
+// ═══════════════════════════════════════════════════════════
+const FOOD_DB=[
+// Nabiał i jajka
+{n:'Jajko kurze całe',           kcal:78,  p:6.3,c:0.6, f:5.3, s:1,   pn:'szt'},
+{n:'Białko jaja',                kcal:17,  p:3.6,c:0.2, f:0.1, s:1,   pn:'szt'},
+{n:'Mleko 2%',                   kcal:50,  p:3.4,c:4.8, f:2,   s:100, pn:'100ml'},
+{n:'Mleko 3.2%',                 kcal:61,  p:3.2,c:4.8, f:3.2, s:100, pn:'100ml'},
+{n:'Jogurt naturalny',           kcal:61,  p:3.5,c:4.7, f:3.3, s:100, pn:'100g'},
+{n:'Jogurt grecki 0%',           kcal:54,  p:10, c:3.6, f:0.2, s:100, pn:'100g'},
+{n:'Jogurt grecki 2%',           kcal:73,  p:9.5,c:3.6, f:2,   s:100, pn:'100g'},
+{n:'Twaróg chudy',               kcal:98,  p:18, c:3.5, f:1,   s:100, pn:'100g'},
+{n:'Twaróg półtłusty',           kcal:140, p:16, c:3,   f:7,   s:100, pn:'100g'},
+{n:'Ser żółty Gouda',            kcal:356, p:25, c:2.2, f:27,  s:100, pn:'100g'},
+{n:'Ser mozzarella',             kcal:280, p:22, c:2.2, f:20,  s:100, pn:'100g'},
+{n:'Ser feta',                   kcal:264, p:14, c:4,   f:21,  s:100, pn:'100g'},
+{n:'Ser cottage (serek wiejski)',kcal:98,  p:11, c:3.4, f:4.3, s:100, pn:'100g'},
+{n:'Masło',                      kcal:717, p:0.9,c:0.1, f:81,  s:10,  pn:'łyżeczka (10g)'},
+{n:'Śmietana 18%',               kcal:185, p:2.7,c:3.8, f:18,  s:100, pn:'100ml'},
+{n:'Kefir 1.5%',                 kcal:40,  p:3.3,c:4.5, f:1.5, s:100, pn:'100ml'},
+{n:'Maślanka',                   kcal:33,  p:3.3,c:4,   f:0.5, s:100, pn:'100ml'},
+// Mięso
+{n:'Pierś kurczaka gotowana',    kcal:165, p:31, c:0,   f:3.6, s:100, pn:'100g'},
+{n:'Pierś kurczaka surowa',      kcal:110, p:23, c:0,   f:1.5, s:100, pn:'100g'},
+{n:'Udo kurczaka bez skóry',     kcal:177, p:25, c:0,   f:8,   s:100, pn:'100g'},
+{n:'Wołowina mielona 15% tłuszczu',kcal:215,p:21,c:0,  f:14,  s:100, pn:'100g'},
+{n:'Wołowina mielona 5% tłuszczu',kcal:140,p:22,c:0,   f:5,   s:100, pn:'100g'},
+{n:'Stek wołowy (rostbef)',      kcal:218, p:26, c:0,   f:12,  s:100, pn:'100g'},
+{n:'Wieprzowina schab',          kcal:182, p:22, c:0,   f:10,  s:100, pn:'100g'},
+{n:'Boczek wieprzowy',           kcal:458, p:12, c:0.6, f:46,  s:100, pn:'100g'},
+{n:'Polędwica wieprzowa',        kcal:123, p:22, c:0,   f:4,   s:100, pn:'100g'},
+{n:'Łosoś pieczony',             kcal:206, p:28, c:0,   f:10,  s:100, pn:'100g'},
+{n:'Łosoś surowy',               kcal:142, p:20, c:0,   f:6.3, s:100, pn:'100g'},
+{n:'Tuńczyk w wodzie (puszka)',  kcal:103, p:23, c:0,   f:0.7, s:100, pn:'100g'},
+{n:'Tuńczyk w oleju (puszka)',   kcal:190, p:25, c:0,   f:10,  s:100, pn:'100g'},
+{n:'Dorsz',                      kcal:82,  p:18, c:0,   f:0.7, s:100, pn:'100g'},
+{n:'Krewetki',                   kcal:99,  p:21, c:0.9, f:1.1, s:100, pn:'100g'},
+{n:'Indyk pierś',                kcal:135, p:29, c:0,   f:1.5, s:100, pn:'100g'},
+{n:'Szynka wieprzowa gotowana',  kcal:145, p:20, c:1,   f:6,   s:100, pn:'100g'},
+{n:'Kiełbasa krakowska',         kcal:304, p:16, c:2,   f:26,  s:100, pn:'100g'},
+{n:'Parówki wieprzowe',          kcal:280, p:11, c:2,   f:25,  s:100, pn:'100g'},
+// Węglowodany
+{n:'Ryż biały gotowany',         kcal:130, p:2.7,c:28,  f:0.3, s:100, pn:'100g'},
+{n:'Ryż brązowy gotowany',       kcal:111, p:2.6,c:23,  f:0.9, s:100, pn:'100g'},
+{n:'Makaron pszenny gotowany',   kcal:158, p:5.8,c:31,  f:0.9, s:100, pn:'100g'},
+{n:'Makaron pełnoziarnisty',     kcal:143, p:5.3,c:27,  f:1.1, s:100, pn:'100g'},
+{n:'Kasza gryczana gotowana',    kcal:92,  p:3.4,c:19,  f:0.6, s:100, pn:'100g'},
+{n:'Kasza jaglana gotowana',     kcal:119, p:3.5,c:23,  f:1,   s:100, pn:'100g'},
+{n:'Kasza bulgur gotowana',      kcal:83,  p:3.1,c:18,  f:0.2, s:100, pn:'100g'},
+{n:'Ziemniaki gotowane',         kcal:77,  p:2,  c:17,  f:0.1, s:100, pn:'100g'},
+{n:'Bataty gotowane',            kcal:86,  p:1.6,c:20,  f:0.1, s:100, pn:'100g'},
+{n:'Płatki owsiane',             kcal:371, p:13, c:60,  f:7,   s:100, pn:'100g'},
+{n:'Owsianka (30g płatków+200ml mleka 2%)',kcal:200,p:8.5,c:30,f:4.5,s:1,pn:'porcja'},
+{n:'Chleb żytni razowy',         kcal:241, p:8.5,c:44,  f:2.3, s:100, pn:'100g'},
+{n:'Chleb pszenny tostowy',      kcal:266, p:8.5,c:50,  f:3.5, s:1,   pn:'kromka (~30g)'},
+{n:'Bułka kajzerka',             kcal:284, p:9.5,c:55,  f:2.5, s:1,   pn:'szt (~60g)'},
+{n:'Bajgiel',                    kcal:250, p:9,  c:48,  f:1.6, s:1,   pn:'szt (~100g)'},
+{n:'Rogalik 7 Days',             kcal:290, p:5,  c:40,  f:12,  s:1,   pn:'szt (~60g)'},
+{n:'Tortilla pszenna',           kcal:310, p:8,  c:52,  f:7,   s:1,   pn:'szt (~60g)'},
+// Rośliny strączkowe i wegetariańskie
+{n:'Fasola czarna gotowana',     kcal:132, p:8.9,c:24,  f:0.5, s:100, pn:'100g'},
+{n:'Soczewica czerwona gotowana',kcal:116, p:9,  c:20,  f:0.4, s:100, pn:'100g'},
+{n:'Ciecierzyca gotowana',       kcal:164, p:8.9,c:27,  f:2.6, s:100, pn:'100g'},
+{n:'Tofu twarde',                kcal:144, p:17, c:2.8, f:8,   s:100, pn:'100g'},
+{n:'Tempeh',                     kcal:193, p:19, c:9,   f:11,  s:100, pn:'100g'},
+{n:'Edamame',                    kcal:121, p:11, c:9,   f:5,   s:100, pn:'100g'},
+// Tłuszcze i orzechy
+{n:'Oliwa z oliwek',             kcal:884, p:0,  c:0,   f:100, s:10,  pn:'łyżka (10ml)'},
+{n:'Olej rzepakowy',             kcal:884, p:0,  c:0,   f:100, s:10,  pn:'łyżka (10ml)'},
+{n:'Migdały',                    kcal:579, p:21, c:22,  f:50,  s:100, pn:'100g'},
+{n:'Orzechy włoskie',            kcal:654, p:15, c:14,  f:65,  s:100, pn:'100g'},
+{n:'Orzechy nerkowca',           kcal:553, p:18, c:30,  f:44,  s:100, pn:'100g'},
+{n:'Masło orzechowe',            kcal:598, p:25, c:20,  f:51,  s:30,  pn:'łyżka (30g)'},
+{n:'Awokado',                    kcal:160, p:2,  c:9,   f:15,  s:100, pn:'100g'},
+{n:'Pestki dyni',                kcal:559, p:30, c:11,  f:49,  s:100, pn:'100g'},
+// Warzywa
+{n:'Brokuły',                    kcal:34,  p:2.8,c:7,   f:0.4, s:100, pn:'100g'},
+{n:'Szpinak',                    kcal:23,  p:2.9,c:3.6, f:0.4, s:100, pn:'100g'},
+{n:'Marchew',                    kcal:41,  p:0.9,c:10,  f:0.2, s:100, pn:'100g'},
+{n:'Pomidor',                    kcal:18,  p:0.9,c:3.9, f:0.2, s:100, pn:'100g'},
+{n:'Ogórek',                     kcal:16,  p:0.7,c:3.6, f:0.1, s:100, pn:'100g'},
+{n:'Papryka czerwona',           kcal:31,  p:1,  c:6,   f:0.3, s:100, pn:'100g'},
+{n:'Cukinia',                    kcal:17,  p:1.2,c:3.1, f:0.3, s:100, pn:'100g'},
+{n:'Ryż jaśminowy gotowany',     kcal:140, p:2.9,c:30,  f:0.4, s:100, pn:'100g'},
+// Owoce
+{n:'Banan',                      kcal:89,  p:1.1,c:23,  f:0.3, s:1,   pn:'szt (~120g)'},
+{n:'Jabłko',                     kcal:52,  p:0.3,c:14,  f:0.2, s:1,   pn:'szt (~150g)'},
+{n:'Pomarańcza',                 kcal:47,  p:0.9,c:12,  f:0.1, s:1,   pn:'szt (~130g)'},
+{n:'Truskawki',                  kcal:32,  p:0.7,c:7.7, f:0.3, s:100, pn:'100g'},
+{n:'Borówki',                    kcal:57,  p:0.7,c:14,  f:0.3, s:100, pn:'100g'},
+{n:'Mango',                      kcal:60,  p:0.8,c:15,  f:0.4, s:100, pn:'100g'},
+// Napooje i suplementy
+{n:'Odżywka białkowa (whey) 1 miarka',kcal:120,p:25,c:4,f:1.5,s:1,pn:'miarka (~30g)'},
+{n:'Odżywka białkowa (whey) 100g',kcal:400,p:80,c:8,f:5,s:100,pn:'100g'},
+{n:'Gajer (gainer) 1 porcja',    kcal:400, p:25, c:65,  f:5,   s:1,   pn:'porcja (~100g)'},
+{n:'Izotonik (np. Powerade)',     kcal:27,  p:0,  c:6.5, f:0,   s:100, pn:'100ml'},
+{n:'Sok pomarańczowy',           kcal:45,  p:0.7,c:10,  f:0.2, s:100, pn:'100ml'},
+{n:'Mleko migdałowe bez cukru',  kcal:13,  p:0.4,c:0.3, f:1.1, s:100, pn:'100ml'},
+// Gotowe posiłki i fast food (uproszczone)
+{n:'Jajecznica 2 jajka z masłem',kcal:230, p:14, c:1,   f:18,  s:1,   pn:'porcja'},
+{n:'Kanapka z szynką i serem',   kcal:350, p:18, c:38,  f:12,  s:1,   pn:'szt'},
+{n:'Sałatka grecka (200g)',      kcal:220, p:6,  c:8,   f:18,  s:1,   pn:'porcja'},
+{n:'Kurczak z ryżem (dieta)',     kcal:420, p:38, c:45,  f:8,   s:1,   pn:'porcja'},
+{n:'Pizza margherita',           kcal:265, p:11, c:33,  f:10,  s:100, pn:'100g'},
+{n:'Burger klasyczny (McDonald\'s Big Mac)',kcal:550,p:25,c:45,f:30,s:1,pn:'szt'},
+{n:'Frytki (duże porcja)',        kcal:490, p:7,  c:66,  f:23,  s:1,   pn:'porcja'},
+{n:'Kotlet schabowy (150g)',      kcal:380, p:32, c:12,  f:22,  s:1,   pn:'porcja'},
+{n:'Zupa pomidorowa z ryżem',     kcal:120, p:3.5,c:20,  f:3,   s:100, pn:'100ml'},
+{n:'Barszcz czerwony (250ml)',    kcal:60,  p:2,  c:12,  f:0.3, s:1,   pn:'talerz'},
+{n:'Pierogi ruskie (1 szt)',      kcal:80,  p:2.5,c:12,  f:2.5, s:1,   pn:'szt'},
+{n:'Naleśnik z twarogiem',       kcal:200, p:9,  c:28,  f:6,   s:1,   pn:'szt'},
+{n:'Baton proteinowy (typowy)',   kcal:200, p:20, c:20,  f:8,   s:1,   pn:'szt (~60g)'},
+{n:'Baton zbożowy müsli',        kcal:380, p:7,  c:62,  f:11,  s:100, pn:'100g'},
+{n:'Czekolada mleczna',          kcal:535, p:7.7,c:59,  f:30,  s:100, pn:'100g'},
+{n:'Czekolada gorzka 70%',       kcal:598, p:7.8,c:46,  f:43,  s:100, pn:'100g'},
+];
+
+function parseQty(text){
+  // Wyodrębnij ilość z tekstu np. "200g kurczaka", "3 jajka", "2 porcje ryżu"
+  const gMatch=text.match(/(\d+(?:[.,]\d+)?)\s*(?:g|gram|gramów)\b/i);
+  if(gMatch) return{qty:parseFloat(gMatch[1].replace(',','.')),mode:'g'};
+  const numMatch=text.match(/^(\d+(?:[.,]\d+)?)\s/);
+  if(numMatch) return{qty:parseFloat(numMatch[1].replace(',','.')),mode:'p'};
+  return{qty:1,mode:'p'};
+}
+
+function searchFood(q){
+  if(!q||q.length<2) return [];
+  const s=q.toLowerCase().replace(/[łl]/g,'l').replace(/[ąa]/g,'a').replace(/[ęe]/g,'e')
+    .replace(/[óo]/g,'o').replace(/[śs]/g,'s').replace(/[źżz]/g,'z').replace(/[ćc]/g,'c').replace(/[ńn]/g,'n');
+  const normalize=t=>t.toLowerCase().replace(/[łl]/g,'l').replace(/[ąa]/g,'a').replace(/[ęe]/g,'e')
+    .replace(/[óo]/g,'o').replace(/[śs]/g,'s').replace(/[źżz]/g,'z').replace(/[ćc]/g,'c').replace(/[ńn]/g,'n');
+  const words=s.split(/\s+/).filter(w=>w.length>1);
+  const scored=FOOD_DB.map(f=>{
+    const name=normalize(f.n);
+    let score=0;
+    if(name.startsWith(s)) score+=10;
+    if(name.includes(s)) score+=5;
+    words.forEach(w=>{if(name.includes(w)) score+=2;});
+    return{...f,score};
+  }).filter(f=>f.score>0).sort((a,b)=>b.score-a.score);
+  return scored.slice(0,8);
+}
+
+function macrosFor(food,qty,mode){
+  // food.s = rozmiar porcji bazowej (g lub ml lub szt)
+  // food.kcal = kcal na tę porcję bazową (nie na 100g!)
+  // Ale mamy podwójny standard w bazie — niektóre per 100g, niektóre per szt
+  // Dlatego: wszystkie pola są per food.s jednostek
+  const mul = mode==='g' ? (qty / food.s) : qty;
+  return{
+    kcal: Math.round(food.kcal * mul),
+    p:    Math.round(food.p    * mul * 10)/10,
+    c:    Math.round(food.c    * mul * 10)/10,
+    f:    Math.round(food.f    * mul * 10)/10,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// KALKULATOR 1RM (Brzycki)
+// ═══════════════════════════════════════════════════════════
+function calc1RM(){
+  const w=parseFloat(document.getElementById('orm-w')?.value)||0;
+  const r=parseInt(document.getElementById('orm-r')?.value)||0;
+  const el=document.getElementById('orm-result');
+  if(!el) return;
+  if(!w||!r||r<1||r>36){
+    el.innerHTML='<span style="color:var(--muted2);font-size:12px">Podaj ciężar i liczbę powtórzeń (1–36)</span>';
+    el.classList.add('show');
+    return;
+  }
+  if(r===1){
+    el.innerHTML=`<div class="orm-label">Szacowany 1RM</div><div class="orm-val">${w} kg <span style="font-size:16px;color:var(--muted2)">(to twoje 1RM)</span></div>`;
+    el.classList.add('show');
+    return;
+  }
+  const orm=Math.round(w*(36/(37-r))*10)/10;
+  const zones=[
+    {pct:95, reps:'1–2',   label:'Siła max'},
+    {pct:85, reps:'4–6',   label:'Siła / moc'},
+    {pct:75, reps:'8–12',  label:'Hipertrofia'},
+    {pct:65, reps:'15–20', label:'Wytrzymałość'},
+    {pct:55, reps:'20+',   label:'Kondycja'},
+  ];
+  const zonesHtml=zones.map(z=>`
+    <div class="orm-zone">
+      <div class="orm-zone-pct">${z.pct}% · ${z.reps} powt</div>
+      <div class="orm-zone-val">${Math.round(orm*z.pct/100*2)/2} kg</div>
+      <div style="font-family:var(--fm);font-size:8px;color:var(--muted)">${z.label}</div>
+    </div>`).join('');
+  el.innerHTML=`
+    <div class="orm-label">Szacowany 1RM (Brzycki)</div>
+    <div class="orm-val">${orm} kg</div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin:4px 0 8px">Na podstawie: ${w}kg × ${r} powt</div>
+    <div class="orm-zones" style="grid-template-columns:repeat(5,1fr)">${zonesHtml}</div>`;
+  el.classList.add('show');
 }
 
 // ═══════════════════════════════════════════════════════════
