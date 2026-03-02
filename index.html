@@ -1237,12 +1237,13 @@ const TIPS=[
 function startQuiz(){show('quiz');currentStep=0;renderQ();}
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
   window.scrollTo(0,0);
-  // Show/hide stats FAB
   const fab=document.getElementById('stats-fab');
-  fab.classList.toggle('visible', id==='results'||id==='plan');
-  document.getElementById('cal-fab').classList.toggle('visible', id==='plan');
+  if(fab) fab.classList.toggle('visible', id==='results'||id==='plan');
+  const calFab=document.getElementById('cal-fab');
+  if(calFab) calFab.classList.toggle('visible', id==='plan');
 }
 function renderQ(){
   const q=QUESTIONS[currentStep];
@@ -1664,6 +1665,20 @@ function initDayDrag(){
       touchSrc=null;moved=false;
     });
   });
+}
+
+function _swapDays(aIdx,bIdx){
+  const days=window.__split.days;
+  if(!days[aIdx]||!days[bIdx]) return;
+  const tmp={label:days[aIdx].label,tr:days[aIdx].tr,ex:days[aIdx].ex};
+  days[aIdx].label=days[bIdx].label;
+  days[aIdx].tr=days[bIdx].tr;
+  days[aIdx].ex=days[bIdx].ex;
+  days[bIdx].label=tmp.label;
+  days[bIdx].tr=tmp.tr;
+  days[bIdx].ex=tmp.ex;
+  showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
+  renderPlan();
 }
 
 function showToast(msg){
@@ -2454,7 +2469,15 @@ let _mobileSettingsOpen=false;
 function openMobileSettings(){
   const panel=document.getElementById('mobile-settings');
   if(!panel) return;
-  document.getElementById('mobile-settings-body').innerHTML=_buildSettingsHTML();
+  if(!answers||!answers.weight){
+    document.getElementById('mobile-settings-body').innerHTML=`
+      <div style="text-align:center;padding:24px 0">
+        <div style="font-size:13px;color:var(--muted2);margin-bottom:16px">Wygeneruj najpierw plan treningowy</div>
+        <button onclick="closeMobileSettings();show('hero')" style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 24px;border-radius:4px;cursor:pointer">Wygeneruj plan →</button>
+      </div>`;
+  } else {
+    document.getElementById('mobile-settings-body').innerHTML=_buildSettingsHTML();
+  }
   _mobileSettingsOpen=true;
   panel.classList.add('open');
 }
@@ -2948,5 +2971,12 @@ function toggleFaq(i){
 function openPolicyModal(){document.getElementById('policy-modal').classList.add('open');}
 function closePolicyModal(){document.getElementById('policy-modal').classList.remove('open');}
 </script>
+<div class="stats-panel" id="stats-panel">
+  <div class="sp-header">
+    <div class="sp-title">Twoje dane</div>
+    <button class="sp-close" onclick="toggleStats()">✕</button>
+  </div>
+  <div class="sp-body" id="sp-body"></div>
+</div>
 </body>
 </html>
