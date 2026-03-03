@@ -366,7 +366,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .faq-wrap{max-width:720px;width:100%;padding:0 24px 60px;margin:0 auto}
 .faq-item{border-bottom:1px solid var(--border)}
 .faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;gap:12px;user-select:none}
-.faq-q:hover{color:var(--accent)}
+.faq-q:hover,.faq-q.active{color:var(--accent)}
+.faq-ico{transition:color .2s}
+.faq-q.active .faq-ico{color:var(--accent)}
 .faq-ico{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--muted);transition:.2s;flex-shrink:0}
 .faq-a{font-size:13px;color:var(--muted2);line-height:1.7;padding:0 0 16px;display:none}
 .faq-a.open{display:block}
@@ -625,6 +627,130 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .day-card.dragging{opacity:.4;border-color:var(--accent)!important}
 .day-card.drag-over{border-color:var(--accent)!important;background:rgba(200,255,0,.06)!important;transform:scale(1.01)}
 .day-card{transition:border-color .15s,background .15s,transform .15s}
+.day-move-btns{display:none;gap:4px;align-items:center}
+.day-move-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);border-radius:4px;cursor:pointer;font-size:14px;padding:4px 9px;line-height:1;transition:.15s}
+.day-move-btn:hover:not([disabled]){border-color:var(--accent);color:var(--accent)}
+.day-move-btn[disabled]{opacity:.25;cursor:default}
+@media(max-width:768px){.day-move-btns{display:flex}}
+/* ── STREAK & BADGES ── */
+.streak-widget{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:16px;flex-wrap:wrap}
+.streak-fire{font-size:32px;line-height:1;flex-shrink:0}
+.streak-count{font-family:var(--fd);font-size:40px;font-weight:900;color:var(--accent);line-height:1}
+.streak-label{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.streak-best{font-family:var(--fm);font-size:10px;color:var(--muted2);margin-top:2px}
+.badges-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;width:100%}
+.badge-item{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:100px;font-family:var(--fm);font-size:10px;letter-spacing:.06em;border:1px solid;transition:.2s}
+.badge-item.earned{background:rgba(200,255,0,.1);border-color:rgba(200,255,0,.3);color:var(--accent)}
+.badge-item.locked{background:var(--bg3);border-color:var(--border);color:var(--muted)}
+.badge-item .bi{font-size:13px}
+
+/* ── ONBOARDING ── */
+.onb-overlay{position:fixed;inset:0;z-index:5000;display:none}
+.onb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(2px)}
+.onb-spotlight{position:absolute;border:2px solid var(--accent);border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.65);z-index:5001;pointer-events:none;transition:all .35s cubic-bezier(.4,0,.2,1)}
+.onb-tooltip{position:absolute;z-index:5002;background:var(--bg2);border:1px solid var(--accent);border-radius:10px;padding:18px 20px;max-width:290px;width:290px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.onb-step-num{font-family:var(--fm);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.15em;margin-bottom:6px}
+.onb-title{font-family:var(--fd);font-size:20px;font-weight:900;text-transform:uppercase;margin-bottom:6px}
+.onb-desc{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:14px}
+.onb-nav{display:flex;gap:8px;align-items:center}
+.btn-onb-next{flex:1;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:14px;font-weight:800;text-transform:uppercase;padding:10px;border-radius:4px;cursor:pointer;transition:.15s}
+.btn-onb-next:hover{background:#fff}
+.btn-onb-skip{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;white-space:nowrap}
+.onb-dots{display:flex;gap:4px;align-items:center;margin-right:auto}
+.onb-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:.2s}
+.onb-dot.active{background:var(--accent);width:14px;border-radius:3px}
+
+/* ── FATIGUE SYSTEM ── */
+.fatigue-btn{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;padding:14px 20px;border-radius:6px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
+.fatigue-btn:hover{border-color:rgba(255,77,0,.5);background:rgba(255,77,0,.04)}
+.fatigue-panel{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+.fatigue-panel.open{display:flex}
+.fatigue-inner{background:var(--bg2);border:1px solid var(--border2);border-radius:16px 16px 0 0;width:min(520px,100%);max-height:88vh;overflow-y:auto;padding:24px 20px calc(28px + env(safe-area-inset-bottom))}
+.fatigue-title{font-family:var(--fd);font-size:24px;font-weight:900;text-transform:uppercase;margin-bottom:6px}
+.fatigue-sub{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6}
+.fatigue-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.fatigue-opt{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:13px 14px;cursor:pointer;transition:.15s;text-align:left}
+.fatigue-opt:hover{border-color:var(--border2);background:var(--bg2)}
+.fatigue-opt.sel{border-color:var(--accent2);background:rgba(255,77,0,.08)}
+.fatigue-opt-ico{font-size:20px;display:block;margin-bottom:4px}
+.fatigue-opt-name{font-family:var(--fd);font-size:15px;font-weight:800;text-transform:uppercase;display:block}
+.fatigue-opt-ex{font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:3px;line-height:1.4;display:block}
+.btn-fatigue-apply{width:100%;background:var(--accent2);color:#fff;border:none;font-family:var(--fd);font-size:16px;font-weight:800;text-transform:uppercase;padding:14px;border-radius:4px;cursor:pointer;transition:.15s}
+.btn-fatigue-apply:hover{background:#ff6a00}
+.btn-fatigue-reset{width:100%;background:none;border:1px solid var(--border);color:var(--muted2);font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;padding:11px;border-radius:4px;cursor:pointer;margin-top:8px;transition:.15s}
+.btn-fatigue-reset:hover{border-color:var(--border2);color:var(--text)}
+.fatigue-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,77,0,.15);border:1px solid rgba(255,77,0,.35);color:var(--accent2);font-family:var(--fm);font-size:9px;padding:3px 9px;border-radius:100px}
+
+/* ── WARMUP MODAL ── */
+.warmup-sets{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.wu-set-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:4px}
+.wu-set-num{font-family:var(--fm);font-size:10px;color:var(--muted);width:20px;flex-shrink:0}
+.wu-set-pct{font-family:var(--fd);font-size:16px;font-weight:900;color:var(--accent);width:44px}
+.wu-set-kg{font-family:var(--fd);font-size:22px;font-weight:900;flex:1;text-align:center}
+.wu-set-reps{font-family:var(--fm);font-size:11px;color:var(--muted2);width:44px;text-align:right}
+.wu-1rm-input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:24px;font-weight:800;padding:8px 12px;border-radius:4px;outline:none;width:110px;text-align:center;transition:.15s}
+.wu-1rm-input:focus{border-color:var(--accent)}
+
+/* ── CHATBOT ── */
+.chat-fab{position:fixed;bottom:88px;right:18px;z-index:600;width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;cursor:pointer;font-size:22px;box-shadow:0 6px 28px rgba(200,255,0,.35);transition:.2s;align-items:center;justify-content:center;display:none}
+.chat-fab:hover{background:#fff;transform:translateY(-2px)}
+.chat-fab.visible{display:flex}
+.chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
+.chat-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
+.chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.chat-avatar{width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.chat-header-info{flex:1;min-width:0}
+.chat-header-name{font-family:var(--fd);font-size:17px;font-weight:900;text-transform:uppercase}
+.chat-header-status{font-family:var(--fm);font-size:9px;color:var(--accent);display:flex;align-items:center;gap:4px;margin-top:1px}
+.chat-header-status::before{content:'';width:5px;height:5px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+.chat-close{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);border-radius:4px;cursor:pointer;font-size:15px;padding:5px 9px;transition:.15s}
+.chat-close:hover{color:var(--text)}
+.chat-messages{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:360px}
+.chat-msg{display:flex;flex-direction:column;gap:3px;max-width:88%}
+.chat-msg.user{align-self:flex-end;align-items:flex-end}
+.chat-msg.ai{align-self:flex-start;align-items:flex-start}
+.chat-bubble{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6}
+.chat-msg.user .chat-bubble{background:var(--accent);color:#000;border-radius:12px 12px 2px 12px;font-weight:600}
+.chat-msg.ai .chat-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 2px}
+.chat-bubble.typing{display:flex;gap:4px;align-items:center;padding:12px 16px}
+.chat-bubble.typing span{width:6px;height:6px;background:var(--muted2);border-radius:50%;animation:typingDot 1.2s infinite}
+.chat-bubble.typing span:nth-child(2){animation-delay:.2s}
+.chat-bubble.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.1);opacity:1}}
+.chat-time{font-family:var(--fm);font-size:9px;color:var(--muted)}
+.chat-quick-btns{display:flex;gap:6px;padding:0 14px 8px;flex-wrap:wrap}
+.chat-quick{background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);font-family:var(--fm);font-size:10px;padding:6px 11px;border-radius:100px;cursor:pointer;transition:.12s;white-space:nowrap}
+.chat-quick:hover{border-color:var(--accent);color:var(--accent)}
+.chat-input-area{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--border);flex-shrink:0}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:13px;padding:10px 13px;border-radius:20px;outline:none;resize:none;max-height:80px;overflow-y:auto;line-height:1.4}
+.chat-input:focus{border-color:var(--accent)}
+.btn-chat-send{background:var(--accent);border:none;border-radius:50%;width:38px;height:38px;min-width:38px;cursor:pointer;font-size:16px;transition:.15s;display:flex;align-items:center;justify-content:center;align-self:flex-end;color:#000;font-weight:800}
+.btn-chat-send:hover{background:#fff}
+.btn-chat-send:disabled{background:var(--border);cursor:not-allowed;color:var(--muted)}
+
+/* ── REFERRAL ── */
+.ref-card{background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(0,212,255,.04));border:1px solid rgba(200,255,0,.18);border-radius:8px;padding:18px 20px;margin-bottom:20px}
+.ref-title{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:5px}
+.ref-sub{font-size:13px;color:var(--muted2);margin-bottom:13px;line-height:1.5}
+.ref-code-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ref-code{font-family:var(--fm);font-size:15px;font-weight:700;color:var(--accent);background:var(--bg3);border:1px solid var(--border2);padding:9px 14px;border-radius:4px;flex:1;text-align:center;letter-spacing:.1em;cursor:pointer;min-width:120px;transition:.15s}
+.ref-code:hover{border-color:var(--accent)}
+.ref-stats{display:flex;gap:20px;margin-top:12px}
+.ref-stat-val{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent)}
+.ref-stat-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:1px}
+
+/* ── MOBILE tweaks ── */
+@media(max-width:768px){
+  .chat-fab{bottom:calc(68px + env(safe-area-inset-bottom) + 8px);right:12px}
+  .chat-panel{width:100vw;max-height:calc(100vh - 60px - env(safe-area-inset-bottom));border-radius:16px 16px 0 0;bottom:calc(60px + env(safe-area-inset-bottom))}
+  .chat-messages{min-height:200px;max-height:calc(100vh - 320px - env(safe-area-inset-bottom))}
+  .fatigue-grid{grid-template-columns:1fr 1fr}
+  .streak-widget{padding:12px 14px;gap:10px}
+  .streak-count{font-size:32px}
+}
+@media(max-width:380px){
+  .fatigue-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -730,11 +856,11 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bn-btn" onclick="openMobileSettings()">
     <span class="bn-ico">⚙️</span>
-    <span>Ustawienia</span>
+    <span>Ustaw.</span>
   </button>
   <button class="bn-btn" onclick="openFoodSearch()">
-    <span class="bn-ico">🔍</span>
-    <span>Jedzenie</span>
+    <span class="bn-ico">🍽</span>
+    <span>Kalorie</span>
   </button>
   <button class="bn-btn center-btn" onclick="openScanner()">
     <span class="bn-ico">📷</span>
@@ -743,9 +869,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <span class="bn-ico">📓</span>
     <span>Trening</span>
   </button>
-  <button class="bn-btn" onclick="toggleStats()">
-    <span class="bn-ico">📊</span>
-    <span>Dane</span>
+  <button class="bn-btn" onclick="toggleChat()">
+    <span class="bn-ico">🤖</span>
+    <span>Trener</span>
   </button>
 </nav>
 
@@ -837,7 +963,54 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     </div>
   </div>
 </div>
+<!-- FATIGUE PANEL -->
+<div class="fatigue-panel" id="fatigue-panel" onclick="if(event.target===this)closeFatigue()">
+  <div class="fatigue-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div class="fatigue-title">💢 Jak się dziś czujesz?</div>
+      <button onclick="closeFatigue()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);border-radius:4px;padding:6px 10px;cursor:pointer;font-size:15px">✕</button>
+    </div>
+    <div class="fatigue-sub">Zaznacz co boli lub jest zmęczone — plan automatycznie zamieni ćwiczenia obciążające te partie na bezpieczne alternatywy dzisiaj.</div>
+    <div class="fatigue-grid" id="fatigue-opts-grid"></div>
+    <button class="btn-fatigue-apply" onclick="applyFatigue()">✓ Dostosuj dzisiejszy plan</button>
+    <button class="btn-fatigue-reset" onclick="resetFatigue()">↺ Przywróć oryginalny plan</button>
+  </div>
+</div>
 
+<!-- ONBOARDING OVERLAY -->
+<div id="onb-overlay" class="onb-overlay">
+  <div class="onb-backdrop" onclick="finishOnboarding()"></div>
+  <div class="onb-spotlight" id="onb-spotlight"></div>
+  <div class="onb-tooltip" id="onb-tooltip"></div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">AI Trener</div>
+      <div class="chat-header-status">Online — gotowy do pomocy</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-quick-btns">
+    <button class="chat-quick" onclick="chatQuick('Co jeść przed treningiem?')">🍌 Przed treningiem</button>
+    <button class="chat-quick" onclick="chatQuick('Jak poprawić technikę squata?')">🏋️ Squat technika</button>
+    <button class="chat-quick" onclick="chatQuick('Dlaczego nie rośnie moja klatka?')">💪 Stagnacja klatki</button>
+    <button class="chat-quick" onclick="chatQuick('Ile odpoczynku między seriami przy budowie masy?')">⏱ Przerwy między seriami</button>
+  </div>
+  <div class="chat-input-area">
+    <textarea class="chat-input" id="chat-input" placeholder="Zapytaj trenera..." rows="1"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
+    <button class="btn-chat-send" id="btn-chat-send" onclick="sendChatMessage()">↑</button>
+  </div>
+</div>
+
+<!-- CHAT FAB -->
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny">🤖</button>
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -850,6 +1023,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 // STATE
 // ═══════════════════════════════════════════════════════════
 let answers = {};
+let _collapsedDays = new Set();
 let currentStep = 0;
 
 // Load saved answers from localStorage
@@ -1013,26 +1187,100 @@ const EX = {
   pull_over: {n:"Pullover ze sztangielką",             m:"Najszersze / klatka",     g:"back",   t:"Unikalne ćwiczenie — rozciąga klatkę I angażuje najszersze jednocześnie.",
     steps:["Połóż się prostopadle na ławce (tylko łopatki na ławce, biodra w dół).","Trzymaj jedną sztangielkę oburącz, ramiona wyprostowane nad klatką.","Opuszczaj sztangielkę za głowę łukiem, lekko uginając łokcie. Poczuj rozciąganie.","Wróć łukiem do pozycji startowej poprzez kontrakcję najszerszych."],
     mistakes:["Zbyt duże obciążenie — utrata kontroli za głową","Biodra lecą w górę (zrób mostek zamiast przysiadu)","Zbyt szybkie tempo — tracisz rozciąganie"]},
+    seated_row:{n:"Wiosłowanie na wyciągu siedząc",      m:"Środkowe plecy / najszersze",g:"back",   t:"Plecy pionowe, ściągaj łokcie wzdłuż ciała. Nie garb się na końcu ruchu.",
+    steps:["Usiądź na maszynie, stopy na podporach, lekkie ugięcie kolan. Chwyć uchwyt neutralnie.","Wyprostuj tułów do pionu — nie opieraj się do tyłu.","Ściągnij uchwyt do brzucha, łokcie cofają się wzdłuż ciała. Pauza 1 sek.","Powolne wypuszczanie — ramiona się wydłużają, poczuj rozciąganie najszerszych."],
+    mistakes:["Kołysanie tułowiem do tyłu przy ciągnięciu (momentum zamiast mięśni)","Garbiecie się przy wypuszczaniu (utrata napięcia rdzenia)","Łokcie rozchylone na boki (przechodzi na bark)"]},
+  cable_row:{n:"Wiosłowanie linką wyciągu (stojąc)",   m:"Najszersze / środkowe plecy",g:"back",   t:"Ustaw blok na wysokości bioder. Krok do tyłu, napnij rdzeń — ściągaj łokcie za linię pleców.",
+    steps:["Ustaw wyciąg na wysokość bioder. Chwyć linkę oburącz, krok do tyłu.","Lekki przedskłon, napięty rdzeń. Ściągaj łokcie za linię pleców.","Na szczycie: ściśnij łopatki. Pauza 1 sek.","Powolne wypuszczanie — ramiona do pełnego wyprostu."],
+    mistakes:["Zbyt duże obciążenie — utrata kontroli","Brak ściśnięcia łopatek na szczycie"]},
+  upright_row:{n:"Wiosłowanie sztangi stojąc (Upright Row)",m:"Barki środkowe / trapez",g:"shoulder",t:"Łokcie prowadzą ruch w górę. Nie wyżej niż do linii barków — ryzyko uderzenia w rotatory.",
+    steps:["Chwyć sztangę nachwytem, ręce bliżej siebie niż szerokość barków.","Ciągnij sztangę pionowo w górę wzdłuż ciała — łokcie prowadzą, idą wyżej niż dłonie.","Zatrzymaj gdy łokcie są na wysokości barków. Pauza 1 sek.","Powolne opuszczanie z kontrolą."],
+    mistakes:["Łokcie powyżej barków — ryzyko uszkodzenia rotatorów","Za szeroki chwyt (redukuje zakres)","Zbyt duże obciążenie = szarpanie tułowiem"]},
+  shrug:     {n:"Wznosy barków (Shrug) ze sztangą",    m:"Trapez górny",            g:"back",     t:"Ruch pionowo w górę — nie rotacyjny. Pełne uniesienie barków do uszu.",
+    steps:["Stój ze sztangą w opuszczonych rękach, chwyt nachwytem na szerokość barków.","Unieś barki pionowo w górę — jakbyś chciał dotknąć nimi uszu. BEZ rotacji.","Pauza 1 sek na górze. Maksymalna kontrakcja trapezu.","Opuść powoli przez 2 sekundy."],
+    mistakes:["Rotacja barków (kółka) — brak dodatkowego efektu, ryzyko kontuzji","Za szybkie, sprężynujące powtórzenia","Zbyt duży ciężar — skrócony zakres"]},
+  preacher_curl:{n:"Uginanie na modlitewniku (Preacher Curl)",m:"Szczyt bicepsa",    g:"biceps",   t:"Pełne rozciąganie w dole. Łokcie nie odrywają się od podkładki.",
+    steps:["Usiądź na ławce do modlitewnika, ramiona oparte o podkładkę pod kątem 45°.","Ramiona muszą być PRZYBITE do podkładki przez cały ruch.","Ugnij powoli do góry — pełna kontrakcja na szczycie. Pauza 1 sek.","Opuść BARDZO powoli — pełne rozciąganie w dole. To jest najtrudniejsza faza."],
+    mistakes:["Odrywanie łokci od podkładki","Za szybkie opuszczanie (marnujesz najlepszą fazę)","Zbyt duże obciążenie — brak pełnego zakresu"]},
+  cable_curl:{n:"Uginanie na wyciągu stojąc",           m:"Biceps — stały opór",    g:"biceps",   t:"Wyciąg utrzymuje napięcie przez cały zakres — lepsza stymulacja niż sztanga.",
+    steps:["Ustaw wyciąg nisko, chwyć drążek lub linki podchwytem.","Łokcie przy boku — NIERUCHOME. Ugnij do maksimum, pauza 1 sek.","Opuść przez 3 sekundy — wyciąg utrzymuje napięcie nawet w dole."],
+    mistakes:["Łokcie odsuwają się od ciała","Zbyt szybkie opuszczanie"]},
+  bench_dip: {n:"Dipy na ławce (Triceps Bench Dip)",   m:"Triceps",                 g:"triceps",  t:"Im dalej nogi — tym trudniej. Tułów blisko ławki, pionowo w dół.",
+    steps:["Oprzyj dłonie na krawędzi ławki za plecami, nogi wyciągnięte przed siebie (lub ugięte — łatwiej).","Opuść ciało pionowo w dół — łokcie cofają się prosto w tył.","Zejdź do kąta 90° w łokciach lub niżej.","Wypchnij z powrotem do pełnego wyprostu."],
+    mistakes:["Tułów odsuwa się od ławki (zamiana w ćwiczenie na barki)","Zbyt głębokie zejście przy bólu łokci","Stopy zbyt blisko ciała (za łatwo)"]},
+  tricep_kick:{n:"Odpychanie sztangielki w tył (Kickback)",m:"Triceps — głowa boczna",g:"triceps",t:"Całkowite unieruchomienie łokcia. Tylko staw łokciowy pracuje.",
+    steps:["Stań w opadzie tułowia ~45°, chwyć sztangielkę. Łokieć unieś do linii pleców.","Wyprostuj przedramię w tył — łokieć NIERUCHOMY przez cały ruch.","Na szczycie: pełne wyprostowanie. Pauza 1 sek, ściśnij tricepsa.","Powolne cofanie przedramienia. Łokieć wciąż nieruchomy."],
+    mistakes:["Łokieć opada w dół przy wyproście","Zbyt duże obciążenie — utrata kontroli","Kołysanie tułowia"]},
+  nordic_curl:{n:"Nordic Curl (GHR)",                   m:"Hamstrings — ekscentryka",g:"legs",    t:"Najtrudniejsze ćwiczenie na tylne udo. Ekscentryka przednia przez cały ruch.",
+    steps:["Zablokuj kostki pod ławką lub z partnerem. Klęcznij, ciało pionowo.","Powoli opadaj do przodu, hamując upadek siłą ud. Jak najwolniej.","Gdy nie dajesz rady — złap podłogę dłońmi i wypchnij się z powrotem.","Wróć do góry pomagając się rękami lub przez skurcz ud."],
+    mistakes:["Zbyt szybkie opadanie (tracisz całą wartość ćwiczenia)","Biodra się zginają (powinny być zablokowane)","Zaawansowane ćwiczenie — zacznij z asekuracją"]},
+  good_morning:{n:"Good Morning ze sztangą",            m:"Tylne udo / plecy dolne", g:"legs",    t:"Ruch z bioder, nie kolan. Biodra cofają się do tyłu. Plecy neutralne bezwzględnie.",
+    steps:["Sztanga na ramionach jak przy squacie. Kolana lekko ugięte — zostają tak.","Przesuń biodra DO TYŁU, jednocześnie pochylając tułów.","Zejdź do momentu gdy czujesz napięcie w tylnych udach (ok. 45° tułowia).","Wróć do góry przez wypchnięcie bioder do przodu."],
+    mistakes:["Uginanie kolan (zamiana w przysiad)","Zaokrąglenie pleców — kontuzja","Zbyt duże obciążenie na start"]},
+  back_ext:  {n:"Prostowanie grzbietu (Hyperextension)",m:"Dolne plecy / pośladki", g:"back",    t:"Do linii ciała — nie przeginaj dalej. Możesz dodać obciążenie na klatkę.",
+    steps:["Ustaw się na ławce do hyperextension, biodra na poduszce, stopy zablokowane.","Opuść tułów w dół — do kąta 45–90° (ile daje rozciąganie).","Wypchnij z powrotem do linii ciała. Pauza 1 sek.","Opcja: trzymaj talerz przy klatce dla większego oporu."],
+    mistakes:["Przeprost — biodra powyżej linii kręgosłupa","Zbyt szybki ruch — balistyka bez kontroli"]},
+  bicycle_crunch:{n:"Rowerek (Bicycle Crunch)",         m:"Skośne mięśnie / brzuch", g:"core",   t:"Powoli. Rotacja tułowia — nie szyi. Łokieć do kolana przez obrót klatki.",
+    steps:["Połóż się na plecach, dłonie lekko za głową (nie ciągnij za szyję).","Unieś łopatki. Naprzemiennie: lewy łokieć → prawe kolano. Przez rotację tułowia.","Drugie kolano wyprostowane równolegle do podłogi — nie opuszczaj całkiem.","Tempo: 2 sekundy na ruch. Nie śpiesz się."],
+    mistakes:["Ciągnięcie za szyję (zamiast rotacji klatki)","Zbyt szybkie tempo — brak aktywacji skośnych","Kolano zbyt wysoko lub za nisko"]},
+  pallof_press:{n:"Pallof Press (wyciąg)",              m:"Core — anti-rotation",    g:"core",   t:"Ciało NIERUCHOME. Chodzi o opór przed rotacją — nie o ruch.",
+    steps:["Stań bokiem do wyciągu, chwyć linkę przy klatce.","Wypchnij linkę prosto przed siebie — utrzymaj ciało idealnie nieruchome.","Wróć do klatki. Powtórz. Ciało musi być jak skała.","Po serii zmień stronę."],
+    mistakes:["Rotacja tułowia przy wyproście (neguje ćwiczenie)","Za duże obciążenie — utrata postawy","Zbyt szybkie tempo"]},
+  side_plank:{n:"Boczna deska (Side Plank)",            m:"Core — skośne",           g:"core",   t:"Biodra do góry — ciało w jednej linii. Napnij gluty.",
+    steps:["Oprzyj się na przedramieniu i krawędzi stopy. Ciało bokiem.","Unieś biodra do pełnej linii prostej od głowy do stóp.","Napnij gluty, brzuch, quady. Oddychaj normalnie.","Utrzymaj czas. Zmień stronę."],
+    mistakes:["Biodra opadają (zamiast linii)","Rotacja tułowia do przodu","Zbyt krótki czas — to ćwiczenie wymaga trwania"]},
+  db_bench:  {n:"Wyciskanie sztangielek leżąc (płaskie)",m:"Klatka piersiowa",       g:"chest",   t:"Pełen zakres — sztangielki niżej niż przy sztandze. Lepsze rozciągnięcie klatki.",
+    steps:["Połóż się na ławce, sztangielki na udach. Wypchnij je w górę przy kładzeniu się.","Łopatki ściągnięte i wbite w ławkę — utrzymaj przez cały set.","Opuść sztangielki do boków klatki — niżej niż przy sztandze, pełny zakres.","Wypchnij eksplozywnie w górę i lekko do środka."],
+    mistakes:["Zbyt wąski ruch (zamiast łuku = brak angażowania klatki)","Brak kontroli przy opuszczaniu","Łokcie za szeroko (powyżej 75° = duże obciążenie na rotatory)"]},
+  pike_pushup:{n:"Pompki w pionie (Pike Push-up)",        m:"Barki / triceps",         g:"shoulder",t:"Im bardziej pionowe ciało, tym więcej barków. Stopy na krześle = trudniejsza wersja.",
+    steps:["Przyjmij pozycję pompki, podejdź stopami bliżej dłoni — ciało w kształcie litery A.","Zegnij łokcie, opuszczając głowę między dłonie — łokcie idą na boki.","Wypchnij z powrotem do góry przez barki.","Progresja: stopy na krześle lub ścianie (pike handstand push-up)."],
+    mistakes:["Biodra opadają w dół zamiast tworzyć kąt","Zbyt szeroko ręce (mniejsze zaangażowanie barków)","Brak pełnego zakresu"]},
+  diamond_pushup:{n:"Pompki diamentowe (Diamond Push-up)",m:"Triceps",                g:"triceps", t:"Dłonie w kształcie rombu pod klatką. Najlepsza izolacja tricepsa bez sprzętu.",
+    steps:["Przyjmij pozycję pompki. Zbliż dłonie tak, żeby kciuki i wskazujące tworzyły romb (◆) — pod środkiem klatki.","Opuść klatkę do dłoni — łokcie blisko ciała, cofają się w tył.","Wypchnij eksplozywnie do pełnego wyprostu."],
+    mistakes:["Dłonie zbyt daleko od środka ciała","Łokcie rozchylają się na boki","Biodra opadają — utrata linii ciała"]},
+  glute_bridge:{n:"Mostek pośladkowy (Glute Bridge)",    m:"Pośladki / tylne udo",    g:"legs",    t:"Wersja hip thrusta bez sprzętu. Tak samo skuteczna przy pełnym napięciu pośladków.",
+    steps:["Połóż się na plecach, kolana ugięte pod ~90°, stopy blisko pośladków.","Unieś biodra przez pięty — pełny wyprost bioder. Ściśnij pośladki MOCNO.","Pauza 2 sek na górze. Opuść powoli — pośladki nie dotykają podłogi między powtórzeniami.","Progresja: jedna noga, ciężar na biodrach, stopy na ławce."],
+    mistakes:["Brak pełnego wyprostu bioder na górze","Pośladki nie są aktywnie napięte — liczy się skurcz","Stopy zbyt daleko = quady i hamstrings zamiast pośladków"]},
+  inverted_row:{n:"Wiosłowanie odwrócone (Inverted Row)", m:"Najszersze / środkowe plecy",g:"back", t:"Im bardziej poziome ciało — tym trudniej. Świetny zamiennik wyciągu bez maszyny.",
+    steps:["Ustaw drążek lub krawędź stołu na wysokości bioder. Chwyć, zwisaj pod spodem.","Ciało w linii prostej od głowy do pięt — napnij gluty i rdzeń.","Ściągnij klatkę do drążka, łokcie cofają się wzdłuż ciała.","Powolne opuszczanie do pełnego wyprostu ramion."],
+    mistakes:["Biodra opadają (zamiast linii ciała — to nie liczy)","Zbyt pionowe ustawienie (za łatwo — obniż drążek lub unieś nogi)","Brak pełnego rozciągnięcia w dole"]},
+  wall_sit:   {n:"Siad przy ścianie (Wall Sit)",          m:"Mięsień czworogłowy",     g:"legs",    t:"Uda równoległe do podłogi. Plecy płasko przy ścianie. Czysta izolacja quada.",
+    steps:["Stań plecami do ściany, zrób krok do przodu. Zsuwaj się do kąta 90° w kolanach.","Plecy płasko przy ścianie przez cały czas — nie opieraj się na rękach.","Utrzymaj zadany czas. Oddychaj spokojnie.","Progresja: ciężar na udach lub jedna noga."],
+    mistakes:["Kolana powyżej 90° (za mały efekt)","Plecy odchodzą od ściany","Wstrzymywanie oddechu — to pogarsza wytrzymałość"]},
+  step_up:    {n:"Wchodzenie na podwyższenie (Step-Up)",  m:"Quady / pośladki",        g:"legs",    t:"Wypchnij TYLKO przednią nogą. Tylna noga jest pasażerem — nie odpycha.",
+    steps:["Stań przed ławką lub solidnym stopniem (~40cm). Postaw jedną stopę na podwyższeniu.","Wypchnij ciało w górę WYŁĄCZNIE przez przednią nogę — tylna noga nie odpycha od podłogi.","Postaw tylną stopę na podwyższeniu. Zejdź pod kontrolą.","Powtórz lub naprzemiennie. Ze sztangielkami w rękach = większy opór."],
+    mistakes:["Odpychanie tylną nogą (to wykrok, nie step-up)","Tułów pochyla się do przodu","Zbyt małe podwyższenie — brak efektu na pośladki"]},
+  bw_squat:   {n:"Przysiad z ciężarem własnym",           m:"Quady / pośladki",        g:"legs",    t:"Perfekcyjna technika zanim dodasz obciążenie. Ręce przed siebie dla równowagi.",
+    steps:["Stopy na szerokość bioder, palce lekko na zewnątrz. Ręce przed sobą lub skrzyżowane.","Kolana w linii palców stóp przez cały ruch — aktywnie napychaj je na zewnątrz.","Schodź poniżej równoległości — uda poniżej kolan. Pełny zakres.","Wypchnij przez pięty do góry."],
+    mistakes:["Kolana wchodzą do środka (valgus)","Pięty odrywają się od podłogi","Płytki przysiad — biodra powyżej kolan"]},
 };
 
 // ═══════════════════════════════════════════════════════════
 // ALTERNATIVES BY MUSCLE GROUP
 // ═══════════════════════════════════════════════════════════
 const GROUP_ALTS = {
-  chest:    ['bench','incline','dips','cable_fly','pushup','chest_press','pec_deck'],
-  back:     ['deadlift','pullup','row_bb','row_db','lat_pull','face_pull','t_bar_row','pull_over'],
-  shoulder: ['ohp','db_press','lat_raise','rear_delt','arnold','front_raise'],
-  biceps:   ['bb_curl','hammer','incline_curl','conc_curl'],
-  triceps:  ['cgbp','skull','pushdown','oh_tri','tri_dips'],
-  legs:     ['squat','rdl','leg_press','lunges','leg_curl','calf_raise','hip_thrust','goblet','sumo_dl','leg_ext','seated_calf','glute_kick'],
-  core:     ['plank','ab_wheel','cable_cr','hang_raise','dead_bug','russian_twist','mountain_climber'],
+  chest:    ['bench','incline','dips','cable_fly','pushup','chest_press','pec_deck','pull_over','db_bench','diamond_pushup','bench_dip'],
+  back:     ['deadlift','pullup','row_bb','row_db','lat_pull','face_pull','t_bar_row','pull_over','seated_row','cable_row','shrug','back_ext','good_morning','inverted_row'],
+  shoulder: ['ohp','db_press','lat_raise','rear_delt','arnold','front_raise','upright_row','pike_pushup'],
+  biceps:   ['bb_curl','hammer','incline_curl','conc_curl','preacher_curl','cable_curl'],
+  triceps:  ['cgbp','skull','pushdown','oh_tri','tri_dips','bench_dip','tricep_kick','diamond_pushup','bench_dip'],
+  legs:     ['squat','rdl','leg_press','lunges','leg_curl','calf_raise','hip_thrust','goblet','sumo_dl','leg_ext','seated_calf','glute_kick','nordic_curl','good_morning','glute_bridge','wall_sit','step_up','bw_squat'],
+  core:     ['plank','ab_wheel','cable_cr','hang_raise','dead_bug','russian_twist','mountain_climber','bicycle_crunch','pallof_press','side_plank'],
 };
-// Map each exercise to its group alternatives (flatten for easy lookup)
-function getAlts(exKey){
+function getAltsRaw(exKey){
   for(const [g,keys] of Object.entries(GROUP_ALTS)){
-    if(keys.includes(exKey)) return keys.filter(k=>k!==exKey && EX[k]);
+    if(keys.includes(exKey)) return keys.filter(k=>k!==exKey&&EX[k]);
   }
   return [];
+}
+
+function getAlts(exKey){
+  const eq=answers.equipment||'full';
+  const allowed=EQUIP_ALLOWED[eq];
+  const alts=getAltsRaw(exKey);
+  if(!allowed) return alts;
+  // Dostępne sprzętowo idą pierwsze, reszta na końcu (jako opcja)
+  return [...alts.filter(k=>allowed.has(k)),...alts.filter(k=>!allowed.has(k))];
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1043,51 +1291,116 @@ const INJURY_SWAPS={
   knees:{squat:'leg_press',lunges:'leg_curl',goblet:'leg_press',leg_press:'leg_curl'},
   shoulders:{ohp:'lat_raise',bench:'cable_fly',cgbp:'pushdown',incline:'cable_fly',dips:'pushdown',arnold:'lat_raise'}
 };
-const EQUIP_SWAPS={
+// Które ćwiczenia są dostępne przy danym sprzęcie
+const EQUIP_ALLOWED = {
+  basic: new Set([
+    // klatka
+    'pushup','dips','bench_dip','diamond_pushup','db_bench','incline','pull_over',
+    // plecy
+    'pullup','row_db','inverted_row','back_ext','shrug','good_morning',
+    // barki
+    'db_press','lat_raise','rear_delt','arnold','front_raise','upright_row','pike_pushup',
+    // biceps
+    'hammer','incline_curl','conc_curl','preacher_curl',
+    // triceps
+    'skull','oh_tri','tri_dips','bench_dip','tricep_kick','cgbp',
+    // nogi
+    'goblet','lunges','rdl','calf_raise','hip_thrust','glute_bridge','step_up','wall_sit',
+    'nordic_curl','glute_kick','bw_squat','squat',
+    // core
+    'plank','ab_wheel','dead_bug','mountain_climber','bicycle_crunch',
+    'side_plank','russian_twist','hang_raise','back_ext',
+  ]),
+  home: new Set([
+    // klatka
+    'pushup','bench_dip','diamond_pushup','dips',
+    // plecy
+    'pullup','inverted_row','back_ext',
+    // barki
+    'pike_pushup',
+    // biceps — podbródek na drążku
+    'pullup',
+    // triceps
+    'bench_dip','dips','diamond_pushup',
+    // nogi
+    'bw_squat','lunges','wall_sit','step_up','glute_bridge','glute_kick','calf_raise','nordic_curl',
+    // core
+    'plank','dead_bug','mountain_climber','bicycle_crunch','side_plank','russian_twist','hang_raise',
+  ]),
+};
+
+// Bezpośrednie zamiany gdy ćwiczenie niedostępne
+const EQUIP_FALLBACK = {
   basic:{
-    bench:'chest_press',squat:'goblet',deadlift:'rdl',row_bb:'row_db',
-    ohp:'db_press',cgbp:'pushdown',skull:'oh_tri',bb_curl:'hammer',
-    cable_fly:'pec_deck',cable_cr:'dead_bug',face_pull:'rear_delt',
-    hip_thrust:'rdl',leg_press:'lunges',lat_pull:'lat_pull',
-    hang_raise:'dead_bug',t_bar_row:'row_db',sumo_dl:'rdl'
+    bench:'db_bench', deadlift:'rdl', row_bb:'row_db', ohp:'db_press',
+    squat:'goblet', sumo_dl:'rdl', bb_curl:'hammer', t_bar_row:'row_db',
+    cable_fly:'pushup', cable_cr:'dead_bug', lat_pull:'pullup',
+    seated_row:'row_db', cable_row:'row_db', leg_press:'goblet',
+    leg_ext:'lunges', leg_curl:'rdl', seated_calf:'calf_raise',
+    pec_deck:'pushup', chest_press:'db_bench', face_pull:'rear_delt',
+    pallof_press:'side_plank', cable_curl:'hammer', hip_thrust:'glute_bridge',
   },
   home:{
-    bench:'pushup',squat:'goblet',deadlift:'rdl',row_bb:'row_db',
-    ohp:'lat_raise',cgbp:'pushup',skull:'oh_tri',bb_curl:'hammer',
-    cable_fly:'pushup',cable_cr:'dead_bug',face_pull:'rear_delt',
-    hip_thrust:'rdl',leg_press:'lunges',leg_curl:'rdl',
-    lat_pull:'pullup',incline:'pushup',calf_raise:'calf_raise',
-    dips:'pushup',chest_press:'pushup',pec_deck:'pushup',
-    t_bar_row:'row_db',sumo_dl:'rdl',hang_raise:'dead_bug',
-    conc_curl:'hammer',incline_curl:'hammer',ab_wheel:'plank',
-    cable_cr:'plank',russian_twist:'dead_bug',leg_ext:'lunges',
-    seated_calf:'calf_raise',glute_kick:'rdl',hip_thrust:'rdl',
-    lat_raise:'lat_raise',front_raise:'lat_raise',arnold:'lat_raise',
-    db_press:'lat_raise'
-  }
+    bench:'pushup', incline:'pushup', db_bench:'pushup', dips:'bench_dip',
+    deadlift:'glute_bridge', row_bb:'inverted_row', row_db:'inverted_row',
+    ohp:'pike_pushup', db_press:'pike_pushup', cgbp:'diamond_pushup',
+    skull:'bench_dip', pushdown:'bench_dip', oh_tri:'bench_dip',
+    tri_dips:'dips', bb_curl:'pullup', hammer:'pullup', incline_curl:'pullup',
+    conc_curl:'pullup', preacher_curl:'pullup', cable_curl:'pullup',
+    squat:'bw_squat', rdl:'glute_bridge', leg_press:'wall_sit',
+    leg_ext:'wall_sit', leg_curl:'nordic_curl', hip_thrust:'glute_bridge',
+    goblet:'bw_squat', sumo_dl:'glute_bridge', cable_fly:'pushup',
+    cable_cr:'dead_bug', lat_pull:'pullup', seated_row:'inverted_row',
+    cable_row:'inverted_row', face_pull:'inverted_row', lat_raise:'pike_pushup',
+    rear_delt:'inverted_row', arnold:'pike_pushup', front_raise:'pike_pushup',
+    upright_row:'inverted_row', shrug:'plank', t_bar_row:'inverted_row',
+    pec_deck:'pushup', chest_press:'pushup', seated_calf:'calf_raise',
+    pallof_press:'side_plank', good_morning:'glute_bridge', pull_over:'pullup',
+    back_ext:'back_ext', ab_wheel:'plank', cable_cr:'dead_bug',
+    hang_raise:'dead_bug', russian_twist:'bicycle_crunch',
+    step_up:'lunges', wall_sit:'wall_sit', glute_bridge:'glute_bridge',
+  },
 };
 function applyMods(exKey){
   const inj=answers.injuries||'none';
   const eq=answers.equipment||'full';
   const exp=answers.experience||'intermediate';
   let k=exKey;
-  // Sprzęt
-  if(eq!=='full'&&EQUIP_SWAPS[eq]&&EQUIP_SWAPS[eq][k]) k=EQUIP_SWAPS[eq][k];
+
+  // Filtr sprzętu
+  if(eq!=='full'){
+    const allowed=EQUIP_ALLOWED[eq];
+    const fallback=EQUIP_FALLBACK[eq];
+    if(!allowed.has(k)){
+      // 1. bezpośredni fallback
+      k=(fallback&&fallback[k])||k;
+      // 2. jeśli dalej niedostępne — weź pierwszą alternatywę z tej samej grupy
+      if(!allowed.has(k)){
+        const alts=getAltsRaw(exKey).filter(a=>allowed.has(a));
+        if(alts.length>0) k=alts[0];
+      }
+    }
+  }
+
   // Kontuzja
   if(inj!=='none'&&INJURY_SWAPS[inj]&&INJURY_SWAPS[inj][k]) k=INJURY_SWAPS[inj][k];
-  // Dla początkujących: usuń zaawansowane ćwiczenia
+
+  // Poziom — początkujący
   if(exp==='beginner'){
+    const eq2=answers.equipment||'full';
     const beginnerSwaps={
-      deadlift:'rdl',squat:'goblet',ohp:'db_press',
-      dips:'pushup',pullup:'lat_pull',skull:'pushdown',
-      cgbp:'pushdown',ab_wheel:'plank',hang_raise:'dead_bug',
-      sumo_dl:'rdl',t_bar_row:'row_db',hip_thrust:'rdl'
+      deadlift:'rdl', squat:'goblet', ohp:'db_press',
+      dips:'pushup', pullup:eq2==='full'?'lat_pull':'pullup',
+      skull:eq2==='full'?'pushdown':'bench_dip',
+      cgbp:eq2==='full'?'pushdown':'bench_dip',
+      ab_wheel:'plank', hang_raise:'dead_bug',
+      sumo_dl:'rdl', t_bar_row:'row_db', hip_thrust:'glute_bridge',
     };
     if(beginnerSwaps[k]) k=beginnerSwaps[k];
   }
+
   return EX[k]?k:exKey;
 }
-
 // ═══════════════════════════════════════════════════════════
 // QUESTIONS
 // ═══════════════════════════════════════════════════════════
@@ -1127,14 +1440,14 @@ function calcTDEE(bmr,act){const m={sedentary:1.2,light:1.375,moderate:1.55,acti
 function calcCal(tdee,goal,weeklyChange){
   const wc=parseFloat(weeklyChange)||0.25;
   if(goal==='bulk'){
-    // 1kg tkanki = ~7700 kcal → ~1100 kcal/dzień na 1kg/tydz
-    // Bez twardego cap — użytkownik świadomie wybrał tempo
     const surplus=Math.round(wc*1100);
     return Math.round(tdee+surplus);
   }
   if(goal==='cut'){
-    // Max deficyt 30% TDEE lub 1000 kcal
-    const deficit=Math.min(Math.round(wc*1000),Math.round(tdee*0.30),1000);
+    const daily=Math.round(wc*1100);
+    // max deficyt: mniejszy z (dzienny wyliczony, TDEE-1200, 1500 kcal)
+    const maxDef=Math.min(daily, tdee-1200, 1500);
+    const deficit=Math.max(maxDef,0);
     return Math.round(tdee-deficit);
   }
   if(goal==='strength') return Math.round(tdee+200);
@@ -1163,6 +1476,9 @@ function bmiStatus(b){if(b<18.5)return"Niedobór masy ciała";if(b<25)return"Pra
 // SPLIT BUILDER
 // ═══════════════════════════════════════════════════════════
 function buildSplit(days,goal,exp){
+  const sex=answers.sex||'M';
+  const weak=answers.weakPoints||[];
+  const femaleGlute=sex==='F'&&(weak.includes('glutes')||weak.includes('legs'));
   const isB=exp==='beginner',isA=exp==='advanced';
   const rng=goal==='strength'?'3-5':goal==='bulk'?'8-12':goal==='cut'?'12-15':'6-10';
   const rst=goal==='strength'?180:goal==='bulk'?90:60;
@@ -1364,7 +1680,7 @@ function buildResults(){
   }catch(e){}
   const D=getComputed();
   const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,exp,wc}=D;
-  const split=buildSplit(answers.days||4,goal,exp);
+  const split=applyWeakPoints(buildSplit(answers.days||4,goal,exp), answers.weakPoints||[]);
   window.__split=split;
   const trDays=split.days.filter(d=>d.tr).length;
   const pPct=Math.round((mac.prot*4/cal)*100),cPct=Math.round((mac.carb*4/cal)*100),fPct=100-pPct-cPct;
@@ -1428,7 +1744,7 @@ function buildResults(){
 function openPlan(){
   const D=getComputed();
   const {cal,mac,goal,glabs,gcol,wc}=D;
-  if(!window.__split) window.__split=buildSplit(answers.days||4,goal,D.exp);
+  if(!window.__split) window.__split=applyWeakPoints(buildSplit(answers.days||4,goal,D.exp),answers.weakPoints||[]);
   renderPlan();
 }
 
@@ -1451,7 +1767,8 @@ function renderPlan(){
         <div class="ex-cell ex-rest">${ex.rest}s</div>
         <div class="ex-cell ex-rpe">${ex.rpe}</div>
         <div class="ex-actions">
-          <button class="btn-ex info" title="Jak wykonać?" data-di="${di}" data-ei="${ei}" onclick="showExInfo(this)">📋</button>
+          <button class="btn-ex info" title="Technika krok po kroku" data-di="${di}" data-ei="${ei}" onclick="showExInfo(this)">📋</button>
+          <button class="btn-ex" title="Rozgrzewka dla tego ćwiczenia" data-di="${di}" data-ei="${ei}" onclick="showWarmup(this)" style="color:var(--accent2)">🔥</button>
           <button class="btn-ex" title="Timer przerwy" data-rest="${ex.rest}" data-name="${ex.n}" onclick="startRestTimer(parseInt(this.dataset.rest)||90,this.dataset.name)">⏱</button>
           <button class="btn-ex swap" title="Zamień ćwiczenie" data-di="${di}" data-ei="${ei}" onclick="showSwap(this)">🔄</button>
         </div>
@@ -1472,11 +1789,13 @@ function renderPlan(){
   }).join('');
 
   document.getElementById('plan-inner').innerHTML=`
+  ${buildStreakWidget()}
   <div class="plan-tag">Twój indywidualny plan</div>
-  ${buildShareBar()}
+  ${buildReferralCard()}
   ${buildCompareCard()}
   <h1 class="plan-h1">${split.name}</h1>
   <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp; <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp; Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp; Węgle: <strong>${mac.carb}g</strong> &nbsp;·&nbsp; Tłuszcze: <strong>${mac.fat}g</strong> &nbsp;·&nbsp; Tempo: <strong>${wc} kg/tydz</strong></div>
+  <button class="fatigue-btn" onclick="openFatigue()">💢 Boli Cię coś dzisiaj? Dostosuj plan ${_fatigueApplied?'<span class="fatigue-badge">AKTYWNE</span>':''}</button>
   <div class="section"><div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none">— przed każdym treningiem (12 min)</span></div>
     <div class="warmup-list">${WARMUP.map(wu=>`<div class="wu-item"><span class="wu-time">${wu.time}</span><span class="wu-name">${wu.name}</span><span class="wu-desc">${wu.desc}</span></div>`).join('')}</div>
   </div>
@@ -1495,7 +1814,11 @@ function renderPlan(){
   </div>
   <div class="plan-footer">
     <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010), Schoenfeld (2010), Helms, Aragon &amp; Fitschen (2014).</p>
-    <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn-ghost" onclick="exportPDF()" id="btn-pdf-export">📄 Pobierz PDF</button>
+      <button class="btn-ghost" onclick="printPlan()">🖨 Drukuj</button>
+      <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
+    </div>
   </div>`;
   // Nie skacz na górę jeśli już jesteśmy na planie
   const alreadyOnPlan=document.getElementById('plan').classList.contains('active');
@@ -1511,8 +1834,21 @@ function renderPlan(){
   if(alreadyOnPlan){
     requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:scrollPos,behavior:'instant'})));
   }
-
+  requestAnimationFrame(()=>{
+  _collapsedDays.forEach(i=>{
+    const el=document.getElementById('day-'+i);
+    const ch=document.getElementById('chev-'+i);
+    if(el) el.style.display='none';
+    if(ch) ch.classList.remove('open');
+  });
+});
   setTimeout(initDayDrag,80);
+
+  // Chat FAB widoczny na planie
+  const chatFab=document.getElementById('chat-fab');
+  if(chatFab) chatFab.classList.add('visible');
+  // Onboarding przy pierwszym otwarciu
+  setTimeout(startOnboarding, 800);
 }
 
 
@@ -1587,18 +1923,20 @@ function closeModal(){document.getElementById('modal-overlay').classList.remove(
 // TOGGLE DAY
 // ═══════════════════════════════════════════════════════════
 function toggleDay(i){
+  if(_dragJustHappened) return;
   const el=document.getElementById('day-'+i);
   const ch=document.getElementById('chev-'+i);
   if(!el)return;
   const hidden=el.style.display==='none';
   el.style.display=hidden?'block':'none';
+  hidden ? _collapsedDays.delete(i) : _collapsedDays.add(i);
   if(ch)ch.classList.toggle('open',hidden);
 }
 
 // ═══════════════════════════════════════════════════════════
 // DRAG & DROP — zamiana dni treningowych
 // ═══════════════════════════════════════════════════════════
-let _dragDayIdx=null;
+let _dragJustHappened=false;
 
 function initDayDrag(){
   const cards=[...document.querySelectorAll('.day-card')];
@@ -1631,22 +1969,33 @@ function initDayDrag(){
       if(dragSrc!==null&&dragSrc!==idx) _swapDays(dragSrc,idx);
     };
 
-    // MOBILE TOUCH
-    let touchSrc=null,touchStartX=0,touchStartY=0,moved=false;
+    // MOBILE TOUCH — długie przytrzymanie aktywuje drag
+    let pressTimer=null;
+    let touchSrc=null,touchStartX=0,touchStartY=0,moved=false,dragActive=false;
 
     card.addEventListener('touchstart',e=>{
       touchSrc=idx;
       touchStartX=e.touches[0].clientX;
       touchStartY=e.touches[0].clientY;
       moved=false;
+      dragActive=false;
+      pressTimer=setTimeout(()=>{
+        dragActive=true;
+        if(navigator.vibrate) navigator.vibrate(40);
+        card.style.opacity='.5';
+        card.style.transform='scale(1.02)';
+      },320);
     },{passive:true});
 
     card.addEventListener('touchmove',e=>{
       const dx=e.touches[0].clientX-touchStartX;
       const dy=e.touches[0].clientY-touchStartY;
-      if(!moved&&Math.abs(dx)<6&&Math.abs(dy)<6) return;
+      if(!dragActive){
+        // jeśli ruch zanim timer odpali — anuluj drag, pozwól scrollować
+        if(Math.abs(dy)>8) clearTimeout(pressTimer);
+        return;
+      }
       moved=true;
-      // Nie blokuj natywnego scroll jeśli to głównie scroll pionowy bez długiego przytrzymania
       const overEl=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
       const overCard=overEl?.closest('.day-card');
       cards.forEach(c=>c.classList.remove('drag-over'));
@@ -1654,15 +2003,24 @@ function initDayDrag(){
     },{passive:true});
 
     card.addEventListener('touchend',e=>{
+      clearTimeout(pressTimer);
+      card.style.opacity='';
+      card.style.transform='';
       cards.forEach(c=>c.classList.remove('drag-over'));
-      if(!moved){touchSrc=null;return;}
+
+      if(!dragActive){touchSrc=null;moved=false;return;}
+
       const overEl=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
       const overCard=overEl?.closest('.day-card');
       if(overCard&&overCard!==card){
         const overIdx=cards.indexOf(overCard);
-        if(overIdx>=0) _swapDays(idx,overIdx);
+        if(overIdx>=0){
+          _dragJustHappened=true;
+          setTimeout(()=>{_dragJustHappened=false;},200);
+          _swapDays(idx,overIdx);
+        }
       }
-      touchSrc=null;moved=false;
+      touchSrc=null;moved=false;dragActive=false;
     });
   });
 }
@@ -1739,13 +2097,61 @@ function applyStatsChanges(){
   saveAnswers();
   // rebuild split with new data
   const D=getComputed();
-  window.__split=buildSplit(answers.days||4,D.goal,D.exp);
+  window.__split=applyWeakPoints(
+  buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate'),
+  answers.weakPoints||[]
+);
   toggleStats();
   renderPlan();
   // flash meta
   const meta=document.querySelector('.plan-meta');
   if(meta){meta.style.transition='opacity .3s';meta.style.opacity='0';setTimeout(()=>meta.style.opacity='1',300);}
 }
+
+function applyWeakPoints(split, weakPoints){
+  if(!weakPoints||weakPoints.length===0) return split;
+  const extras={
+    chest:    [{key:'cable_fly', sets:'3',reps:'12-15',rest:60,rpe:'RPE 7'}],
+    back:     [{key:'face_pull', sets:'3',reps:'15-20',rest:45,rpe:'RPE 7'}],
+    shoulders:[{key:'lat_raise', sets:'3',reps:'15-20',rest:45,rpe:'RPE 8'},
+               {key:'rear_delt', sets:'3',reps:'15-20',rest:45,rpe:'RPE 7'}],
+    arms:     [{key:'hammer',    sets:'3',reps:'12-15',rest:45,rpe:'RPE 7'},
+               {key:'pushdown',  sets:'3',reps:'12-15',rest:45,rpe:'RPE 7'}],
+    legs:     [{key:'leg_curl',  sets:'3',reps:'12-15',rest:60,rpe:'RPE 7'}],
+    glutes:   [{key:'hip_thrust',sets:'4',reps:'10-12',rest:90,rpe:'RPE 8'},
+               {key:'glute_kick',sets:'3',reps:'15/str.',rest:45,rpe:'RPE 7'}],
+    core:     [{key:'dead_bug',  sets:'3',reps:'10/str.',rest:45,rpe:'-'}],
+    calves:   [{key:'calf_raise',sets:'4',reps:'15-20',rest:45,rpe:'RPE 8'},
+               {key:'seated_calf',sets:'3',reps:'15-20',rest:45,rpe:'RPE 8'}],
+  };
+  const exToGroup={};
+  for(const [g,keys] of Object.entries(GROUP_ALTS)) keys.forEach(k=>exToGroup[k]=g);
+  const wpGroupMap={
+    chest:'chest',back:'back',shoulders:'shoulder',
+    arms:'biceps',legs:'legs',glutes:'legs',core:'core',calves:'legs'
+  };
+  split.days.forEach(day=>{
+    if(!day.tr||!day.ex) return;
+    weakPoints.forEach(wp=>{
+      const items=extras[wp]||[];
+      items.forEach(item=>{
+        if(day.ex.length>=7) return;
+        if(day.ex.some(e=>e.key===item.key)) return;
+        const wpGroup=wpGroupMap[wp];
+        const dayGroups=day.ex.map(e=>exToGroup[e.key]||'').filter(Boolean);
+        const relevant=dayGroups.includes(wpGroup)||
+          (wp==='arms'&&(dayGroups.includes('biceps')||dayGroups.includes('triceps')))||
+          (wp==='glutes'&&dayGroups.includes('legs'));
+        if(!relevant) return;
+        const k=applyMods(item.key);
+        if(!EX[k]) return;
+        day.ex.push({key:k,...EX[k],sets:item.sets,reps:item.reps,rest:item.rest,rpe:item.rpe});
+      });
+    });
+  });
+  return split;
+}
+
 // ═══════════════════════════════════════════════════════════
 // TIMER PRZERW
 // ═══════════════════════════════════════════════════════════
@@ -1784,6 +2190,286 @@ function playBeep(){
       o.stop(ctx.currentTime+delay/1000+0.1);
     });
   }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// PDF EXPORT (jsPDF)
+// ═══════════════════════════════════════════════════════════
+async function exportPDF(){
+  const btn=document.getElementById('btn-pdf-export');
+  if(btn){btn.textContent='⏳ Generuję...';btn.disabled=true;}
+
+  if(!window.jspdf){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=res;s.onerror=rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const D=getComputed();
+  const split=window.__split;
+  const W=210,margin=14,colW=W-margin*2;
+  let y=18;
+
+  const bg=(x,yy,w,h,r,g,b)=>{doc.setFillColor(r,g,b);doc.rect(x,yy,w,h,'F');};
+  const chk=(need=10)=>{if(y+need>277){doc.addPage();bg(0,0,W,297,7,7,7);y=18;}};
+
+  // Tło
+  bg(0,0,W,297,7,7,7);
+
+  // Nagłówek
+  doc.setFillColor(200,255,0);doc.rect(margin,y,colW,0.8,'F');
+  y+=4;
+  doc.setFont('helvetica','bold');doc.setFontSize(26);doc.setTextColor(200,255,0);
+  doc.text('FORMULAPLAN',margin,y+8);
+  doc.setFontSize(11);doc.setTextColor(100,100,100);
+  doc.text(split?.name||'Plan treningowy',margin,y+15);
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString('pl-PL'),W-margin,y+15,{align:'right'});
+  y+=22;
+
+  // Metryki
+  const mets=[
+    ['Kalorie',D.cal+' kcal'],['Białko',D.mac.prot+'g'],['Węgle',D.mac.carb+'g'],
+    ['Tłuszcze',D.mac.fat+'g'],['BMI',String(D.bmi)],['Cel',D.glabs[D.goal]],
+  ];
+  const mW=colW/mets.length;
+  mets.forEach(([l,v],i)=>{
+    const x=margin+i*mW;
+    bg(x+0.5,y,mW-1,14,18,18,18);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(200,255,0);
+    doc.text(v,x+mW/2,y+6,{align:'center'});
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(80,80,80);
+    doc.text(l.toUpperCase(),x+mW/2,y+12,{align:'center'});
+  });
+  y+=20;
+
+  // Dni treningowe
+  if(split?.days){
+    split.days.filter(d=>d.tr&&d.ex).forEach(day=>{
+      chk(28);
+      bg(margin,y,colW,9,18,18,18);
+      bg(margin,y,3,9,200,255,0);
+      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(235,235,235);
+      doc.text(day.name.toUpperCase(),margin+6,y+6.2);
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100,100,100);
+      doc.text(day.label||'',margin+52,y+6.2);
+      y+=11;
+
+      // Nagłówek kolumn
+      doc.setFontSize(8);doc.setTextColor(80,80,80);
+      doc.text('Ćwiczenie',margin+3,y+4);
+      doc.text('Partie',margin+colW*0.55,y+4);
+      doc.text('Serie',margin+colW*0.7,y+4);
+      doc.text('Powt.',margin+colW*0.8,y+4);
+      doc.text('RPE',margin+colW*0.9,y+4);
+      doc.setDrawColor(30,30,30);doc.line(margin,y+5.5,margin+colW,y+5.5);
+      y+=7;
+
+      day.ex.forEach(ex=>{
+        chk(7);
+        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(225,225,225);
+        doc.text('• '+ex.n,margin+3,y+4.5,{maxWidth:colW*0.52});
+        doc.setTextColor(100,100,100);doc.setFontSize(8);
+        doc.text(ex.m.split('/')[0].trim(),margin+colW*0.55,y+4.5,{maxWidth:colW*0.14});
+        doc.setFontSize(9);doc.setTextColor(200,255,0);
+        doc.text(ex.sets,margin+colW*0.72,y+4.5,{align:'center'});
+        doc.setTextColor(180,180,180);
+        doc.text(ex.reps,margin+colW*0.82,y+4.5,{align:'center'});
+        doc.setTextColor(80,80,80);
+        doc.text(ex.rpe.replace('RPE ',''),margin+colW*0.935,y+4.5,{align:'center'});
+        doc.setDrawColor(22,22,22);doc.line(margin,y+6,margin+colW,y+6);
+        y+=7;
+      });
+      y+=4;
+    });
+  }
+
+  // Makra sekcja
+  chk(30);
+  y+=4;
+  doc.setFillColor(20,20,20);doc.rect(margin,y,colW,0.6,'F');y+=6;
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(200,255,0);
+  doc.text('PLAN ŻYWIENIOWY',margin,y+5);y+=9;
+  const days2=[['Dzień treningowy',D.cal],[`Dzień odpoczynku`,D.cal-200]];
+  days2.forEach(([label,kcal])=>{
+    chk(12);
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(200,200,200);
+    doc.text(label+':',margin+3,y+5);
+    doc.setTextColor(200,255,0);
+    doc.text(kcal.toLocaleString()+' kcal',margin+50,y+5);
+    doc.setTextColor(100,100,100);doc.setFontSize(8);
+    doc.text(`B: ${D.mac.prot}g  W: ${Math.round(D.mac.carb*(label.includes('treningowy')?1:.85))}g  T: ${D.mac.fat}g`,margin+90,y+5);
+    y+=8;
+  });
+
+  // Stopka
+  doc.setFillColor(200,255,0);doc.rect(margin,285,colW,0.5,'F');
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(70,70,70);
+  doc.text('FormulaPlan.pl — Plan oparty na: Mifflin-St Jeor, Schoenfeld (2010), Helms et al. (2014)',margin,290);
+  doc.text(`${D.w}kg · ${D.h}cm · ${D.a}lat`,W-margin,290,{align:'right'});
+
+  doc.save(`formulaplan-${new Date().toISOString().slice(0,10)}.pdf`);
+  if(btn){btn.textContent='📄 Pobierz PDF';btn.disabled=false;}
+}
+
+// ═══════════════════════════════════════════════════════════
+// REFERRAL
+// ═══════════════════════════════════════════════════════════
+function generateRefCode(){
+  const seed=(answers.weight||0)*7+(answers.height||0)*3+(answers.age||0)*11;
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code='FP-',n=seed*1664525+1013904223;
+  for(let i=0;i<6;i++){n=(n*1664525+1013904223)>>>0;code+=chars[n%chars.length];}
+  return code;
+}
+
+function buildReferralCard(){
+  const code=generateRefCode();
+  const count=parseInt(localStorage.getItem('fp_ref_count')||'0');
+  const refUrl=`${window.location.origin}${window.location.pathname}?ref=${code}${getPlanUrl().includes('#')?getPlanUrl().slice(getPlanUrl().indexOf('#')):''}`;
+  return `<div class="ref-card">
+    <div class="ref-title">🎁 Poleć znajomemu</div>
+    <div class="ref-sub">Znajomy dostaje <strong style="color:var(--accent)">-25%</strong> na plan. Ty dostajesz <strong style="color:var(--accent)">darmowy miesiąc dostępu</strong> za każde polecenie.</div>
+    <div class="ref-code-row">
+      <div class="ref-code" id="ref-code-display" onclick="copyRefLink('${refUrl}')">${code}</div>
+      <button class="btn-copy" onclick="copyRefLink('${refUrl}')">Kopiuj link</button>
+    </div>
+    <div class="ref-stats">
+      <div class="ref-stat"><div class="ref-stat-val">${count}</div><div class="ref-stat-lbl">Polecenia</div></div>
+      <div class="ref-stat"><div class="ref-stat-val">${count*30}</div><div class="ref-stat-lbl">Dni dostępu</div></div>
+    </div>
+  </div>`;
+}
+
+function copyRefLink(url){
+  navigator.clipboard.writeText(url).then(()=>{
+    const el=document.getElementById('ref-code-display');
+    if(el){const orig=el.textContent;el.textContent='✓ Skopiowano!';el.style.color='var(--accent)';setTimeout(()=>{el.textContent=orig;el.style.color='';},2200);}
+  }).catch(()=>prompt('Twój link polecający:',url));
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI CHATBOT
+// ═══════════════════════════════════════════════════════════
+let _chatHistory=[];
+let _chatOpen=false;
+
+function toggleChat(){
+  _chatOpen=!_chatOpen;
+  const panel=document.getElementById('chat-panel');
+  panel.classList.toggle('open',_chatOpen);
+  if(_chatOpen&&_chatHistory.length===0) initChat();
+  if(_chatOpen){
+    setTimeout(()=>{
+      const inp=document.getElementById('chat-input');
+      if(inp&&window.innerWidth>768) inp.focus();
+    },350);
+  }
+}
+
+function initChat(){
+  const D=getComputed();
+  _chatHistory=[{
+    role:'assistant',
+    content:`Cześć! 💪 Jestem Twoim AI trenerem.\n\nWidzę Twój profil: **${D.glabs[D.goal]}**, **${D.w} kg**, **${D.cal.toLocaleString()} kcal/dzień**.\n\nMam dostęp do Twojego pełnego planu i danych — pytaj o co chcesz.`,
+    time:now()
+  }];
+  renderChatMessages();
+}
+
+function now(){return new Date().toLocaleTimeString('pl',{hour:'2-digit',minute:'2-digit'});}
+
+function renderChatMessages(){
+  const c=document.getElementById('chat-messages');
+  if(!c) return;
+  c.innerHTML=_chatHistory.map(m=>`
+    <div class="chat-msg ${m.role==='user'?'user':'ai'}">
+      <div class="chat-bubble">${m.content.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
+      <div class="chat-time">${m.time}</div>
+    </div>`).join('');
+  c.scrollTop=c.scrollHeight;
+}
+
+function buildChatContext(){
+  const D=getComputed();
+  const split=window.__split;
+  const exStr=split?split.days.filter(d=>d.tr).map(d=>`${d.name}: ${(d.ex||[]).map(e=>e.n).join(', ')}`).join('\n'):'brak planu';
+  const prs=[];
+  Object.keys(localStorage).filter(k=>k.startsWith('fp_ex_')).slice(0,6).forEach(k=>{
+    try{
+      const exKey=k.replace('fp_ex_','');
+      const sess=JSON.parse(localStorage.getItem(k)||'[]');
+      let best=0;
+      sess.forEach(s=>s.sets&&s.sets.forEach(st=>{if((st.w||0)>best)best=st.w;}));
+      if(best>0&&EX[exKey]) prs.push(`${EX[exKey].n}: ${best}kg`);
+    }catch(e){}
+  });
+  const streak=getStreakData();
+  return `Jesteś doświadczonym trenerem personalnym i dietetykiem sportowym. Odpowiadasz po polsku, konkretnie i na temat.
+
+PROFIL:
+Płeć: ${D.s==='M'?'Mężczyzna':'Kobieta'}, wiek: ${D.a} lat
+Waga: ${D.w}kg, wzrost: ${D.h}cm, BMI: ${D.bmi} (${D.bs})
+Cel: ${D.glabs[D.goal]}, tempo: ${D.wc}kg/tydzień
+Kalorie: ${D.cal} kcal/dzień | B: ${D.mac.prot}g | W: ${D.mac.carb}g | T: ${D.mac.fat}g
+Doświadczenie: ${D.exp}, sprzęt: ${answers.equipment==='full'?'pełna siłownia':answers.equipment==='basic'?'podstawowy sprzęt':'dom'}
+Sen: ${answers.sleep||'ok'}, kontuzje: ${answers.injuries||'brak'}
+Słabe partie: ${(answers.weakPoints||[]).join(', ')||'nie określono'}
+Streak: ${streak.current} dni z rzędu, ${streak.totalWorkouts} treningów łącznie
+${prs.length?'Rekordy: '+prs.join(', '):''}
+
+PLAN (${split?.name||'brak'}):
+${exStr}
+
+Odpowiadaj konkretnie, max 150 słów (chyba że pytanie wymaga więcej). Używaj **pogrubień** dla kluczowych informacji. Bądź bezpośredni jak dobry trener — bez lania wody.`;
+}
+
+async function sendChatMessage(){
+  const inp=document.getElementById('chat-input');
+  if(!inp) return;
+  const msg=inp.value.trim();
+  if(!msg) return;
+  _chatHistory.push({role:'user',content:msg,time:now()});
+  inp.value='';inp.style.height='auto';
+  renderChatMessages();
+
+  // Typing indicator
+  const c=document.getElementById('chat-messages');
+  const t=document.createElement('div');
+  t.className='chat-msg ai';t.id='chat-typing';
+  t.innerHTML='<div class="chat-bubble typing"><span></span><span></span><span></span></div>';
+  c.appendChild(t);c.scrollTop=c.scrollHeight;
+  document.getElementById('btn-chat-send').disabled=true;
+
+  try{
+    const msgs=_chatHistory.filter(m=>m.role!=='system').slice(-10)
+      .map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}));
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:buildChatContext(),messages:msgs})
+    });
+    const data=await res.json();
+    const reply=data.content?.map(c=>c.text||'').join('').trim()||'Przepraszam, spróbuj ponownie.';
+    document.getElementById('chat-typing')?.remove();
+    _chatHistory.push({role:'assistant',content:reply,time:now()});
+    renderChatMessages();
+  }catch(e){
+    document.getElementById('chat-typing')?.remove();
+    _chatHistory.push({role:'assistant',content:'Błąd połączenia — sprawdź internet.',time:now()});
+    renderChatMessages();
+  }
+  document.getElementById('btn-chat-send').disabled=false;
+}
+
+function chatQuick(text){
+  const inp=document.getElementById('chat-input');
+  if(inp){inp.value=text;sendChatMessage();}
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2147,7 +2833,7 @@ async function analyzeFood(dataUrl){
       method:'POST',
       headers:{
   'Content-Type':'application/json',
-  'x-api-key':'TWOJ_KLUCZ_API',
+  'x-api-key':'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',
   'anthropic-version':'2023-06-01',
   'anthropic-dangerous-direct-browser-access':'true',
       },
@@ -2330,6 +3016,7 @@ function saveExSet(){
   if(!sess){sess={date:today,sets:[]};sessions.push(sess);}
   sess.sets.push({w,r,rpe,note});
   saveExData(_exLogKey,sessions);
+  updateStreak();
   renderExLogBody();
 }
 
@@ -2372,6 +3059,9 @@ function _updateNav(screenId){
 
   const planEl=document.getElementById('plan');
   if(planEl) planEl.classList.toggle('with-sidebar',onPlan&&!mob);
+
+  const chatFab=document.getElementById('chat-fab');
+  if(chatFab) chatFab.classList.toggle('visible',onPlan&&!mob);
 }
 // ═══════════════════════════════════════════════════════════
 // SETTINGS — SHARED RENDERER
@@ -2458,7 +3148,10 @@ function applySettings(){
   if(goalBtn) answers.goal=goalBtn.dataset.goal;
   if(daysBtn) answers.days=parseInt(daysBtn.dataset.days);
   saveAnswers();
-  window.__split=buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate');
+  window.__split=applyWeakPoints(
+  buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate'),
+  answers.weakPoints||[]
+);
   closeMobileSettings();
   closeDesktopSettings();
   renderPlan();
@@ -2870,6 +3563,288 @@ function macrosFor(food,qty,mode){
 }
 
 // ═══════════════════════════════════════════════════════════
+// ONBOARDING TOUR
+// ═══════════════════════════════════════════════════════════
+const ONB_STEPS=[
+  {sel:'.day-header',         title:'Twój plan tygodnia',    desc:'Kliknij na dzień aby rozwinąć ćwiczenia. Na mobile możesz przytrzymać i przeciągnąć dzień aby zmienić kolejność.',pos:'bottom'},
+  {sel:'.btn-ex.info',        title:'Technika krok po kroku',desc:'Kliknij 📋 aby zobaczyć szczegółową instrukcję wykonania ćwiczenia i najczęstsze błędy.',pos:'left'},
+  {sel:'.btn-ex.swap',        title:'Zamień ćwiczenie',      desc:'Kliknij 🔄 aby zamienić ćwiczenie na inne z tej samej grupy mięśniowej. Parametry (serie/powt) zostają.',pos:'left'},
+  {sel:'.fatigue-btn',        title:'Boli Cię coś?',         desc:'Kliknij tutaj przed treningiem i zaznacz co boli — plan automatycznie dostosuje ćwiczenia na dziś.',pos:'bottom'},
+  {sel:'#chat-fab,.chat-fab', title:'AI Trener personalny',  desc:'Masz pytanie o trening lub dietę? Zapytaj AI trenera — odpowie bazując na Twoim planie i danych.',pos:'top'},
+];
+
+let _onbStep=0;
+
+function startOnboarding(){
+  if(localStorage.getItem('fp_onb_done')) return;
+  // Sprawdź czy elementy istnieją zanim zaczniesz
+  const firstTarget=document.querySelector(ONB_STEPS[0].sel);
+  if(!firstTarget) return;
+  _onbStep=0;
+  const overlay=document.getElementById('onb-overlay');
+  overlay.style.display='block';
+  overlay.style.opacity='0';
+  requestAnimationFrame(()=>{
+    overlay.style.transition='opacity .3s';
+    overlay.style.opacity='1';
+    setTimeout(()=>showOnbStep(0),200);
+  });
+}
+
+function showOnbStep(step){
+  if(step>=ONB_STEPS.length){finishOnboarding();return;}
+  const s=ONB_STEPS[step];
+  const target=document.querySelector(s.sel);
+  if(!target){showOnbStep(step+1);return;}
+
+  target.scrollIntoView({behavior:'smooth',block:'center'});
+
+  setTimeout(()=>{
+    const rect=target.getBoundingClientRect();
+    const pad=8;
+    const spotlight=document.getElementById('onb-spotlight');
+    const tooltip=document.getElementById('onb-tooltip');
+
+    spotlight.style.cssText=`
+      position:fixed;
+      top:${rect.top-pad}px;
+      left:${rect.left-pad}px;
+      width:${rect.width+pad*2}px;
+      height:${rect.height+pad*2}px;
+      display:block;
+      border:2px solid var(--accent);
+      border-radius:8px;
+      box-shadow:0 0 0 9999px rgba(0,0,0,.72);
+      z-index:5001;
+      pointer-events:none;
+      transition:all .35s cubic-bezier(.4,0,.2,1);
+    `;
+
+    const vw=window.innerWidth;
+    const vh=window.innerHeight;
+    const tW=Math.min(290,vw-28);
+    let top,left;
+
+    // Pozycja tooltipa — nad lub pod spotlight
+    const spaceBelow=vh-(rect.bottom+pad+16);
+    const spaceAbove=rect.top-pad-16;
+    if(spaceBelow>=160||spaceBelow>spaceAbove){
+      top=rect.bottom+pad+14;
+    } else {
+      top=rect.top-pad-170;
+      if(top<8) top=rect.bottom+pad+14;
+    }
+    left=Math.max(14,Math.min(rect.left,vw-tW-14));
+    // Upewnij się że tooltip nie wychodzi poza ekran
+    if(top+160>vh) top=Math.max(8,vh-170);
+
+    const dots=ONB_STEPS.map((_,i)=>`<div class="onb-dot${i===step?' active':''}"></div>`).join('');
+    tooltip.style.cssText=`
+      position:fixed;
+      top:${top}px;
+      left:${left}px;
+      width:${tW}px;
+      z-index:5002;
+      background:var(--bg2);
+      border:1px solid var(--accent);
+      border-radius:10px;
+      padding:18px 20px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
+    `;
+    tooltip.innerHTML=`
+      <div class="onb-step-num">${step+1} / ${ONB_STEPS.length}</div>
+      <div class="onb-title">${s.title}</div>
+      <div class="onb-desc">${s.desc}</div>
+      <div class="onb-nav">
+        <div class="onb-dots">${dots}</div>
+        <button class="btn-onb-skip" onclick="finishOnboarding()">Pomiń</button>
+        <button class="btn-onb-next" onclick="showOnbStep(${step+1})">${step===ONB_STEPS.length-1?'Gotowe ✓':'Dalej →'}</button>
+      </div>`;
+  },350);
+}
+
+function finishOnboarding(){
+  const overlay=document.getElementById('onb-overlay');
+  overlay.style.transition='opacity .25s';
+  overlay.style.opacity='0';
+  setTimeout(()=>{
+    overlay.style.display='none';
+    overlay.style.opacity='';
+    overlay.style.transition='';
+    document.getElementById('onb-spotlight').style.cssText='display:none';
+    document.getElementById('onb-tooltip').style.cssText='';
+    document.getElementById('onb-tooltip').innerHTML='';
+  },260);
+  localStorage.setItem('fp_onb_done','1');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FATIGUE SYSTEM
+// ═══════════════════════════════════════════════════════════
+const FATIGUE_ZONES={
+  lower_back:{ico:'🔴',name:'Dolny grzbiet',   ex:'deadlift, squat, wiosłowania',
+    affects:['deadlift','rdl','row_bb','squat','sumo_dl','good_morning','back_ext','t_bar_row','seated_row','cable_row'],
+    swapTo: {deadlift:'leg_press',rdl:'leg_curl',row_bb:'lat_pull',squat:'leg_press',sumo_dl:'leg_press',good_morning:'leg_curl',back_ext:'plank',t_bar_row:'lat_pull',seated_row:'lat_pull',cable_row:'lat_pull'}},
+  upper_back:{ico:'🟠',name:'Górny grzbiet',   ex:'wiosłowania, shrugs, OHP',
+    affects:['row_bb','row_db','t_bar_row','shrug','seated_row','cable_row','ohp','upright_row'],
+    swapTo: {row_bb:'lat_pull',row_db:'lat_pull',t_bar_row:'lat_pull',shrug:'plank',seated_row:'lat_pull',cable_row:'lat_pull',ohp:'lat_raise',upright_row:'lat_raise'}},
+  chest:{ico:'🟡',name:'Klatka piersiowa',      ex:'wyciskania, pompki, dipy',
+    affects:['bench','incline','dips','cable_fly','pushup','chest_press','pec_deck','db_bench','diamond_pushup'],
+    swapTo: {bench:'lat_pull',incline:'lat_pull',dips:'lat_pull',cable_fly:'lat_pull',pushup:'plank',chest_press:'lat_pull',pec_deck:'lat_pull',db_bench:'lat_pull',diamond_pushup:'plank'}},
+  shoulders:{ico:'🟣',name:'Barki',             ex:'OHP, lateral raise',
+    affects:['ohp','db_press','lat_raise','arnold','front_raise','upright_row','pike_pushup'],
+    swapTo: {ohp:'lat_pull',db_press:'lat_pull',lat_raise:'face_pull',arnold:'lat_pull',front_raise:'face_pull',upright_row:'lat_pull',pike_pushup:'plank'}},
+  arms:{ico:'💜',name:'Ramiona',                ex:'uginania, prostowania',
+    affects:['bb_curl','hammer','incline_curl','conc_curl','skull','pushdown','oh_tri','cgbp','bench_dip','tricep_kick'],
+    swapTo: {bb_curl:'plank',hammer:'plank',incline_curl:'plank',conc_curl:'plank',skull:'plank',pushdown:'plank',oh_tri:'plank',cgbp:'lat_pull',bench_dip:'plank',tricep_kick:'plank'}},
+  quads:{ico:'🦵',name:'Quady / kolana',        ex:'squat, leg press, wykroki',
+    affects:['squat','leg_press','lunges','goblet','bw_squat','leg_ext','wall_sit','step_up'],
+    swapTo: {squat:'rdl',leg_press:'rdl',lunges:'rdl',goblet:'rdl',bw_squat:'glute_bridge',leg_ext:'leg_curl',wall_sit:'glute_bridge',step_up:'glute_bridge'}},
+  hamstrings:{ico:'🦿',name:'Tylne udo',        ex:'RDL, leg curl, nordic',
+    affects:['rdl','leg_curl','nordic_curl','good_morning','sumo_dl'],
+    swapTo: {rdl:'glute_bridge',leg_curl:'wall_sit',nordic_curl:'glute_bridge',good_morning:'glute_bridge',sumo_dl:'leg_press'}},
+  glutes:{ico:'🍑',name:'Pośladki',             ex:'hip thrust, glute bridge',
+    affects:['hip_thrust','glute_bridge','glute_kick'],
+    swapTo: {hip_thrust:'leg_curl',glute_bridge:'leg_curl',glute_kick:'leg_curl'}},
+  core:{ico:'🎯',name:'Brzuch / Core',          ex:'plank, ab wheel, spięcia',
+    affects:['plank','ab_wheel','cable_cr','hang_raise','russian_twist','mountain_climber','bicycle_crunch','pallof_press','side_plank'],
+    swapTo: {plank:'dead_bug',ab_wheel:'dead_bug',cable_cr:'dead_bug',hang_raise:'dead_bug',russian_twist:'dead_bug',mountain_climber:'dead_bug',bicycle_crunch:'dead_bug',pallof_press:'dead_bug',side_plank:'dead_bug'}},
+};
+
+let _fatigueSel=new Set();
+let _fatigueApplied=false;
+let _originalPlan=null;
+
+function openFatigue(){
+  const grid=document.getElementById('fatigue-opts-grid');
+  if(grid){
+    grid.innerHTML=Object.entries(FATIGUE_ZONES).map(([key,z])=>`
+      <div class="fatigue-opt${_fatigueSel.has(key)?' sel':''}" onclick="toggleFatigueOpt('${key}',this)">
+        <span class="fatigue-opt-ico">${z.ico}</span>
+        <span class="fatigue-opt-name">${z.name}</span>
+        <span class="fatigue-opt-ex">${z.ex}</span>
+      </div>`).join('');
+  }
+  document.getElementById('fatigue-panel').classList.add('open');
+}
+
+function closeFatigue(){document.getElementById('fatigue-panel').classList.remove('open');}
+
+function toggleFatigueOpt(zone,el){
+  el.classList.toggle('sel');
+  _fatigueSel.has(zone)?_fatigueSel.delete(zone):_fatigueSel.add(zone);
+}
+
+function applyFatigue(){
+  if(_fatigueSel.size===0){closeFatigue();return;}
+  if(!_fatigueApplied) _originalPlan=JSON.parse(JSON.stringify(window.__split));
+
+  const affectedKeys=new Set();
+  const swapMap={};
+  _fatigueSel.forEach(zone=>{
+    const z=FATIGUE_ZONES[zone];
+    if(!z) return;
+    z.affects.forEach(k=>affectedKeys.add(k));
+    Object.assign(swapMap,z.swapTo);
+  });
+
+  let swappedCount=0;
+  window.__split.days.forEach(day=>{
+    if(!day.tr||!day.ex) return;
+    day.ex.forEach((ex,ei)=>{
+      if(!affectedKeys.has(ex.key)) return;
+      const newKey=applyMods(swapMap[ex.key]||ex.key);
+      if(newKey!==ex.key&&EX[newKey]){
+        day.ex[ei]={key:newKey,...EX[newKey],sets:ex.sets,reps:ex.reps,rest:ex.rest,rpe:ex.rpe,_fatigue:true};
+        swappedCount++;
+      }
+    });
+  });
+
+  _fatigueApplied=true;
+  closeFatigue();
+  const zoneNames=[..._fatigueSel].map(z=>FATIGUE_ZONES[z]?.name).join(', ');
+  showToast(`${swappedCount} ćwiczeń dostosowanych (${zoneNames})`);
+  renderPlan();
+}
+
+function resetFatigue(){
+  if(_originalPlan) window.__split=JSON.parse(JSON.stringify(_originalPlan));
+  _originalPlan=null;
+  _fatigueApplied=false;
+  _fatigueSel.clear();
+  closeFatigue();
+  renderPlan();
+  showToast('Plan przywrócony do oryginału');
+}
+
+// ═══════════════════════════════════════════════════════════
+// WARMUP GENERATOR
+// ═══════════════════════════════════════════════════════════
+const WU_SETS=[
+  {pct:40,reps:10,label:'Rozgrzewka'},
+  {pct:60,reps:6, label:'Rozgrzewka'},
+  {pct:75,reps:4, label:'Przygotowanie'},
+  {pct:85,reps:2, label:'Aktywacja'},
+];
+
+window._warmupSets=WU_SETS;
+
+function showWarmup(btn){
+  const di=parseInt(btn.dataset.di),ei=parseInt(btn.dataset.ei);
+  const ex=window.__split.days[di].ex[ei];
+  const sessions=getExData(ex.key||ex.n);
+  let best=0;
+  sessions.forEach(s=>s.sets&&s.sets.forEach(st=>{if((st.w||0)>best)best=st.w;}));
+
+  const setsHtml=w=>WU_SETS.map((s,i)=>{
+    const kg=w>0?Math.round(w*s.pct/100*2)/2:null;
+    return `<div class="wu-set-row">
+      <span class="wu-set-num">S${i+1}</span>
+      <span class="wu-set-pct">${s.pct}%</span>
+      <span class="wu-set-kg" id="wu-kg-${i}">${kg?kg+' kg':'—'}</span>
+      <span class="wu-set-reps">${s.reps} ×</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-content').innerHTML=`
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">🔥 Rozgrzewka</div>
+        <div class="modal-muscle">${ex.n} — 4 serie przed właściwym zestawem</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-section-title">Twój ciężar roboczy (kg)</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">
+          <input class="wu-1rm-input" id="wu-w" type="number" step="2.5" min="0"
+            placeholder="${best||0}" value="${best||''}"
+            oninput="updateWarmupKg(this.value)">
+          <span style="font-family:var(--fm);font-size:11px;color:var(--muted);line-height:1.5">kg roboczy<br>${best>0?'<span style="color:var(--accent)">📊 PR: '+best+' kg</span>':'Wpisz ciężar z którym trenujesz'}</span>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section-title">Serie rozgrzewkowe</div>
+        <div class="warmup-sets" id="wu-sets-container">${setsHtml(best)}</div>
+      </div>
+      <div style="background:rgba(200,255,0,.04);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:12px;color:var(--muted2);line-height:1.7">
+        <strong style="color:var(--text)">Zasada:</strong> rozgrzewka ≠ zmęczenie. 40–60 sek przerwy między seriami. Seria 85% to ostatnia aktywacja CNS — po niej pełna przerwa przed zestawem roboczym.
+      </div>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function updateWarmupKg(val){
+  const w=parseFloat(val)||0;
+  WU_SETS.forEach((s,i)=>{
+    const el=document.getElementById('wu-kg-'+i);
+    if(el) el.textContent=w>0?Math.round(w*s.pct/100*2)/2+' kg':'—';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
 // KALKULATOR 1RM (Brzycki)
 // ═══════════════════════════════════════════════════════════
 function calc1RM(){
@@ -2960,17 +3935,124 @@ function _swapDays(aIdx,bIdx){
 function toggleFaq(i){
   const a=document.getElementById('faq-a-'+i);
   const ico=document.getElementById('faq-ico-'+i);
+  const q=a?.closest('.faq-item')?.querySelector('.faq-q');
   if(!a) return;
   const open=a.classList.toggle('open');
   if(ico) ico.textContent=open?'−':'+';
+  if(q) q.classList.toggle('active',open);
 }
 
 // ═══════════════════════════════════════════════════════════
 // POLITYKA
 // ═══════════════════════════════════════════════════════════
-function openPolicyModal(){document.getElementById('policy-modal').classList.add('open');}
+function openPolicyModal(type){
+  const modal=document.getElementById('policy-modal');
+  const box=modal.querySelector('.policy-box');
+  if(type==='terms'){
+    box.querySelector('h2').textContent='Regulamin';
+    box.querySelectorAll('h3,p').forEach(el=>el.remove());
+    box.insertAdjacentHTML('beforeend',`
+      <h3>Postanowienia ogólne</h3>
+      <p>Regulamin określa zasady korzystania z serwisu FormulaPlan.pl. Korzystając z serwisu, akceptujesz niniejszy regulamin.</p>
+      <h3>Zakup i dostęp</h3>
+      <p>Po dokonaniu płatności przez Stripe, dostęp do planu treningowego jest przyznawany natychmiastowo. Plan jest dostępny przez 12 miesięcy od daty zakupu.</p>
+      <h3>Gwarancja zwrotu</h3>
+      <p>W ciągu 30 dni od zakupu możesz zwrócić plan bez podawania przyczyny. Napisz na kontakt@formulaplan.pl — zwrot następuje w ciągu 5 dni roboczych.</p>
+      <h3>Prawa autorskie</h3>
+      <p>Treści zawarte w planie (ćwiczenia, algorytmy, opisy) są własnością FormulaPlan.pl i nie mogą być kopiowane ani odsprzedawane.</p>
+      <h3>Odpowiedzialność</h3>
+      <p>FormulaPlan.pl nie ponosi odpowiedzialności za kontuzje wynikające z nieprawidłowego wykonywania ćwiczeń. Przed rozpoczęciem planu skonsultuj się z lekarzem jeśli masz wątpliwości zdrowotne.</p>
+      <h3>Kontakt</h3>
+      <p>kontakt@formulaplan.pl — odpowiadamy w ciągu 24h w dni robocze.</p>
+    `);
+  } else {
+    // przywr treść polityki jeśli była zmieniana
+    box.querySelector('h2').textContent='Polityka prywatności';
+  }
+  modal.classList.add('open');
+}
 function closePolicyModal(){document.getElementById('policy-modal').classList.remove('open');}
+// ═══════════════════════════════════════════════════════════
+// STREAK & BADGES
+// ═══════════════════════════════════════════════════════════
+function getStreakData(){
+  try{return JSON.parse(localStorage.getItem('fp_streak')||'{"current":0,"best":0,"lastDate":null,"totalWorkouts":0}');}
+  catch(e){return{current:0,best:0,lastDate:null,totalWorkouts:0};}
+}
+function saveStreakData(d){try{localStorage.setItem('fp_streak',JSON.stringify(d));}catch(e){}}
+
+function updateStreak(){
+  const data=getStreakData();
+  const today=new Date().toDateString();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(data.lastDate===today) return data;
+  data.current=data.lastDate===yesterday?data.current+1:1;
+  data.best=Math.max(data.best,data.current);
+  data.lastDate=today;
+  data.totalWorkouts=(data.totalWorkouts||0)+1;
+  saveStreakData(data);
+  if(data.current===3||data.current===7||data.current===30){
+    setTimeout(()=>showToast(`🔥 ${data.current} dni z rzędu! Niesamowite!`),500);
+  }
+  return data;
+}
+
+function getAllPRs(){
+  const prs=[];
+  Object.keys(localStorage).filter(k=>k.startsWith('fp_ex_')).forEach(k=>{
+    try{
+      const sessions=JSON.parse(localStorage.getItem(k)||'[]');
+      let best=0;
+      sessions.forEach(s=>s.sets&&s.sets.forEach(st=>{if((st.w||0)>best)best=st.w;}));
+      if(best>0) prs.push(best);
+    }catch(e){}
+  });
+  return prs;
+}
+
+const BADGES=[
+  {id:'first_workout', ico:'🏋️',name:'Pierwszy trening',  cond:(s,p)=>s.totalWorkouts>=1},
+  {id:'dedicated_3',   ico:'✅', name:'3 dni z rzędu',     cond:(s,p)=>s.current>=3},
+  {id:'consistent_5',  ico:'📅', name:'5 dni z rzędu',     cond:(s,p)=>s.best>=5},
+  {id:'week_streak',   ico:'🔥', name:'7 dni z rzędu',     cond:(s,p)=>s.best>=7},
+  {id:'pr_50kg',       ico:'⭐', name:'50 kg w ćwiczeniu', cond:(s,p)=>p.some(x=>x>=50)},
+  {id:'pr_100kg',      ico:'🏆', name:'100 kg PR',         cond:(s,p)=>p.some(x=>x>=100)},
+  {id:'pr_barbarian',  ico:'🦍', name:'200 kg PR',         cond:(s,p)=>p.some(x=>x>=200)},
+  {id:'workouts_10',   ico:'💪', name:'10 treningów',      cond:(s,p)=>s.totalWorkouts>=10},
+  {id:'workouts_30',   ico:'🥇', name:'30 treningów',      cond:(s,p)=>s.totalWorkouts>=30},
+  {id:'workouts_100',  ico:'💯', name:'100 treningów',     cond:(s,p)=>s.totalWorkouts>=100},
+];
+
+function buildStreakWidget(){
+  const data=getStreakData();
+  const prs=getAllPRs();
+  const earned=BADGES.filter(b=>b.cond(data,prs));
+  const next=BADGES.filter(b=>!b.cond(data,prs)).slice(0,2);
+  const fireColor=data.current>=7?'#ff6a00':data.current>=3?'var(--accent)':'var(--muted2)';
+  return `<div class="streak-widget">
+    <span class="streak-fire" style="${data.current>=3?'filter:drop-shadow(0 0 10px '+fireColor+')':''}">🔥</span>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="streak-count" style="color:${fireColor}">${data.current}</div>
+        <div>
+          <div class="streak-label">Dni z rzędu</div>
+          <div class="streak-best">Rekord: ${data.best} · Łącznie: ${data.totalWorkouts} treningów</div>
+        </div>
+      </div>
+      ${earned.length>0||next.length>0?`<div class="badges-wrap">
+        ${earned.map(b=>`<div class="badge-item earned" title="Odblokowano!"><span class="bi">${b.ico}</span>${b.name}</div>`).join('')}
+        ${next.map(b=>`<div class="badge-item locked" title="Zdobądź tę odznakę"><span class="bi">🔒</span>${b.name}</div>`).join('')}
+      </div>`:''}
+    </div>
+  </div>`;
+}
 </script>
+<div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
+  <div class="ms-handle"></div>
+  <div class="ms-title">Ustawienia</div>
+  <div id="mobile-settings-body"></div>
+</div>
+
 <div class="stats-panel" id="stats-panel">
   <div class="sp-header">
     <div class="sp-title">Twoje dane</div>
