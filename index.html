@@ -692,9 +692,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .wu-1rm-input:focus{border-color:var(--accent)}
 
 /* ── CHATBOT ── */
-.chat-fab{position:fixed;bottom:88px;right:18px;z-index:600;width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;cursor:pointer;font-size:22px;box-shadow:0 6px 28px rgba(200,255,0,.35);transition:.2s;align-items:center;justify-content:center;display:none}
-.chat-fab:hover{background:#fff;transform:translateY(-2px)}
-.chat-fab.visible{display:flex}
+.chat-fab {
+  display: none !important; /* usunięty — przycisk jest w navbarze */
+}
 .chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
 .chat-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
 .chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -748,6 +748,64 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   .streak-widget{padding:12px 14px;gap:10px}
   .streak-count{font-size:32px}
 }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  border-radius: 6px;
+  transition: border-color .18s;
+}
+
+.feature-card:hover {
+  border-color: var(--border2);
+}
+
+.feature-card .fi {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.feature-card h3 {
+  font-family: var(--fd);
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.feature-card p {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+/* ── MOBILE: features grid 2 kolumny ──────────────────── */
+@media (max-width: 480px) {
+  .features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .feature-card {
+    padding: 14px 14px;
+  }
+  .feature-card .fi {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .feature-card h3 {
+    font-size: 13px;
+  }
+  .feature-card p {
+    font-size: 11px;
+  }
+}
 @media(max-width:380px){
   .fatigue-grid{grid-template-columns:1fr}
 }
@@ -755,7 +813,10 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </head>
 <body>
 
-<!-- HERO -->
+<!-- ═══════════════════════════════════════════════════════
+  HERO — zastąp istniejące <div id="hero" class="screen active">
+  Pokazuje wszystkie funkcje aplikacji
+════════════════════════════════════════════════════════ -->
 <div id="hero" class="screen active">
   <div class="hero-inner">
     <div class="badge"><span class="badge-dot"></span>System treningowy v3.0</div>
@@ -769,29 +830,114 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <button class="btn-cta" onclick="startQuiz()">Wygeneruj swój plan →</button>
   </div>
 
+  <!-- JAK TO DZIAŁA -->
   <div class="how-wrap">
     <div class="sec-label">Jak to działa</div>
     <div class="steps-grid">
-      <div class="step-card" data-n="01"><h3>Odpowiedz</h3><p>15 precyzyjnych pytań o Twoje ciało, cel i możliwości.</p></div>
-      <div class="step-card" data-n="02"><h3>Algorytm liczy</h3><p>BMR, TDEE, makra, split, objętość i progresję — czysta nauka.</p></div>
-      <div class="step-card" data-n="03"><h3>Masz plan</h3><p>Pełny harmonogram z możliwością zamiany ćwiczeń i edycji danych.</p></div>
+      <div class="step-card" data-n="01"><h3>Odpowiedz</h3><p>15 precyzyjnych pytań o Twoje ciało, cel, sprzęt i możliwości czasowe.</p></div>
+      <div class="step-card" data-n="02"><h3>Algorytm liczy</h3><p>BMR, TDEE, makra, split, objętość i progresję — czysta nauka, zero zgadywania.</p></div>
+      <div class="step-card" data-n="03"><h3>Masz plan</h3><p>Pełny harmonogram z narzędziami do śledzenia, zamiany ćwiczeń i edycji danych.</p></div>
     </div>
   </div>
 
+  <!-- WSZYSTKIE FUNKCJE -->
+  <div class="how-wrap" style="padding-top:0">
+    <div class="sec-label">Co zawiera aplikacja</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">🏋️</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Plan treningowy</h3>
+        <p>Split dopasowany do liczby dni, sprzętu i poziomu. Periodyzacja blokowa, zakres RPE.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">🔄</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Zamiana ćwiczeń</h3>
+        <p>Każde ćwiczenie ma przycisk 🔄 — zamień na alternatywę z tej samej grupy mięśniowej. Serie i powt. zostają.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">📋</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Technika krok po kroku</h3>
+        <p>Każde ćwiczenie ma opis wykonania, listę najczęstszych błędów i link do YouTube.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">⏱</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Timer przerw</h3>
+        <p>Kliknij ⏱ przy ćwiczeniu — odlicza czas przerwy z animowanym kołem i sygnałem dźwiękowym.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">🍽</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Dziennik kalorii</h3>
+        <p>Wyszukaj produkt z bazy 100+ pozycji lub wpisz ręcznie. Śledzenie B/W/T i porównanie z celem.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">📷</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Skaner jedzenia</h3>
+        <p>Zrób zdjęcie posiłku — AI rozpozna produkty i poda przybliżone makro. Dodaj jednym kliknięciem.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">🤖</div>
+        <h3 style="font-size:16px;margin-bottom:6px">AI Trener personalny</h3>
+        <p>Chatbot zna Twój plan i dane. Pytaj o technikę, dietę, stagnację — odpowiada konkretnie.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">📓</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Dziennik ćwiczeń</h3>
+        <p>Zapisuj serie, ciężary i RPE. Historia treningów, automatyczne wykrywanie rekordów (PR), kalkulator 1RM.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">💢</div>
+        <h3 style="font-size:16px;margin-bottom:6px">System zmęczenia</h3>
+        <p>Zaznacz co boli przed treningiem — plan automatycznie zamieni niebezpieczne ćwiczenia na bezpieczne alternatywy.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">🔥</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Streak i odznaki</h3>
+        <p>Śledzenie serii treningowych, rekord najdłuższej serii, odznaki za osiągnięcia (PR, liczba treningów).</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">⚙️</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Edycja w locie</h3>
+        <p>Zmień wagę, cel lub liczbę dni treningowych — plan przeliczy się natychmiast bez ponownego quizu.</p>
+      </div>
+
+      <div class="step-card" style="padding:18px 20px">
+        <div style="font-size:28px;margin-bottom:8px">📄</div>
+        <h3 style="font-size:16px;margin-bottom:6px">Eksport PDF</h3>
+        <p>Pobierz plan jako PDF z pełnym harmonogramem, makrami i planem żywieniowym — na trening bez telefonu.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FAQ -->
   <div class="faq-wrap">
     <div class="sec-label">Najczęstsze pytania</div>
     <div id="faq-list">
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(0)"><span>Czy plan naprawdę jest oparty na nauce?</span><span class="faq-ico" id="faq-ico-0">+</span></div><div class="faq-a" id="faq-a-0">Tak. Kalorie obliczamy wzorem Mifflin-St Jeor (1990) — najdokładniejszym dostępnym. TDEE to Harris-Benedict z korektą aktywności. Makra bazują na metaanalizie Helms, Aragon i Fitschen (2014). Split treningowy oparty na badaniach Schoenfelda (2010) dotyczących częstości treningu a hipertrofii.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(1)"><span>Ile czasu zajmie wygenerowanie planu?</span><span class="faq-ico" id="faq-ico-1">+</span></div><div class="faq-a" id="faq-a-1">Około 3 minut na odpowiedzenie na 15 pytań. Algorytm liczy w kilka sekund. Plan jest gotowy natychmiast po zakupie.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(2)"><span>Czy mogę zmienić ćwiczenia w planie?</span><span class="faq-ico" id="faq-ico-2">+</span></div><div class="faq-a" id="faq-a-2">Tak — każde ćwiczenie ma przycisk 🔄 zamiany na alternatywę z tej samej grupy mięśniowej. Plan automatycznie zachowuje zestawy, powtórzenia i RPE oryginalnego ćwiczenia.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(3)"><span>Co jeśli mam kontuzję lub ograniczony sprzęt?</span><span class="faq-ico" id="faq-ico-3">+</span></div><div class="faq-a" id="faq-a-3">Algorytm automatycznie zamienia ćwiczenia niedostępne przy danym sprzęcie lub niebezpieczne przy wybranej kontuzji. Pytamy o to w formularzu — to nie jest czysto marketingowe.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(4)"><span>Jak działa 30-dniowa gwarancja?</span><span class="faq-ico" id="faq-ico-4">+</span></div><div class="faq-a" id="faq-a-4">Jeśli w ciągu 30 dni od zakupu uznasz, że plan nie spełnia Twoich oczekiwań, napisz na kontakt@formulaplan.pl — zwrot bez pytań. Płatność przez Stripe, więc proces jest automatyczny.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(5)"><span>Czy plan można wydrukować lub zapisać?</span><span class="faq-ico" id="faq-ico-5">+</span></div><div class="faq-a" id="faq-a-5">Tak — w planie dostępny jest przycisk drukowania (PDF przez okno druku przeglądarki) oraz link do udostępnienia planu z zachowanymi odpowiedziami.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(0)"><span>Czy plan naprawdę jest oparty na nauce?</span><span class="faq-ico" id="faq-ico-0">+</span></div><div class="faq-a" id="faq-a-0">Tak. Kalorie: Mifflin-St Jeor (1990). TDEE: Harris-Benedict z korektą aktywności. Makra: metaanaliza Helms, Aragon i Fitschen (2014). Split: badania Schoenfelda (2010) dotyczące częstości treningu a hipertrofii.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(1)"><span>Jak działa dziennik kalorii — czy zeruje się każdego dnia?</span><span class="faq-ico" id="faq-ico-1">+</span></div><div class="faq-a" id="faq-a-1">Tak — każdy dzień ma osobne wpisy. Po północy dziennik automatycznie zaczyna nowy dzień. Poprzednie dni są przechowywane lokalnie przez 30 dni.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(2)"><span>Jak działa streak i gdzie są zapisywane dane?</span><span class="faq-ico" id="faq-ico-2">+</span></div><div class="faq-a" id="faq-a-2">Wszystkie dane (plan, dziennik, streak, historia ćwiczeń) są zapisywane lokalnie w przeglądarce (localStorage). Nie wysyłamy danych na serwer. Oznacza to, że dane są przypisane do konkretnej przeglądarki i urządzenia.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(3)"><span>Czy mogę zamienić ćwiczenia w planie?</span><span class="faq-ico" id="faq-ico-3">+</span></div><div class="faq-a" id="faq-a-3">Tak — każde ćwiczenie ma przycisk 🔄 zamiany na alternatywę z tej samej grupy mięśniowej. Plan automatycznie zachowuje zestawy, powtórzenia i RPE.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(4)"><span>Co jeśli mam kontuzję lub ograniczony sprzęt?</span><span class="faq-ico" id="faq-ico-4">+</span></div><div class="faq-a" id="faq-a-4">Algorytm automatycznie dobiera ćwiczenia dostępne dla wybranego sprzętu i bezpieczne przy wybranej kontuzji. W trakcie treningu możesz też użyć systemu zmęczenia (💢) żeby dostosować dzisiejszy plan.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(5)"><span>Czy plan można wydrukować lub pobrać?</span><span class="faq-ico" id="faq-ico-5">+</span></div><div class="faq-a" id="faq-a-5">Tak — w planie dostępny jest przycisk „📄 Pobierz PDF" generujący plik z pełnym harmonogramem oraz „🖨 Drukuj" otwierający okno druku przeglądarki.</div></div>
     </div>
   </div>
 
   <div class="site-footer">
-    <p><strong>FormulaPlan.pl</strong> — Wszelkie prawa zastrzeżone © 2026 &nbsp;·&nbsp; <button onclick="openPolicyModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Polityka prywatności</button> &nbsp;·&nbsp; <button onclick="openPolicyModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Regulamin</button></p>
+    <p><strong>FormulaPlan.pl</strong> — Wszelkie prawa zastrzeżone © 2026 &nbsp;·&nbsp;
+      <button onclick="openPolicyModal()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Polityka prywatności</button> &nbsp;·&nbsp;
+      <button onclick="openPolicyModal('terms')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline">Regulamin</button>
+    </p>
   </div>
 </div>
 
@@ -852,38 +998,42 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   </div>
 </div>
 
-<!-- BOTTOM NAV — mobile only -->
+<!-- ═══════════════════════════════════════════════════════
+  BOTTOM NAV — zastąp istniejący <nav class="bottom-nav">
+════════════════════════════════════════════════════════ -->
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="bn-btn" onclick="openMobileSettings()">
+  <button class="bn-btn" onclick="navOpenSettings()">
     <span class="bn-ico">⚙️</span>
     <span>Ustaw.</span>
   </button>
-  <button class="bn-btn" onclick="openFoodSearch()">
+  <button class="bn-btn" onclick="navOpenCalories()">
     <span class="bn-ico">🍽</span>
     <span>Kalorie</span>
   </button>
-  <button class="bn-btn center-btn" onclick="openScanner()">
+  <button class="bn-btn center-btn" onclick="navOpenScanner()">
     <span class="bn-ico">📷</span>
   </button>
-  <button class="bn-btn" onclick="openExLogMenu()">
+  <button class="bn-btn" onclick="navOpenExLog()">
     <span class="bn-ico">📓</span>
     <span>Trening</span>
   </button>
-  <button class="bn-btn" onclick="toggleChat()">
+  <button class="bn-btn" onclick="navToggleChat()">
     <span class="bn-ico">🤖</span>
     <span>Trener</span>
   </button>
 </nav>
 
-<!-- DESKTOP SIDEBAR -->
+<!-- ═══════════════════════════════════════════════════════
+  DESKTOP SIDEBAR — zastąp istniejący <div class="desktop-sidebar">
+════════════════════════════════════════════════════════ -->
 <div class="desktop-sidebar" id="desktop-sidebar">
   <button class="dsb-btn" onclick="openDesktopSettings()" title="Ustawienia">
     <span class="dsb-ico">⚙️</span><span>Ustaw.</span>
   </button>
-  <button class="dsb-btn" onclick="openFoodSearch()" title="Dziennik kalorii">
+  <button class="dsb-btn" onclick="navOpenCalories()" title="Dziennik kalorii">
     <span class="dsb-ico">🍽</span><span>Kalorie</span>
   </button>
-  <button class="dsb-btn center-btn" onclick="openExLogMenu()" title="Dziennik treningu">
+  <button class="dsb-btn center-btn" onclick="navOpenExLog()" title="Dziennik treningu">
     <span class="dsb-ico">📓</span><span>Trening</span>
   </button>
   <div class="dsb-divider"></div>
@@ -1019,6 +1169,14 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </div>
 
 <script>
+
+// ═══════════════════════════════════════════════════════════
+// CONFIG — WSTAW SWÓJ KLUCZ API
+// Wklej tę linię NA SAMEJ GÓRZE <script>, przed wszystkim innym
+// ═══════════════════════════════════════════════════════════
+const ANTHROPIC_API_KEY = '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';
+
+
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
@@ -1026,7 +1184,6 @@ let answers = {};
 let _collapsedDays = new Set();
 let currentStep = 0;
 
-// Load saved answers from localStorage
 try {
   const saved = localStorage.getItem('fp_answers');
   if (saved) answers = JSON.parse(saved);
@@ -1035,6 +1192,7 @@ try {
 function saveAnswers() {
   try { localStorage.setItem('fp_answers', JSON.stringify(answers)); } catch(e){}
 }
+
 
 // ═══════════════════════════════════════════════════════════
 // EXERCISE DATABASE
@@ -1748,18 +1906,21 @@ function openPlan(){
   renderPlan();
 }
 
-function renderPlan(){
-  const D=getComputed();
-  const {cal,mac,goal,glabs,gcol,wc}=D;
-  const split=window.__split;
+// ═══════════════════════════════════════════════════════════
+// renderPlan — bez referral, bez porównania
+// ═══════════════════════════════════════════════════════════
+function renderPlan() {
+  const D = getComputed();
+  const { cal, mac, goal, glabs, gcol, wc } = D;
+  const split = window.__split;
 
-  const weekHtml=split.days.map((day,di)=>{
-    if(!day.tr) return `
+  const weekHtml = split.days.map((day, di) => {
+    if (!day.tr) return `
       <div class="day-card rest-day">
         <div class="day-header"><span class="day-name">${day.name}</span><span class="day-tag rs">Odpoczynek</span></div>
-        <div class="rest-note">Aktywna regeneracja: spacer, pływanie, rozciąganie. Nie obciążaj mięśni, ale ruszaj się.</div>
+        <div class="rest-note">Aktywna regeneracja: spacer, pływanie, rozciąganie.</div>
       </div>`;
-    const exHtml=day.ex.map((ex,ei)=>`
+    const exHtml = day.ex.map((ex, ei) => `
       <div class="ex-row">
         <div><div class="ex-name">${ex.n}</div><div class="ex-muscle">${ex.m}</div></div>
         <div class="ex-cell hl">${ex.sets}</div>
@@ -1767,10 +1928,10 @@ function renderPlan(){
         <div class="ex-cell ex-rest">${ex.rest}s</div>
         <div class="ex-cell ex-rpe">${ex.rpe}</div>
         <div class="ex-actions">
-          <button class="btn-ex info" title="Technika krok po kroku" data-di="${di}" data-ei="${ei}" onclick="showExInfo(this)">📋</button>
-          <button class="btn-ex" title="Rozgrzewka dla tego ćwiczenia" data-di="${di}" data-ei="${ei}" onclick="showWarmup(this)" style="color:var(--accent2)">🔥</button>
-          <button class="btn-ex" title="Timer przerwy" data-rest="${ex.rest}" data-name="${ex.n}" onclick="startRestTimer(parseInt(this.dataset.rest)||90,this.dataset.name)">⏱</button>
-          <button class="btn-ex swap" title="Zamień ćwiczenie" data-di="${di}" data-ei="${ei}" onclick="showSwap(this)">🔄</button>
+          <button class="btn-ex info" title="Technika" data-di="${di}" data-ei="${ei}" onclick="showExInfo(this)">📋</button>
+          <button class="btn-ex" title="Rozgrzewka" data-di="${di}" data-ei="${ei}" onclick="showWarmup(this)" style="color:var(--accent2)">🔥</button>
+          <button class="btn-ex" title="Timer" data-rest="${ex.rest}" data-name="${ex.n}" onclick="startRestTimer(parseInt(this.dataset.rest)||90,this.dataset.name)">⏱</button>
+          <button class="btn-ex swap" title="Zamień" data-di="${di}" data-ei="${ei}" onclick="showSwap(this)">🔄</button>
         </div>
       </div>
       <div class="ex-tip-row">💡 ${ex.t}</div>`).join('');
@@ -1788,69 +1949,90 @@ function renderPlan(){
       </div>`;
   }).join('');
 
-  document.getElementById('plan-inner').innerHTML=`
+  document.getElementById('plan-inner').innerHTML = `
   ${buildStreakWidget()}
   <div class="plan-tag">Twój indywidualny plan</div>
-  ${buildReferralCard()}
-  ${buildCompareCard()}
   <h1 class="plan-h1">${split.name}</h1>
-  <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp; <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp; Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp; Węgle: <strong>${mac.carb}g</strong> &nbsp;·&nbsp; Tłuszcze: <strong>${mac.fat}g</strong> &nbsp;·&nbsp; Tempo: <strong>${wc} kg/tydz</strong></div>
-  <button class="fatigue-btn" onclick="openFatigue()">💢 Boli Cię coś dzisiaj? Dostosuj plan ${_fatigueApplied?'<span class="fatigue-badge">AKTYWNE</span>':''}</button>
-  <div class="section"><div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none">— przed każdym treningiem (12 min)</span></div>
-    <div class="warmup-list">${WARMUP.map(wu=>`<div class="wu-item"><span class="wu-time">${wu.time}</span><span class="wu-name">${wu.name}</span><span class="wu-desc">${wu.desc}</span></div>`).join('')}</div>
+  <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp;
+    <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp;
+    Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp;
+    Węgle: <strong>${mac.carb}g</strong> &nbsp;·&nbsp;
+    Tłuszcze: <strong>${mac.fat}g</strong> &nbsp;·&nbsp;
+    Tempo: <strong>${wc} kg/tydz</strong></div>
+  <button class="fatigue-btn" onclick="openFatigue()">💢 Boli Cię coś dzisiaj? Dostosuj plan ${_fatigueApplied ? '<span class="fatigue-badge">AKTYWNE</span>' : ''}</button>
+  <div class="section">
+    <div class="sec-title"><span class="dot">●</span> Rozgrzewka <span style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none">— 12 min przed każdym treningiem</span></div>
+    <div class="warmup-list">${WARMUP.map(wu => `
+      <div class="wu-item">
+        <span class="wu-time">${wu.time}</span>
+        <span class="wu-name">${wu.name}</span>
+        <span class="wu-desc">${wu.desc}</span>
+      </div>`).join('')}</div>
   </div>
-  <div class="section"><div class="sec-title"><span class="dot">●</span> Tygodniowy harmonogram</div><div class="week-grid">${weekHtml}</div></div>
-  <div class="section"><div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>
+  <div class="section">
+    <div class="sec-title"><span class="dot">●</span> Tygodniowy harmonogram</div>
+    <div class="week-grid">${weekHtml}</div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>
     <div class="nutri-grid">
-      <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div><div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div></div>
-      <div class="nc"><div class="nc-day">Dzień odpoczynku</div><div class="nc-kcal">${(cal-200).toLocaleString()} <span>kcal</span></div><div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${Math.round(mac.carb*.85)}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div></div>
+      <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div>
+        <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
+      </div>
+      <div class="nc"><div class="nc-day">Dzień odpoczynku</div><div class="nc-kcal">${(cal - 200).toLocaleString()} <span>kcal</span></div>
+        <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${Math.round(mac.carb * .85)}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
+      </div>
     </div>
   </div>
-  <div class="section"><div class="sec-title"><span class="dot">●</span> Zasady progresji</div>
-    <div class="prog-card">${PROG.map(p=>`<div class="prog-row"><div><div class="prog-lbl">${p.l}</div><div class="prog-desc">${p.d}</div></div><div class="prog-val">${p.v}</div></div>`).join('')}</div>
+  <div class="section">
+    <div class="sec-title"><span class="dot">●</span> Zasady progresji</div>
+    <div class="prog-card">${PROG.map(p => `
+      <div class="prog-row">
+        <div><div class="prog-lbl">${p.l}</div><div class="prog-desc">${p.d}</div></div>
+        <div class="prog-val">${p.v}</div>
+      </div>`).join('')}</div>
   </div>
-  <div class="section"><div class="sec-title"><span class="dot">●</span> Wiedza eksperta</div>
-    <div class="tips-grid">${TIPS.map((t,i)=>`<div class="tip-item"><div class="tip-num">${String(i+1).padStart(2,'0')}</div><div><div class="tip-h">${t.h}</div><div class="tip-p">${t.p}</div></div></div>`).join('')}</div>
+  <div class="section">
+    <div class="sec-title"><span class="dot">●</span> Wiedza eksperta</div>
+    <div class="tips-grid">${TIPS.map((t, i) => `
+      <div class="tip-item">
+        <div class="tip-num">${String(i + 1).padStart(2, '0')}</div>
+        <div><div class="tip-h">${t.h}</div><div class="tip-p">${t.p}</div></div>
+      </div>`).join('')}</div>
   </div>
   <div class="plan-footer">
-    <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Oparty na: Mifflin-St Jeor (1990), Kreider et al. (2010), Schoenfeld (2010), Helms, Aragon &amp; Fitschen (2014).</p>
+    <p>Plan wygenerowany przez <strong>FormulaPlan.pl</strong> · Mifflin-St Jeor (1990), Schoenfeld (2010), Helms et al. (2014).</p>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn-ghost" onclick="exportPDF()" id="btn-pdf-export">📄 Pobierz PDF</button>
       <button class="btn-ghost" onclick="printPlan()">🖨 Drukuj</button>
       <button class="btn-ghost" onclick="show('hero')">← Strona główna</button>
     </div>
   </div>`;
-  // Nie skacz na górę jeśli już jesteśmy na planie
-  const alreadyOnPlan=document.getElementById('plan').classList.contains('active');
-  const scrollPos=window.scrollY;
 
-  if(!alreadyOnPlan){
+  const alreadyOnPlan = document.getElementById('plan').classList.contains('active');
+  const scrollPos = window.scrollY;
+  if (!alreadyOnPlan) {
     show('plan');
   } else {
     _updateNav('plan');
   }
-
-  // Przywróć pozycję scrollu
-  if(alreadyOnPlan){
-    requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:scrollPos,behavior:'instant'})));
+  if (alreadyOnPlan) {
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+      window.scrollTo({ top: scrollPos, behavior: 'instant' })));
   }
-  requestAnimationFrame(()=>{
-  _collapsedDays.forEach(i=>{
-    const el=document.getElementById('day-'+i);
-    const ch=document.getElementById('chev-'+i);
-    if(el) el.style.display='none';
-    if(ch) ch.classList.remove('open');
+  requestAnimationFrame(() => {
+    _collapsedDays.forEach(i => {
+      const el = document.getElementById('day-' + i);
+      const ch = document.getElementById('chev-' + i);
+      if (el) el.style.display = 'none';
+      if (ch) ch.classList.remove('open');
+    });
   });
-});
-  setTimeout(initDayDrag,80);
-
-  // Chat FAB widoczny na planie
-  const chatFab=document.getElementById('chat-fab');
-  if(chatFab) chatFab.classList.add('visible');
-  // Onboarding przy pierwszym otwarciu
+  setTimeout(initDayDrag, 80);
+  const chatFab = document.getElementById('chat-fab');
+  if (chatFab) chatFab.classList.add('visible');
   setTimeout(startOnboarding, 800);
 }
-
 
 // ═══════════════════════════════════════════════════════════
 // MODAL — EXERCISE INFO
@@ -2051,6 +2233,54 @@ function showToast(msg){
   t.style.opacity='1';
   clearTimeout(t._to);
   t._to=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOTTOM NAV — każda akcja najpierw zamyka inne panele
+// ═══════════════════════════════════════════════════════════
+
+// Zastąp WSZYSTKIE onclick w bottom-nav i desktop-sidebar
+// tymi funkcjami:
+
+function navOpenSettings() {
+  // Settings jest toggle — nie closeAllPanels przed nim
+  openMobileSettings();
+}
+
+function navOpenCalories() {
+  closeMobileSettings();
+  closeDesktopSettings();
+  if (!calLogOpen) {
+    toggleCalLog();
+  } else {
+    // Już otwarte — scroll do inputa
+  }
+  setTimeout(() => {
+    const input = document.getElementById('food-search-input');
+    if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 300);
+}
+
+function navOpenScanner() {
+  closeAllPanels();
+  // Zamknij cal panel jeśli otwarty
+  if (calLogOpen) toggleCalLog();
+  openScanner();
+}
+
+function navOpenExLog() {
+  closeAllPanels();
+  openExLogMenu();
+}
+
+function navToggleChat() {
+  closeAllPanels();
+  toggleChat();
+}
+
+// Zamiennik openFoodSearch (używany z desktop sidebar)
+function openFoodSearch() {
+  navOpenCalories();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2353,139 +2583,140 @@ function copyRefLink(url){
   }).catch(()=>prompt('Twój link polecający:',url));
 }
 
+
 // ═══════════════════════════════════════════════════════════
-// AI CHATBOT
+// HELPER — wszystkie zapytania do Anthropic przez tę funkcję
 // ═══════════════════════════════════════════════════════════
-let _chatHistory=[];
-let _chatOpen=false;
-
-function toggleChat(){
-  _chatOpen=!_chatOpen;
-  const panel=document.getElementById('chat-panel');
-  panel.classList.toggle('open',_chatOpen);
-  if(_chatOpen&&_chatHistory.length===0) initChat();
-  if(_chatOpen){
-    setTimeout(()=>{
-      const inp=document.getElementById('chat-input');
-      if(inp&&window.innerWidth>768) inp.focus();
-    },350);
-  }
-}
-
-function initChat(){
-  const D=getComputed();
-  _chatHistory=[{
-    role:'assistant',
-    content:`Cześć! 💪 Jestem Twoim AI trenerem.\n\nWidzę Twój profil: **${D.glabs[D.goal]}**, **${D.w} kg**, **${D.cal.toLocaleString()} kcal/dzień**.\n\nMam dostęp do Twojego pełnego planu i danych — pytaj o co chcesz.`,
-    time:now()
-  }];
-  renderChatMessages();
-}
-
-function now(){return new Date().toLocaleTimeString('pl',{hour:'2-digit',minute:'2-digit'});}
-
-function renderChatMessages(){
-  const c=document.getElementById('chat-messages');
-  if(!c) return;
-  c.innerHTML=_chatHistory.map(m=>`
-    <div class="chat-msg ${m.role==='user'?'user':'ai'}">
-      <div class="chat-bubble">${m.content.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
-      <div class="chat-time">${m.time}</div>
-    </div>`).join('');
-  c.scrollTop=c.scrollHeight;
-}
-
-function buildChatContext(){
-  const D=getComputed();
-  const split=window.__split;
-  const exStr=split?split.days.filter(d=>d.tr).map(d=>`${d.name}: ${(d.ex||[]).map(e=>e.n).join(', ')}`).join('\n'):'brak planu';
-  const prs=[];
-  Object.keys(localStorage).filter(k=>k.startsWith('fp_ex_')).slice(0,6).forEach(k=>{
-    try{
-      const exKey=k.replace('fp_ex_','');
-      const sess=JSON.parse(localStorage.getItem(k)||'[]');
-      let best=0;
-      sess.forEach(s=>s.sets&&s.sets.forEach(st=>{if((st.w||0)>best)best=st.w;}));
-      if(best>0&&EX[exKey]) prs.push(`${EX[exKey].n}: ${best}kg`);
-    }catch(e){}
+async function callAnthropic(body) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify(body),
   });
-  const streak=getStreakData();
-  return `Jesteś doświadczonym trenerem personalnym i dietetykiem sportowym. Odpowiadasz po polsku, konkretnie i na temat.
-
-PROFIL:
-Płeć: ${D.s==='M'?'Mężczyzna':'Kobieta'}, wiek: ${D.a} lat
-Waga: ${D.w}kg, wzrost: ${D.h}cm, BMI: ${D.bmi} (${D.bs})
-Cel: ${D.glabs[D.goal]}, tempo: ${D.wc}kg/tydzień
-Kalorie: ${D.cal} kcal/dzień | B: ${D.mac.prot}g | W: ${D.mac.carb}g | T: ${D.mac.fat}g
-Doświadczenie: ${D.exp}, sprzęt: ${answers.equipment==='full'?'pełna siłownia':answers.equipment==='basic'?'podstawowy sprzęt':'dom'}
-Sen: ${answers.sleep||'ok'}, kontuzje: ${answers.injuries||'brak'}
-Słabe partie: ${(answers.weakPoints||[]).join(', ')||'nie określono'}
-Streak: ${streak.current} dni z rzędu, ${streak.totalWorkouts} treningów łącznie
-${prs.length?'Rekordy: '+prs.join(', '):''}
-
-PLAN (${split?.name||'brak'}):
-${exStr}
-
-Odpowiadaj konkretnie, max 150 słów (chyba że pytanie wymaga więcej). Używaj **pogrubień** dla kluczowych informacji. Bądź bezpośredni jak dobry trener — bez lania wody.`;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  return res.json();
 }
 
-async function sendChatMessage(){
-  const inp=document.getElementById('chat-input');
-  if(!inp) return;
-  const msg=inp.value.trim();
-  if(!msg) return;
-  _chatHistory.push({role:'user',content:msg,time:now()});
-  inp.value='';inp.style.height='auto';
+// ═══════════════════════════════════════════════════════════
+// CHATBOT — używa callAnthropic()
+// ═══════════════════════════════════════════════════════════
+async function sendChatMessage() {
+  const inp = document.getElementById('chat-input');
+  if (!inp) return;
+  const msg = inp.value.trim();
+  if (!msg) return;
+  _chatHistory.push({ role: 'user', content: msg, time: now() });
+  inp.value = ''; inp.style.height = 'auto';
   renderChatMessages();
 
-  // Typing indicator
-  const c=document.getElementById('chat-messages');
-  const t=document.createElement('div');
-  t.className='chat-msg ai';t.id='chat-typing';
-  t.innerHTML='<div class="chat-bubble typing"><span></span><span></span><span></span></div>';
-  c.appendChild(t);c.scrollTop=c.scrollHeight;
-  document.getElementById('btn-chat-send').disabled=true;
+  const c = document.getElementById('chat-messages');
+  const t = document.createElement('div');
+  t.className = 'chat-msg ai'; t.id = 'chat-typing';
+  t.innerHTML = '<div class="chat-bubble typing"><span></span><span></span><span></span></div>';
+  c.appendChild(t); c.scrollTop = c.scrollHeight;
+  document.getElementById('btn-chat-send').disabled = true;
 
-  try{
-    const msgs=_chatHistory.filter(m=>m.role!=='system').slice(-10)
-      .map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:buildChatContext(),messages:msgs})
+  try {
+    const msgs = _chatHistory
+      .filter(m => m.role !== 'system').slice(-10)
+      .map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+
+    const data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 500,
+      system: buildChatContext(),
+      messages: msgs,
     });
-    const data=await res.json();
-    const reply=data.content?.map(c=>c.text||'').join('').trim()||'Przepraszam, spróbuj ponownie.';
+    const reply = data.content?.map(c => c.text || '').join('').trim() || 'Przepraszam, spróbuj ponownie.';
     document.getElementById('chat-typing')?.remove();
-    _chatHistory.push({role:'assistant',content:reply,time:now()});
+    _chatHistory.push({ role: 'assistant', content: reply, time: now() });
     renderChatMessages();
-  }catch(e){
+  } catch(e) {
     document.getElementById('chat-typing')?.remove();
-    _chatHistory.push({role:'assistant',content:'Błąd połączenia — sprawdź internet.',time:now()});
+    _chatHistory.push({ role: 'assistant', content: `Błąd: ${e.message}`, time: now() });
     renderChatMessages();
   }
-  document.getElementById('btn-chat-send').disabled=false;
-}
-
-function chatQuick(text){
-  const inp=document.getElementById('chat-input');
-  if(inp){inp.value=text;sendChatMessage();}
+  document.getElementById('btn-chat-send').disabled = false;
 }
 
 // ═══════════════════════════════════════════════════════════
-// DZIENNIK KALORII
+// SKANER JEDZENIA — używa callAnthropic()
 // ═══════════════════════════════════════════════════════════
-let calLog=[];
-let calLogOpen=false;
-let _selFood=null,_selQty=1,_selMode='p';
-try{const s=localStorage.getItem('fp_callog_v2');if(s)calLog=JSON.parse(s);}catch(e){}
-function saveCalLog(){try{localStorage.setItem('fp_callog_v2',JSON.stringify(calLog));}catch(e){}}
-
-function toggleCalLog(){
-  calLogOpen=!calLogOpen;
-  document.getElementById('cal-panel').classList.toggle('open',calLogOpen);
-  if(calLogOpen) renderCalLog();
+async function analyzeFood(dataUrl) {
+  const base64 = dataUrl.split(',')[1];
+  try {
+    const data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 600,
+      system: `Jesteś ekspertem od żywienia. Rozpoznajesz jedzenie na zdjęciach i podajesz przybliżone wartości odżywcze.
+Odpowiadasz WYŁĄCZNIE poprawnym JSON bez żadnego dodatkowego tekstu ani markdown.
+Format: {"items":[{"name":"polska nazwa produktu","qty":"szacowana porcja np. 1 szt / 200g","kcal":liczba,"p":białko_g,"c":węgle_g,"f":tłuszcz_g}]}
+Podaj do 5 rozpoznanych produktów/składników. Bądź realistyczny — typowe porcje domowe.
+Jeśli nie rozpoznajesz jedzenia, zwróć: {"items":[],"error":"Nie rozpoznano jedzenia na zdjęciu"}`,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+          { type: 'text', text: 'Co jest na tym zdjęciu? Podaj wartości odżywcze.' },
+        ],
+      }],
+    });
+    const text = data.content?.map(c => c.text || '').join('').trim();
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    document.getElementById('scanner-spinner').style.display = 'none';
+    if (parsed.error || !parsed.items || parsed.items.length === 0) {
+      document.getElementById('scanner-status').textContent = parsed.error || 'Nie rozpoznano jedzenia';
+      document.getElementById('scanner-controls-retry').style.display = 'block';
+      return;
+    }
+    _scannedItems = parsed.items;
+    showScannerResults(parsed.items);
+  } catch(e) {
+    document.getElementById('scanner-spinner').style.display = 'none';
+    document.getElementById('scanner-status').textContent = `Błąd: ${e.message}`;
+    document.getElementById('scanner-controls-retry').style.display = 'block';
+  }
 }
+
+// ═══════════════════════════════════════════════════════════
+// DZIENNIK KALORII — date-aware
+// ═══════════════════════════════════════════════════════════
+let calLog = [];
+let calLogOpen = false;
+let _selFood = null, _selQty = 1, _selMode = 'p';
+
+// Klucz = "DD.MM.YYYY"
+const _calDateKey = () =>
+  new Date().toLocaleDateString('pl-PL', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+function loadCalLog() {
+  try {
+    const all = JSON.parse(localStorage.getItem('fp_callog_days') || '{}');
+    calLog = all[_calDateKey()] || [];
+  } catch(e) { calLog = []; }
+}
+
+function saveCalLog() {
+  try {
+    const all = JSON.parse(localStorage.getItem('fp_callog_days') || '{}');
+    all[_calDateKey()] = calLog;
+    // trzymaj max 30 dni
+    const keys = Object.keys(all).sort();
+    if (keys.length > 30) keys.slice(0, keys.length - 30).forEach(k => delete all[k]);
+    localStorage.setItem('fp_callog_days', JSON.stringify(all));
+  } catch(e) {}
+}
+
+// Ładuj dzisiejsze wpisy przy starcie i przy otwarciu panelu
+loadCalLog();
 
 function renderCalLog(){
   const D=getComputed();
@@ -2665,24 +2896,53 @@ function updateFoodPreview(){
   if(el)el.innerHTML=`<strong style="color:var(--accent);font-family:var(--fd);font-size:18px">${m.kcal} kcal</strong><br>B:${m.p}g · W:${m.c}g · T:${m.f}g`;
 }
 
-function addFoodEntry(){
-  if(!_selFood)return;
-  const m=macrosFor(_selFood,_selQty,_selMode);
-  const label=(_selMode==='g'?`${_selQty}g `:(_selQty===1?'':_selQty+'× '))+_selFood.n;
-  calLog.push({name:label,kcal:m.kcal,p:m.p,c:m.c,f:m.f,ts:Date.now()});
-  saveCalLog();_selFood=null;
-  document.getElementById('food-search-input').value='';
-  document.getElementById('food-sel-area').style.display='none';
+function addFoodEntry() {
+  if (!_selFood) return;
+  const m = macrosFor(_selFood, _selQty, _selMode);
+  const label = (_selMode === 'g' ? `${_selQty}g ` : (_selQty === 1 ? '' : _selQty + '× ')) + _selFood.n;
+  calLog.push({ name: label, kcal: m.kcal, p: m.p, c: m.c, f: m.f, ts: Date.now() });
+  saveCalLog();
+  _selFood = null;
+  document.getElementById('food-search-input').value = '';
+  document.getElementById('food-sel-area').style.display = 'none';
   renderCalLog();
 }
 
-function addCalManual(){
-  const name=document.getElementById('cal-manual-name')?.value.trim();
-  const kcal=parseInt(document.getElementById('cal-manual-kcal')?.value);
-  if(!name||!kcal||kcal<1)return;
-  calLog.push({name,kcal,p:0,c:0,f:0,ts:Date.now()});
-  saveCalLog();renderCalLog();
+// Nadpisz addCalManual i delCalEntry żeby używały saveCalLog (nie localStorage.setItem bezpośrednio)
+function addCalManual() {
+  const name = document.getElementById('cal-manual-name')?.value.trim();
+  const kcal = parseInt(document.getElementById('cal-manual-kcal')?.value);
+  if (!name || !kcal || kcal < 1) return;
+  calLog.push({ name, kcal, p:0, c:0, f:0, ts: Date.now() });
+  saveCalLog();
+  renderCalLog();
 }
+
+// ═══════════════════════════════════════════════════════════
+// TOGGLE PANELU KALORII
+// ═══════════════════════════════════════════════════════════
+function toggleCalLog() {
+  calLogOpen = !calLogOpen;
+  if (calLogOpen) {
+    loadCalLog(); // zawsze odśwież przy otwarciu (może minęła północ)
+  }
+  document.getElementById('cal-panel').classList.toggle('open', calLogOpen);
+  if (calLogOpen) renderCalLog();
+}
+
+function delCalEntry(i) {
+  calLog.splice(i, 1);
+  saveCalLog();
+  renderCalLog();
+}
+
+function clearCalLog() {
+  calLog = [];
+  saveCalLog();
+  renderCalLog();
+}
+
+
 
 function delCalEntry(i){calLog.splice(i,1);saveCalLog();renderCalLog();}
 function clearCalLog(){calLog=[];saveCalLog();renderCalLog();}
@@ -2763,6 +3023,14 @@ function buildCompareCard(){
   }catch(e){return '';}
 }
 
+// ═══════════════════════════════════════════════════════════
+// CLOSE ALL PANELS — wywołuj przed otwarciem nowego
+// ═══════════════════════════════════════════════════════════
+function closeAllPanels() {
+  closeMobileSettings();
+  closeDesktopSettings();
+  // Nie zamykamy calLog ani chatu — mają własne toggle
+}
 
 // ═══════════════════════════════════════════════════════════
 // SKANER JEDZENIA (kamera + Claude Vision)
@@ -3157,60 +3425,80 @@ function applySettings(){
   renderPlan();
 }
 
-// ── MOBILE SETTINGS ──
-let _mobileSettingsOpen=false;
-function openMobileSettings(){
-  const panel=document.getElementById('mobile-settings');
-  if(!panel) return;
-  if(!answers||!answers.weight){
-    document.getElementById('mobile-settings-body').innerHTML=`
+// ═══════════════════════════════════════════════════════════
+// MOBILE SETTINGS — czysty toggle bez konfliktów
+// ═══════════════════════════════════════════════════════════
+let _mobileSettingsOpen = false;
+
+function openMobileSettings() {
+  // toggle
+  if (_mobileSettingsOpen) {
+    closeMobileSettings();
+    return;
+  }
+  const panel = document.getElementById('mobile-settings');
+  if (!panel) return;
+
+  if (!answers || !answers.weight) {
+    document.getElementById('mobile-settings-body').innerHTML = `
       <div style="text-align:center;padding:24px 0">
         <div style="font-size:13px;color:var(--muted2);margin-bottom:16px">Wygeneruj najpierw plan treningowy</div>
-        <button onclick="closeMobileSettings();show('hero')" style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 24px;border-radius:4px;cursor:pointer">Wygeneruj plan →</button>
+        <button onclick="closeMobileSettings();show('hero')"
+          style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 24px;border-radius:4px;cursor:pointer">
+          Wygeneruj plan →
+        </button>
       </div>`;
   } else {
-    document.getElementById('mobile-settings-body').innerHTML=_buildSettingsHTML();
+    document.getElementById('mobile-settings-body').innerHTML = _buildSettingsHTML();
   }
-  _mobileSettingsOpen=true;
+  _mobileSettingsOpen = true;
   panel.classList.add('open');
 }
-function closeMobileSettings(){
+
+function closeMobileSettings() {
   document.getElementById('mobile-settings')?.classList.remove('open');
-  _mobileSettingsOpen=false;
-  // NIE chowamy navbaru — on ma być zawsze widoczny na planie
-  const active=document.querySelector('.screen.active');
-  if(active) _updateNav(active.id);
+  _mobileSettingsOpen = false;
 }
-document.addEventListener('click',e=>{
-  if(_mobileSettingsOpen&&!e.target.closest('.mobile-settings')&&!e.target.closest('.bottom-nav'))
-    closeMobileSettings();
-});
 
-// ── DESKTOP SETTINGS ──
-let _desktopSettingsOpen=false;
-function openDesktopSettings(){
-  const panel=document.getElementById('desktop-settings-panel');
-  if(!panel) return;
-  document.getElementById('desktop-settings-body').innerHTML=_buildSettingsHTML();
-  _desktopSettingsOpen=!_desktopSettingsOpen;
-  panel.classList.toggle('open',_desktopSettingsOpen);
+
+// ═══════════════════════════════════════════════════════════
+// DESKTOP SETTINGS
+// ═══════════════════════════════════════════════════════════
+let _desktopSettingsOpen = false;
+
+function openDesktopSettings() {
+  const panel = document.getElementById('desktop-settings-panel');
+  if (!panel) return;
+  _desktopSettingsOpen = !_desktopSettingsOpen;
+  if (_desktopSettingsOpen) {
+    document.getElementById('desktop-settings-body').innerHTML = _buildSettingsHTML();
+  }
+  panel.classList.toggle('open', _desktopSettingsOpen);
 }
-function closeDesktopSettings(){
+
+function closeDesktopSettings() {
   document.getElementById('desktop-settings-panel')?.classList.remove('open');
-  _desktopSettingsOpen=false;
+  _desktopSettingsOpen = false;
 }
-document.addEventListener('click',e=>{
-  if(_desktopSettingsOpen&&!e.target.closest('.desktop-settings-panel')&&!e.target.closest('.desktop-sidebar'))
-    closeDesktopSettings();
-});
 
-function openFoodSearch(){
-  if(!calLogOpen) toggleCalLog();
-  setTimeout(()=>{
-    const input=document.getElementById('food-search-input');
-    if(input){input.focus();input.scrollIntoView({behavior:'smooth',block:'center'});}
-  },300);
-}
+// ═══════════════════════════════════════════════════════════
+// DOCUMENT CLICK — minimalistyczny, bez konfliktów
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('click', e => {
+  // Zamknij mobile settings klikając poza nim (ale NIE przez nawigację — to obsługuje navOpenSettings)
+  if (_mobileSettingsOpen
+    && !e.target.closest('.mobile-settings')
+    && !e.target.closest('.bottom-nav')
+    && !e.target.closest('#desktop-sidebar')) {
+    closeMobileSettings();
+  }
+  // Zamknij desktop settings klikając poza nim
+  if (_desktopSettingsOpen
+    && !e.target.closest('.desktop-settings-panel')
+    && !e.target.closest('.desktop-sidebar')) {
+    closeDesktopSettings();
+  }
+});
 
 // ═══════════════════════════════════════════════════════════
 // DZIENNIK ĆWICZEŃ
