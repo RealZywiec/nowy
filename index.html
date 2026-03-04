@@ -728,17 +728,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .btn-chat-send:hover{background:#fff}
 .btn-chat-send:disabled{background:var(--border);cursor:not-allowed;color:var(--muted)}
 
-/* ── REFERRAL ── */
-.ref-card{background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(0,212,255,.04));border:1px solid rgba(200,255,0,.18);border-radius:8px;padding:18px 20px;margin-bottom:20px}
-.ref-title{font-family:var(--fd);font-size:18px;font-weight:900;text-transform:uppercase;margin-bottom:5px}
-.ref-sub{font-size:13px;color:var(--muted2);margin-bottom:13px;line-height:1.5}
-.ref-code-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ref-code{font-family:var(--fm);font-size:15px;font-weight:700;color:var(--accent);background:var(--bg3);border:1px solid var(--border2);padding:9px 14px;border-radius:4px;flex:1;text-align:center;letter-spacing:.1em;cursor:pointer;min-width:120px;transition:.15s}
-.ref-code:hover{border-color:var(--accent)}
-.ref-stats{display:flex;gap:20px;margin-top:12px}
-.ref-stat-val{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent)}
-.ref-stat-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:1px}
-
 /* ── MOBILE tweaks ── */
 @media(max-width:768px){
   .chat-fab{bottom:calc(68px + env(safe-area-inset-bottom) + 8px);right:12px}
@@ -883,6 +872,86 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .slider-inline-num:focus { border-bottom-color: var(--accent); }
 .slider-inline-num::-webkit-outer-spin-button,
 .slider-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+/* ══════════════════════════════════════════════════════════
+   UNIFIED PANELS — wszystkie panele wyglądają tak samo
+══════════════════════════════════════════════════════════ */
+
+/* Exlog — zmiana z centered modal na bottom sheet */
+.exlog-overlay {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  background: rgba(0,0,0,.75) !important;
+  backdrop-filter: blur(4px) !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.exlog-overlay.open {
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+.exlog-box {
+  border-radius: 16px 16px 0 0 !important;
+  border-bottom: none !important;
+  width: min(520px, 100%) !important;
+  max-height: 88vh !important;
+  transform: translateY(100%);
+  transition: transform .38s cubic-bezier(.32,.72,0,1) !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+.exlog-overlay.open .exlog-box {
+  transform: translateY(0) !important;
+}
+
+/* Chat — wyśrodkowany, taka sama szerokość jak reszta */
+.chat-panel {
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: min(520px, 100vw) !important;
+  max-width: 100% !important;
+  transform: translateX(-50%) translateY(100%) !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 16px 16px 0 0 !important;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+.chat-panel.open {
+  transform: translateX(-50%) translateY(0) !important;
+  pointer-events: all !important;
+}
+@media(max-width:768px){
+  .chat-panel {
+    bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+  }
+}
+@media(min-width:769px){
+  .chat-panel {
+    bottom: 0 !important;
+  }
+}
+
+/* Uchwyt (kreska) na górze każdego panelu */
+.exlog-box::before,
+.cal-panel-inner::before,
+.fatigue-inner::before,
+.chat-panel::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: var(--border2);
+  border-radius: 100px;
+  margin: 10px auto 2px;
+  flex-shrink: 0;
+}
+
+/* Scanner — wyrównaj do reszty */
+.scanner-overlay {
+  backdrop-filter: blur(4px) !important;
+}
 
 </style>
 </head>
@@ -1074,7 +1143,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 <!-- ═══════════════════════════════════════════════════════
   BOTTOM NAV — zastąp istniejący <nav class="bottom-nav">
 ════════════════════════════════════════════════════════ -->
-<nav class="bottom-nav" id="bottom-nav">
+<nav class="bottom-nav hidden" id="bottom-nav">
   <button class="bn-btn" onclick="navOpenSettings()">
     <span class="bn-ico">⚙️</span>
     <span>Ustaw.</span>
@@ -1810,6 +1879,17 @@ function renderQ(){
     q.opts.forEach(o=>{
       const sel=answers[q.id]===o.v?'sel':'';
       html+=`<button class="opt ${sel}" data-qid="${q.id}" data-val="${o.v}" onclick="pickOpt(this)"><span class="opt-lbl">${o.l}</span>${o.s?`<span class="opt-sub">${o.s}</span>`:''}</button>`;
+    });
+    html+='</div>';
+    } else if(q.type==='multi'){
+    if(!answers[q.id]) answers[q.id]=[];
+    html+=`<div class="multi-hint">Możesz zaznaczyć kilka opcji</div>`;
+    html+=`<div class="opts ${q.grid}">`;
+    q.opts.forEach(o=>{
+      const sel=(answers[q.id]||[]).includes(o.v)?'sel':'';
+      html+=`<button class="opt ${sel}" data-qid="${q.id}" data-val="${o.v}" onclick="toggleMulti(this)">
+        <span class="opt-lbl">${o.l}</span>${o.s?`<span class="opt-sub">${o.s}</span>`:''}
+      </button>`;
     });
     html+='</div>';
   } else if(q.type==='slider'){
@@ -2663,41 +2743,6 @@ async function exportPDF(){
   if(btn){btn.textContent='📄 Pobierz PDF';btn.disabled=false;}
 }
 
-// ═══════════════════════════════════════════════════════════
-// REFERRAL
-// ═══════════════════════════════════════════════════════════
-function generateRefCode(){
-  const seed=(answers.weight||0)*7+(answers.height||0)*3+(answers.age||0)*11;
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code='FP-',n=seed*1664525+1013904223;
-  for(let i=0;i<6;i++){n=(n*1664525+1013904223)>>>0;code+=chars[n%chars.length];}
-  return code;
-}
-
-function buildReferralCard(){
-  const code=generateRefCode();
-  const count=parseInt(localStorage.getItem('fp_ref_count')||'0');
-  const refUrl=`${window.location.origin}${window.location.pathname}?ref=${code}${getPlanUrl().includes('#')?getPlanUrl().slice(getPlanUrl().indexOf('#')):''}`;
-  return `<div class="ref-card">
-    <div class="ref-title">🎁 Poleć znajomemu</div>
-    <div class="ref-sub">Znajomy dostaje <strong style="color:var(--accent)">-25%</strong> na plan. Ty dostajesz <strong style="color:var(--accent)">darmowy miesiąc dostępu</strong> za każde polecenie.</div>
-    <div class="ref-code-row">
-      <div class="ref-code" id="ref-code-display" onclick="copyRefLink('${refUrl}')">${code}</div>
-      <button class="btn-copy" onclick="copyRefLink('${refUrl}')">Kopiuj link</button>
-    </div>
-    <div class="ref-stats">
-      <div class="ref-stat"><div class="ref-stat-val">${count}</div><div class="ref-stat-lbl">Polecenia</div></div>
-      <div class="ref-stat"><div class="ref-stat-val">${count*30}</div><div class="ref-stat-lbl">Dni dostępu</div></div>
-    </div>
-  </div>`;
-}
-
-function copyRefLink(url){
-  navigator.clipboard.writeText(url).then(()=>{
-    const el=document.getElementById('ref-code-display');
-    if(el){const orig=el.textContent;el.textContent='✓ Skopiowano!';el.style.color='var(--accent)';setTimeout(()=>{el.textContent=orig;el.style.color='';},2200);}
-  }).catch(()=>prompt('Twój link polecający:',url));
-}
 
 
 // ═══════════════════════════════════════════════════════════
@@ -4501,6 +4546,81 @@ function buildStreakWidget(){
     </div>
   </div>`;
 }
+// ═══════════════════════════════════════════════════════════
+// BRAKUJĄCE FUNKCJE — chat, kalendarz, utils
+// ═══════════════════════════════════════════════════════════
+
+// Utils
+function now(){
+  return new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── CHAT ──────────────────────────────────────────────────
+let _chatHistory = [];
+
+function toggleChat(){
+  const panel = document.getElementById('chat-panel');
+  if(!panel) return;
+  const open = panel.classList.toggle('open');
+  if(open && _chatHistory.length === 0){
+    _chatHistory.push({
+      role:'assistant',
+      content:'Cześć! Jestem Twoim AI trenerem. Zapytaj o technikę, dietę lub trening — odpowiem na podstawie Twojego planu.',
+      time:now()
+    });
+    renderChatMessages();
+  }
+}
+
+function renderChatMessages(){
+  const c = document.getElementById('chat-messages');
+  if(!c) return;
+  c.innerHTML = _chatHistory.map(m=>`
+    <div class="chat-msg ${m.role==='user'?'user':'ai'}">
+      <div class="chat-bubble">${m.content.replace(/\n/g,'<br>')}</div>
+      ${m.time?`<div class="chat-time">${m.time}</div>`:''}
+    </div>`).join('');
+  c.scrollTop = c.scrollHeight;
+}
+
+function buildChatContext(){
+  const D = getComputed();
+  return `Jesteś doświadczonym trenerem personalnym i dietetykiem. Odpowiadasz ZAWSZE po polsku, krótko i konkretnie — max 3-4 zdania. Bez markdown, bez list z myślnikami.
+Dane użytkownika: waga ${D.w}kg, wzrost ${D.h}cm, wiek ${D.a} lat, ${D.s==='M'?'mężczyzna':'kobieta'}.
+Cel: ${D.glabs[D.goal]}, ${D.cal} kcal/dzień, białko: ${D.mac.prot}g, węgle: ${D.mac.carb}g, tłuszcze: ${D.mac.fat}g.
+Plan treningowy: ${window.__split?.name||'nie wygenerowany'}.
+Doświadczenie: ${D.exp}. Kontuzje: ${answers.injuries||'brak'}. Sprzęt: ${answers.equipment||'full'}.`;
+}
+
+function chatQuick(msg){
+  const panel = document.getElementById('chat-panel');
+  if(panel && !panel.classList.contains('open')) toggleChat();
+  const inp = document.getElementById('chat-input');
+  if(!inp) return;
+  inp.value = msg;
+  sendChatMessage();
+}
+
+// ── KALENDARZ — brakujące funkcje ─────────────────────────
+let _calViewDate = null;
+
+function _calNavDate(){
+  return _calViewDate || _calDateKey();
+}
+
+function calNavDay(dir){
+  const cur = _calNavDate();
+  const parts = cur.split('.');
+  const date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+  date.setDate(date.getDate() + dir);
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(date > today) return;
+  const newKey = date.toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  _calViewDate = (newKey === _calDateKey()) ? null : newKey;
+  loadCalLog();
+  renderCalLog();
+}
+
 </script>
 <div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
   <div class="ms-handle"></div>
