@@ -3098,60 +3098,36 @@ async function exportPDF(){
 
 
 async function callAnthropic(body) {
-  // Gemini API (darmowa - 1500 req/dzień)
-  const GEMINI_KEY = 'AIzaSyDAGfPSFsQl_kDwicd76MgXUwyKzk5N69U';
-  const MODEL      = 'gemini-2.0-flash';
-
-  // Konwertuj format Anthropic → Gemini
   const contents = [];
-
-  // System prompt jako pierwsza wiadomość
   if (body.system) {
     contents.push({ role: 'user',  parts: [{ text: body.system }] });
-    contents.push({ role: 'model', parts: [{ text: 'Rozumiem. Działam zgodnie z instrukcjami.' }] });
+    contents.push({ role: 'model', parts: [{ text: 'Rozumiem.' }] });
   }
-
-  // Wiadomości użytkownika/asystenta
   (body.messages || []).forEach(m => {
     const role = m.role === 'assistant' ? 'model' : 'user';
-    let text = '';
-    if (typeof m.content === 'string') {
-      text = m.content;
-    } else if (Array.isArray(m.content)) {
-      text = m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
-    }
+    const text = typeof m.content === 'string'
+      ? m.content
+      : (m.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n');
     if (text) contents.push({ role, parts: [{ text }] });
   });
 
-  try {
-    return fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          generationConfig: { maxOutputTokens: body.max_tokens || 1000 }
-        })
-      }
-    ).then(async res => {
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        const msg = err?.error?.message || `HTTP ${res.status}`;
-        throw new Error(msg);
-      }
-      return res.json().then(data => {
-        // Mapuj odpowiedź Gemini → format Anthropic (content[0].text)
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        return { content: [{ type: 'text', text }] };
-      });
-    });
-  } catch (e) {
-    if (e instanceof TypeError && e.message.includes('fetch')) {
-      throw new Error('Brak połączenia z internetem lub błąd CORS');
-    }
-    throw e;
+  const res = await fetch('/.netlify/functions/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents,
+      generationConfig: { maxOutputTokens: body.max_tokens || 1000 }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error || `HTTP ${res.status}`);
   }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return { content: [{ type: 'text', text }] };
 }
 
 // ═══════════════════════════════════════════════════════════════
