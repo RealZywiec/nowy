@@ -3098,34 +3098,60 @@ async function exportPDF(){
 
 
 async function callAnthropic(body) {
+  // Gemini API (darmowa - 1500 req/dzień)
   const GEMINI_KEY = 'AIzaSyDAGfPSFsQl_kDwicd76MgXUwyKzk5N69U';
-  const msgs = [];
+  const MODEL      = 'gemini-2.0-flash';
+
+  // Konwertuj format Anthropic → Gemini
+  const contents = [];
+
+  // System prompt jako pierwsza wiadomość
   if (body.system) {
-    msgs.push({ role: 'user', parts: [{ text: body.system }] });
-    msgs.push({ role: 'model', parts: [{ text: 'Rozumiem.' }] });
+    contents.push({ role: 'user',  parts: [{ text: body.system }] });
+    contents.push({ role: 'model', parts: [{ text: 'Rozumiem. Działam zgodnie z instrukcjami.' }] });
   }
-  (body.messages || []).forEach(m => msgs.push({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: msgs,
-        generationConfig: { maxOutputTokens: body.max_tokens || 1000 }
-      })
+
+  // Wiadomości użytkownika/asystenta
+  (body.messages || []).forEach(m => {
+    const role = m.role === 'assistant' ? 'model' : 'user';
+    let text = '';
+    if (typeof m.content === 'string') {
+      text = m.content;
+    } else if (Array.isArray(m.content)) {
+      text = m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
     }
-  );
-  if (!res.ok) {
-    const e = await res.json().catch(() => ({}));
-    throw new Error(e.error?.message || 'HTTP ' + res.status);
+    if (text) contents.push({ role, parts: [{ text }] });
+  });
+
+  try {
+    return fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: { maxOutputTokens: body.max_tokens || 1000 }
+        })
+      }
+    ).then(async res => {
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = err?.error?.message || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return res.json().then(data => {
+        // Mapuj odpowiedź Gemini → format Anthropic (content[0].text)
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        return { content: [{ type: 'text', text }] };
+      });
+    });
+  } catch (e) {
+    if (e instanceof TypeError && e.message.includes('fetch')) {
+      throw new Error('Brak połączenia z internetem lub błąd CORS');
+    }
+    throw e;
   }
-  const d = await res.json();
-  const text = d.candidates?.[0]?.content?.parts?.[0]?.text || 'Brak odpowiedzi.';
-  return { content: [{ type: 'text', text }] };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -5398,11 +5424,13 @@ async function runProgressAnalysis() {
   const btn = document.getElementById('analysis-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Analizuję...'; }
 
-  const prs  = _prData();
-  const bt   = _btData().slice(-8);
-  const stg  = _stgData();
-  const D    = getComputed();
+  // Zbierz dane
+  const prs   = _prData();
+  const bt    = _btData().slice(-8);
+  const stg   = _stgData();
+  const D     = getComputed();
 
+  // Objętość treningowa z ostatnich 7 dni
   let weekVolume = 0;
   try {
     const exLog = JSON.parse(localStorage.getItem('fp_ex_log') || '{}');
@@ -5416,11 +5444,13 @@ async function runProgressAnalysis() {
     });
   } catch {}
 
+  // Plateau data
   const plateauList = Object.entries(stg)
     .filter(([,v]) => v.daysSince >= 14)
     .map(([k,v]) => `${k.replace(/_/g,' ')}: ${v.daysSince} dni bez PR`)
     .join('; ') || 'brak';
 
+  // Trend wagi
   let weightTrend = 'brak danych';
   if (bt.length >= 2) {
     const diff = (bt[bt.length-1].weight - bt[0].weight).toFixed(1);
@@ -5443,6 +5473,7 @@ Dane:
 
   try {
     const data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 400,
       system: prompt,
       messages: [{ role: 'user', content: 'Przeprowadź analizę.' }]
@@ -5454,6 +5485,33 @@ Dane:
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Analizuj postęp'; }
   }
+}
+
+function _renderAnalysisResult(text) {
+  const sections = ['POSTĘP','STAGNACJA','DELOAD','PRIORYTET'];
+  const icons    = { POSTĘP:'📈', STAGNACJA:'⚠️', DELOAD:'🔄', PRIORYTET:'🎯' };
+
+  let html = '<div class="analysis-result">';
+  sections.forEach(sec => {
+    const regex = new RegExp(`${sec}:\\s*(.+?)(?=\\n[A-ZĘŃÓŚŹ]+:|$)`, 's');
+    const match = text.match(regex);
+    if (match) {
+      html += `<div class="analysis-card">
+        <div class="analysis-card-header">${icons[sec]} ${sec}</div>
+        <div class="analysis-card-body">${sanitize(match[1].trim())}</div>
+      </div>`;
+    }
+  });
+  html += '</div>';
+
+  let panel = document.getElementById('analysis-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'analysis-panel';
+    document.body.appendChild(panel);
+  }
+  panel.innerHTML = html;
+  panel.classList.add('analysis-visible');
 }
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS PANEL
