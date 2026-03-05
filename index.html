@@ -164,6 +164,8 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 /* WEEK GRID */
 .week-grid{display:grid;gap:12px}
 .day-card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 4px 24px rgba(200,255,0,.12)}
+.day-card.today .day-name{color:var(--accent)}
 .day-card.rest-day{opacity:.5}
 .day-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none}
 .day-name{font-family:var(--fd);font-size:20px;font-weight:800;text-transform:uppercase;flex:1}
@@ -707,8 +709,8 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 }
 .chat-fab.visible{display:flex}
 .chat-fab:hover{transform:scale(1.08);background:#fff}
-.chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
-.chat-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
+.chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(105%);opacity:0;visibility:hidden;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
+.chat-panel.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:all}
 .chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
 .chat-avatar{width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .chat-header-info{flex:1;min-width:0}
@@ -1298,6 +1300,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   text-transform: uppercase; cursor: pointer; transition: opacity .2s;
 }
 .bt-save-btn:hover { opacity: .85; }
+.bt-content-area { max-height: 40vh; overflow-y: auto; padding: 0 4px; }
 .settings-danger-btn {
   width: 100%; padding: 13px;
   background: rgba(255,77,0,.08);
@@ -2485,10 +2488,12 @@ function renderPlan() {
   const D = getComputed();
   const { cal, mac, goal, glabs, gcol, wc } = D;
   const split = window.__split;
+  const _todayName = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'][new Date().getDay()];
 
   const weekHtml = split.days.map((day, di) => {
+    const _isToday = day.name && day.name.startsWith(_todayName.slice(0,3));
     if (!day.tr) return `
-      <div class="day-card rest-day">
+      <div class="day-card rest-day${_isToday?' today':''}">
         <div class="day-header"><span class="day-name">${day.name}</span><span class="day-tag rs">Odpoczynek</span></div>
         <div class="rest-note">Aktywna regeneracja: spacer, pływanie, rozciąganie.</div>
       </div>`;
@@ -2508,7 +2513,7 @@ function renderPlan() {
       </div>
       <div class="ex-tip-row">💡 ${ex.t}</div>`).join('');
     return `
-      <div class="day-card">
+      <div class="day-card${_isToday?' today':''}">
         <div class="day-header" onclick="toggleDay(${di})">
           <span class="day-name">${day.name}</span>
           <span class="day-tag tr">${day.label}</span>
@@ -3368,11 +3373,9 @@ function renderCalLog(){
         <div style="font-family:var(--fd);font-size:18px;font-weight:800">${dayLabel}</div>
         <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${isToday?'':viewDate}</div>
       </div>
-      <button onclick="calNavDay(1)" ${!canGoNext ? 'disabled style="opacity:.3;cursor:default"' : ''}
+      <button onclick="calNavDay(1)" ${isToday ? 'disabled style="opacity:.3;cursor:default"' : ''}
         style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);
                font-size:18px;width:36px;height:36px;border-radius:4px;cursor:pointer">›</button>
-      ${!isToday ? `<button onclick="calJumpToday()"
-        style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:11px;font-weight:800;padding:4px 8px;border-radius:4px;cursor:pointer;text-transform:uppercase">Dziś</button>` : ''}
     </div>
 
     <!-- Podsumowanie -->
@@ -4313,115 +4316,166 @@ const FOOD_DB=[
 // Nabiał i jajka
 {n:'Jajko kurze całe',           kcal:78,  p:6.3,c:0.6, f:5.3, s:1,   pn:'szt'},
 {n:'Białko jaja',                kcal:17,  p:3.6,c:0.2, f:0.1, s:1,   pn:'szt'},
+{n:'Żółtko jaja',                kcal:61,  p:2.7,c:0.6, f:5.1, s:1,   pn:'szt'},
 {n:'Mleko 2%',                   kcal:50,  p:3.4,c:4.8, f:2,   s:100, pn:'100ml'},
 {n:'Mleko 3.2%',                 kcal:61,  p:3.2,c:4.8, f:3.2, s:100, pn:'100ml'},
+{n:'Mleko odtłuszczone',         kcal:35,  p:3.5,c:5.0, f:0.1, s:100, pn:'100ml'},
 {n:'Jogurt naturalny',           kcal:61,  p:3.5,c:4.7, f:3.3, s:100, pn:'100g'},
 {n:'Jogurt grecki 0%',           kcal:54,  p:10, c:3.6, f:0.2, s:100, pn:'100g'},
 {n:'Jogurt grecki 2%',           kcal:73,  p:9.5,c:3.6, f:2,   s:100, pn:'100g'},
-{n:'Twaróg chudy',               kcal:98,  p:18, c:3.5, f:1,   s:100, pn:'100g'},
-{n:'Twaróg półtłusty',           kcal:140, p:16, c:3,   f:7,   s:100, pn:'100g'},
-{n:'Ser żółty Gouda',            kcal:356, p:25, c:2.2, f:27,  s:100, pn:'100g'},
-{n:'Ser mozzarella',             kcal:280, p:22, c:2.2, f:20,  s:100, pn:'100g'},
+{n:'Jogurt skyr',                kcal:63,  p:11, c:4,   f:0.2, s:100, pn:'100g'},
+{n:'Twaróg chudy',               kcal:98,  p:17, c:3.5, f:1,   s:100, pn:'100g'},
+{n:'Twaróg półtłusty',           kcal:132, p:15, c:3.5, f:6,   s:100, pn:'100g'},
+{n:'Twaróg tłusty',              kcal:181, p:13, c:3,   f:12,  s:100, pn:'100g'},
+{n:'Serek wiejski 0%',           kcal:70,  p:12, c:4,   f:0.2, s:100, pn:'100g'},
+{n:'Serek wiejski 3%',           kcal:88,  p:11, c:4,   f:3,   s:100, pn:'100g'},
+{n:'Ser żółty Gouda',            kcal:356, p:25, c:0.5, f:28,  s:100, pn:'100g'},
+{n:'Ser żółty Edam',             kcal:310, p:28, c:0.5, f:22,  s:100, pn:'100g'},
+{n:'Ser mozzarella',             kcal:254, p:18, c:3.1, f:19,  s:100, pn:'100g'},
 {n:'Ser feta',                   kcal:264, p:14, c:4,   f:21,  s:100, pn:'100g'},
-{n:'Ser cottage (serek wiejski)',kcal:98,  p:11, c:3.4, f:4.3, s:100, pn:'100g'},
-{n:'Masło',                      kcal:717, p:0.9,c:0.1, f:81,  s:10,  pn:'łyżeczka (10g)'},
-{n:'Śmietana 18%',               kcal:185, p:2.7,c:3.8, f:18,  s:100, pn:'100ml'},
-{n:'Kefir 1.5%',                 kcal:40,  p:3.3,c:4.5, f:1.5, s:100, pn:'100ml'},
-{n:'Maślanka',                   kcal:33,  p:3.3,c:4,   f:0.5, s:100, pn:'100ml'},
+{n:'Ser parmezan',               kcal:431, p:38, c:3,   f:29,  s:100, pn:'100g'},
+{n:'Masło',                      kcal:748, p:0.5,c:0.6, f:83,  s:10,  pn:'łyżka'},
+{n:'Śmietana 12%',               kcal:118, p:3,  c:4,   f:10,  s:100, pn:'100ml'},
+{n:'Śmietana 18%',               kcal:166, p:2.8,c:3.5, f:15,  s:100, pn:'100ml'},
+{n:'Kefir',                      kcal:51,  p:3.3,c:4.5, f:1.5, s:100, pn:'100ml'},
+{n:'Maślanka',                   kcal:37,  p:3.4,c:4.8, f:0.5, s:100, pn:'100ml'},
 // Mięso
-{n:'Pierś kurczaka gotowana',    kcal:165, p:31, c:0,   f:3.6, s:100, pn:'100g'},
-{n:'Pierś kurczaka surowa',      kcal:110, p:23, c:0,   f:1.5, s:100, pn:'100g'},
-{n:'Udo kurczaka bez skóry',     kcal:177, p:25, c:0,   f:8,   s:100, pn:'100g'},
-{n:'Wołowina mielona 15% tłuszczu',kcal:215,p:21,c:0,  f:14,  s:100, pn:'100g'},
-{n:'Wołowina mielona 5% tłuszczu',kcal:140,p:22,c:0,   f:5,   s:100, pn:'100g'},
-{n:'Stek wołowy (rostbef)',      kcal:218, p:26, c:0,   f:12,  s:100, pn:'100g'},
-{n:'Wieprzowina schab',          kcal:182, p:22, c:0,   f:10,  s:100, pn:'100g'},
-{n:'Boczek wieprzowy',           kcal:458, p:12, c:0.6, f:46,  s:100, pn:'100g'},
-{n:'Polędwica wieprzowa',        kcal:123, p:22, c:0,   f:4,   s:100, pn:'100g'},
-{n:'Łosoś pieczony',             kcal:206, p:28, c:0,   f:10,  s:100, pn:'100g'},
-{n:'Łosoś surowy',               kcal:142, p:20, c:0,   f:6.3, s:100, pn:'100g'},
-{n:'Tuńczyk w wodzie (puszka)',  kcal:103, p:23, c:0,   f:0.7, s:100, pn:'100g'},
-{n:'Tuńczyk w oleju (puszka)',   kcal:190, p:25, c:0,   f:10,  s:100, pn:'100g'},
+{n:'Pierś kurczaka',             kcal:110, p:23, c:0,   f:1.5, s:100, pn:'100g'},
+{n:'Udo kurczaka',               kcal:175, p:19, c:0,   f:11,  s:100, pn:'100g'},
+{n:'Pierś indyka',               kcal:104, p:22, c:0,   f:1.2, s:100, pn:'100g'},
+{n:'Mielone wołowe 10%',         kcal:152, p:21, c:0,   f:7.5, s:100, pn:'100g'},
+{n:'Mielone wołowe 20%',         kcal:218, p:18, c:0,   f:16,  s:100, pn:'100g'},
+{n:'Stek wołowy',                kcal:158, p:26, c:0,   f:6,   s:100, pn:'100g'},
+{n:'Schab wieprzowy',            kcal:157, p:22, c:0,   f:7,   s:100, pn:'100g'},
+{n:'Polędwiczki wieprzowe',      kcal:109, p:22, c:0,   f:2,   s:100, pn:'100g'},
+{n:'Boczek wędzony',             kcal:337, p:14, c:0.5, f:30,  s:100, pn:'100g'},
+{n:'Szynka gotowana',            kcal:120, p:18, c:1,   f:5,   s:100, pn:'100g'},
+{n:'Wędlina drobiowa',           kcal:95,  p:16, c:1.5, f:3,   s:100, pn:'100g'},
+{n:'Kiełbasa kabanos',           kcal:320, p:20, c:2,   f:26,  s:100, pn:'100g'},
+{n:'Kiełbasa toruńska',          kcal:280, p:15, c:2,   f:24,  s:100, pn:'100g'},
+{n:'Wątróbka drobiowa',          kcal:119, p:17, c:3,   f:4.5, s:100, pn:'100g'},
+{n:'Wątróbka wieprzowa',         kcal:137, p:21, c:3,   f:4,   s:100, pn:'100g'},
+// Ryby i owoce morza
+{n:'Łosoś świeży',               kcal:179, p:20, c:0,   f:11,  s:100, pn:'100g'},
+{n:'Łosoś wędzony',              kcal:172, p:25, c:0,   f:8,   s:100, pn:'100g'},
+{n:'Tuńczyk w wodzie',           kcal:96,  p:22, c:0,   f:0.6, s:100, pn:'100g'},
+{n:'Tuńczyk w oleju',            kcal:190, p:22, c:0,   f:11,  s:100, pn:'100g'},
 {n:'Dorsz',                      kcal:82,  p:18, c:0,   f:0.7, s:100, pn:'100g'},
-{n:'Krewetki',                   kcal:99,  p:21, c:0.9, f:1.1, s:100, pn:'100g'},
-{n:'Indyk pierś',                kcal:135, p:29, c:0,   f:1.5, s:100, pn:'100g'},
-{n:'Szynka wieprzowa gotowana',  kcal:145, p:20, c:1,   f:6,   s:100, pn:'100g'},
-{n:'Kiełbasa krakowska',         kcal:304, p:16, c:2,   f:26,  s:100, pn:'100g'},
-{n:'Parówki wieprzowe',          kcal:280, p:11, c:2,   f:25,  s:100, pn:'100g'},
-// Węglowodany
+{n:'Pstrąg',                     kcal:141, p:20, c:0,   f:6.5, s:100, pn:'100g'},
+{n:'Makrela wędzona',            kcal:305, p:19, c:0,   f:25,  s:100, pn:'100g'},
+{n:'Sardynki w oleju',           kcal:208, p:25, c:0,   f:12,  s:100, pn:'100g'},
+{n:'Krewetki',                   kcal:85,  p:20, c:0,   f:0.5, s:100, pn:'100g'},
+{n:'Mintaj',                     kcal:72,  p:16, c:0,   f:0.5, s:100, pn:'100g'},
+// Węglowodany — kasze, ryż, makaron
 {n:'Ryż biały gotowany',         kcal:130, p:2.7,c:28,  f:0.3, s:100, pn:'100g'},
-{n:'Ryż brązowy gotowany',       kcal:111, p:2.6,c:23,  f:0.9, s:100, pn:'100g'},
+{n:'Ryż brązowy gotowany',       kcal:122, p:2.5,c:26,  f:1,   s:100, pn:'100g'},
+{n:'Ryż jaśminowy gotowany',     kcal:136, p:2.8,c:30,  f:0.3, s:100, pn:'100g'},
 {n:'Makaron pszenny gotowany',   kcal:158, p:5.8,c:31,  f:0.9, s:100, pn:'100g'},
-{n:'Makaron pełnoziarnisty',     kcal:143, p:5.3,c:27,  f:1.1, s:100, pn:'100g'},
-{n:'Kasza gryczana gotowana',    kcal:92,  p:3.4,c:19,  f:0.6, s:100, pn:'100g'},
-{n:'Kasza jaglana gotowana',     kcal:119, p:3.5,c:23,  f:1,   s:100, pn:'100g'},
-{n:'Kasza bulgur gotowana',      kcal:83,  p:3.1,c:18,  f:0.2, s:100, pn:'100g'},
+{n:'Makaron razowy gotowany',    kcal:149, p:5.5,c:29,  f:1.1, s:100, pn:'100g'},
+{n:'Kasza gryczana gotowana',    kcal:92,  p:3.4,c:20,  f:0.6, s:100, pn:'100g'},
+{n:'Kasza jaglana gotowana',     kcal:120, p:3.5,c:23,  f:1,   s:100, pn:'100g'},
+{n:'Kasza bulgur gotowana',      kcal:83,  p:3,  c:18,  f:0.2, s:100, pn:'100g'},
+{n:'Kasza kuskus gotowana',      kcal:112, p:3.8,c:23,  f:0.2, s:100, pn:'100g'},
+{n:'Owsianka (płatki owsiane)',  kcal:366, p:13, c:62,  f:7,   s:100, pn:'100g'},
+{n:'Płatki owsiane porcja',      kcal:183, p:6.5,c:31,  f:3.5, s:50,  pn:'porcja'},
+{n:'Chleb żytni',                kcal:209, p:7,  c:41,  f:1.5, s:100, pn:'100g'},
+{n:'Chleb pszenny',              kcal:265, p:9,  c:51,  f:2,   s:100, pn:'100g'},
+{n:'Chleb tostowy',              kcal:265, p:8,  c:49,  f:3.5, s:30,  pn:'kromka'},
+{n:'Bułka pszenna',              kcal:262, p:9,  c:50,  f:2,   s:60,  pn:'szt'},
+{n:'Bagietka',                   kcal:275, p:9,  c:54,  f:1.5, s:100, pn:'100g'},
+{n:'Tortilla pszenna',           kcal:300, p:8,  c:50,  f:7,   s:55,  pn:'szt'},
+{n:'Ryżowe wafle',               kcal:387, p:7,  c:82,  f:2.5, s:10,  pn:'szt'},
+{n:'Płatki kukurydziane',        kcal:357, p:7,  c:79,  f:1,   s:30,  pn:'porcja'},
+{n:'Granola',                    kcal:456, p:10, c:65,  f:17,  s:50,  pn:'porcja'},
 {n:'Ziemniaki gotowane',         kcal:77,  p:2,  c:17,  f:0.1, s:100, pn:'100g'},
 {n:'Bataty gotowane',            kcal:86,  p:1.6,c:20,  f:0.1, s:100, pn:'100g'},
-{n:'Płatki owsiane',             kcal:371, p:13, c:60,  f:7,   s:100, pn:'100g'},
-{n:'Owsianka (30g płatków+200ml mleka 2%)',kcal:200,p:8.5,c:30,f:4.5,s:1,pn:'porcja'},
-{n:'Chleb żytni razowy',         kcal:241, p:8.5,c:44,  f:2.3, s:100, pn:'100g'},
-{n:'Chleb pszenny tostowy',      kcal:266, p:8.5,c:50,  f:3.5, s:1,   pn:'kromka (~30g)'},
-{n:'Bułka kajzerka',             kcal:284, p:9.5,c:55,  f:2.5, s:1,   pn:'szt (~60g)'},
-{n:'Bajgiel',                    kcal:250, p:9,  c:48,  f:1.6, s:1,   pn:'szt (~100g)'},
-{n:'Rogalik 7 Days',             kcal:290, p:5,  c:40,  f:12,  s:1,   pn:'szt (~60g)'},
-{n:'Tortilla pszenna',           kcal:310, p:8,  c:52,  f:7,   s:1,   pn:'szt (~60g)'},
-// Rośliny strączkowe i wegetariańskie
-{n:'Fasola czarna gotowana',     kcal:132, p:8.9,c:24,  f:0.5, s:100, pn:'100g'},
-{n:'Soczewica czerwona gotowana',kcal:116, p:9,  c:20,  f:0.4, s:100, pn:'100g'},
-{n:'Ciecierzyca gotowana',       kcal:164, p:8.9,c:27,  f:2.6, s:100, pn:'100g'},
-{n:'Tofu twarde',                kcal:144, p:17, c:2.8, f:8,   s:100, pn:'100g'},
-{n:'Tempeh',                     kcal:193, p:19, c:9,   f:11,  s:100, pn:'100g'},
-{n:'Edamame',                    kcal:121, p:11, c:9,   f:5,   s:100, pn:'100g'},
-// Tłuszcze i orzechy
-{n:'Oliwa z oliwek',             kcal:884, p:0,  c:0,   f:100, s:10,  pn:'łyżka (10ml)'},
-{n:'Olej rzepakowy',             kcal:884, p:0,  c:0,   f:100, s:10,  pn:'łyżka (10ml)'},
-{n:'Migdały',                    kcal:579, p:21, c:22,  f:50,  s:100, pn:'100g'},
-{n:'Orzechy włoskie',            kcal:654, p:15, c:14,  f:65,  s:100, pn:'100g'},
-{n:'Orzechy nerkowca',           kcal:553, p:18, c:30,  f:44,  s:100, pn:'100g'},
-{n:'Masło orzechowe',            kcal:598, p:25, c:20,  f:51,  s:30,  pn:'łyżka (30g)'},
-{n:'Awokado',                    kcal:160, p:2,  c:9,   f:15,  s:100, pn:'100g'},
-{n:'Pestki dyni',                kcal:559, p:30, c:11,  f:49,  s:100, pn:'100g'},
+{n:'Frytki',                     kcal:312, p:3.5,c:45,  f:14,  s:100, pn:'100g'},
 // Warzywa
-{n:'Brokuły',                    kcal:34,  p:2.8,c:7,   f:0.4, s:100, pn:'100g'},
+{n:'Brokuły',                    kcal:34,  p:2.8,c:6.6, f:0.4, s:100, pn:'100g'},
+{n:'Kalafior',                   kcal:25,  p:1.9,c:5,   f:0.3, s:100, pn:'100g'},
 {n:'Szpinak',                    kcal:23,  p:2.9,c:3.6, f:0.4, s:100, pn:'100g'},
-{n:'Marchew',                    kcal:41,  p:0.9,c:10,  f:0.2, s:100, pn:'100g'},
+{n:'Sałata',                     kcal:13,  p:1.3,c:2,   f:0.2, s:100, pn:'100g'},
 {n:'Pomidor',                    kcal:18,  p:0.9,c:3.9, f:0.2, s:100, pn:'100g'},
-{n:'Ogórek',                     kcal:16,  p:0.7,c:3.6, f:0.1, s:100, pn:'100g'},
+{n:'Ogórek',                     kcal:15,  p:0.7,c:3.6, f:0.1, s:100, pn:'100g'},
 {n:'Papryka czerwona',           kcal:31,  p:1,  c:6,   f:0.3, s:100, pn:'100g'},
+{n:'Marchew',                    kcal:41,  p:0.9,c:9.6, f:0.2, s:100, pn:'100g'},
 {n:'Cukinia',                    kcal:17,  p:1.2,c:3.1, f:0.3, s:100, pn:'100g'},
-{n:'Ryż jaśminowy gotowany',     kcal:140, p:2.9,c:30,  f:0.4, s:100, pn:'100g'},
+{n:'Bakłażan',                   kcal:25,  p:1,  c:5.7, f:0.2, s:100, pn:'100g'},
+{n:'Cebula',                     kcal:40,  p:1.1,c:9.3, f:0.1, s:100, pn:'100g'},
+{n:'Czosnek',                    kcal:149, p:6.4,c:33,  f:0.5, s:10,  pn:'ząbek'},
+{n:'Groszek zielony',            kcal:81,  p:5.4,c:14,  f:0.4, s:100, pn:'100g'},
+{n:'Kukurydza',                  kcal:96,  p:3.4,c:21,  f:1.5, s:100, pn:'100g'},
+{n:'Fasola czerwona',            kcal:127, p:8.7,c:22,  f:0.5, s:100, pn:'100g'},
+{n:'Ciecierzyca gotowana',       kcal:164, p:8.9,c:27,  f:2.6, s:100, pn:'100g'},
+{n:'Soczewica gotowana',         kcal:116, p:9,  c:20,  f:0.4, s:100, pn:'100g'},
+{n:'Edamame',                    kcal:121, p:11, c:9,   f:5,   s:100, pn:'100g'},
 // Owoce
-{n:'Banan',                      kcal:89,  p:1.1,c:23,  f:0.3, s:1,   pn:'szt (~120g)'},
-{n:'Jabłko',                     kcal:52,  p:0.3,c:14,  f:0.2, s:1,   pn:'szt (~150g)'},
-{n:'Pomarańcza',                 kcal:47,  p:0.9,c:12,  f:0.1, s:1,   pn:'szt (~130g)'},
+{n:'Banan',                      kcal:89,  p:1.1,c:23,  f:0.3, s:120, pn:'szt'},
+{n:'Jabłko',                     kcal:52,  p:0.3,c:14,  f:0.2, s:150, pn:'szt'},
+{n:'Pomarańcza',                 kcal:47,  p:0.9,c:12,  f:0.1, s:150, pn:'szt'},
 {n:'Truskawki',                  kcal:32,  p:0.7,c:7.7, f:0.3, s:100, pn:'100g'},
 {n:'Borówki',                    kcal:57,  p:0.7,c:14,  f:0.3, s:100, pn:'100g'},
+{n:'Maliny',                     kcal:52,  p:1.2,c:12,  f:0.6, s:100, pn:'100g'},
 {n:'Mango',                      kcal:60,  p:0.8,c:15,  f:0.4, s:100, pn:'100g'},
-// Napooje i suplementy
-{n:'Odżywka białkowa (whey) 1 miarka',kcal:120,p:25,c:4,f:1.5,s:1,pn:'miarka (~30g)'},
-{n:'Odżywka białkowa (whey) 100g',kcal:400,p:80,c:8,f:5,s:100,pn:'100g'},
-{n:'Gajer (gainer) 1 porcja',    kcal:400, p:25, c:65,  f:5,   s:1,   pn:'porcja (~100g)'},
-{n:'Izotonik (np. Powerade)',     kcal:27,  p:0,  c:6.5, f:0,   s:100, pn:'100ml'},
-{n:'Sok pomarańczowy',           kcal:45,  p:0.7,c:10,  f:0.2, s:100, pn:'100ml'},
-{n:'Mleko migdałowe bez cukru',  kcal:13,  p:0.4,c:0.3, f:1.1, s:100, pn:'100ml'},
-// Gotowe posiłki i fast food (uproszczone)
-{n:'Jajecznica 2 jajka z masłem',kcal:230, p:14, c:1,   f:18,  s:1,   pn:'porcja'},
-{n:'Kanapka z szynką i serem',   kcal:350, p:18, c:38,  f:12,  s:1,   pn:'szt'},
-{n:'Sałatka grecka (200g)',      kcal:220, p:6,  c:8,   f:18,  s:1,   pn:'porcja'},
-{n:'Kurczak z ryżem (dieta)',     kcal:420, p:38, c:45,  f:8,   s:1,   pn:'porcja'},
-{n:'Pizza margherita',           kcal:265, p:11, c:33,  f:10,  s:100, pn:'100g'},
-{n:'Burger klasyczny (McDonald\'s Big Mac)',kcal:550,p:25,c:45,f:30,s:1,pn:'szt'},
-{n:'Frytki (duże porcja)',        kcal:490, p:7,  c:66,  f:23,  s:1,   pn:'porcja'},
-{n:'Kotlet schabowy (150g)',      kcal:380, p:32, c:12,  f:22,  s:1,   pn:'porcja'},
-{n:'Zupa pomidorowa z ryżem',     kcal:120, p:3.5,c:20,  f:3,   s:100, pn:'100ml'},
-{n:'Barszcz czerwony (250ml)',    kcal:60,  p:2,  c:12,  f:0.3, s:1,   pn:'talerz'},
-{n:'Pierogi ruskie (1 szt)',      kcal:80,  p:2.5,c:12,  f:2.5, s:1,   pn:'szt'},
-{n:'Naleśnik z twarogiem',       kcal:200, p:9,  c:28,  f:6,   s:1,   pn:'szt'},
-{n:'Baton proteinowy (typowy)',   kcal:200, p:20, c:20,  f:8,   s:1,   pn:'szt (~60g)'},
-{n:'Baton zbożowy müsli',        kcal:380, p:7,  c:62,  f:11,  s:100, pn:'100g'},
-{n:'Czekolada mleczna',          kcal:535, p:7.7,c:59,  f:30,  s:100, pn:'100g'},
-{n:'Czekolada gorzka 70%',       kcal:598, p:7.8,c:46,  f:43,  s:100, pn:'100g'},
+{n:'Awokado',                    kcal:160, p:2,  c:9,   f:15,  s:100, pn:'100g'},
+{n:'Winogrona',                  kcal:67,  p:0.6,c:17,  f:0.4, s:100, pn:'100g'},
+{n:'Ananas',                     kcal:50,  p:0.5,c:13,  f:0.1, s:100, pn:'100g'},
+{n:'Kiwi',                       kcal:61,  p:1.1,c:15,  f:0.5, s:70,  pn:'szt'},
+{n:'Gruszka',                    kcal:57,  p:0.4,c:15,  f:0.1, s:150, pn:'szt'},
+{n:'Melon',                      kcal:34,  p:0.8,c:8,   f:0.2, s:100, pn:'100g'},
+{n:'Arbuz',                      kcal:30,  p:0.6,c:7.5, f:0.2, s:100, pn:'100g'},
+// Orzechy i nasiona
+{n:'Migdały',                    kcal:576, p:21, c:22,  f:49,  s:30,  pn:'garść'},
+{n:'Orzechy włoskie',            kcal:654, p:15, c:14,  f:65,  s:30,  pn:'garść'},
+{n:'Orzechy nerkowca',           kcal:553, p:18, c:30,  f:44,  s:30,  pn:'garść'},
+{n:'Orzechy arachidowe',         kcal:567, p:26, c:16,  f:49,  s:30,  pn:'garść'},
+{n:'Masło orzechowe',            kcal:588, p:25, c:20,  f:50,  s:32,  pn:'2 łyżki'},
+{n:'Masło migdałowe',            kcal:614, p:21, c:22,  f:56,  s:32,  pn:'2 łyżki'},
+{n:'Nasiona chia',               kcal:486, p:17, c:42,  f:31,  s:15,  pn:'łyżka'},
+{n:'Siemię lniane',              kcal:534, p:18, c:29,  f:42,  s:15,  pn:'łyżka'},
+{n:'Pestki dyni',                kcal:559, p:30, c:11,  f:49,  s:30,  pn:'garść'},
+{n:'Sezam',                      kcal:573, p:17, c:23,  f:50,  s:15,  pn:'łyżka'},
+// Oleje i tłuszcze
+{n:'Oliwa z oliwek',             kcal:884, p:0,  c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Olej kokosowy',              kcal:862, p:0,  c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Olej rzepakowy',             kcal:900, p:0,  c:0,   f:100, s:10,  pn:'łyżka'},
+// Suplementy i shake
+{n:'Białko WPC 80',              kcal:380, p:80, c:7,   f:5,   s:30,  pn:'miarka'},
+{n:'Białko WPI 90',              kcal:360, p:90, c:2,   f:1.5, s:30,  pn:'miarka'},
+{n:'Odżywka białkowa (avg)',     kcal:378, p:76, c:8,   f:5,   s:30,  pn:'miarka'},
+{n:'Kreatyna',                   kcal:0,   p:0,  c:0,   f:0,   s:5,   pn:'miarka'},
+{n:'Maltodekstryna',             kcal:382, p:0,  c:95,  f:0,   s:50,  pn:'porcja'},
+// Napoje
+{n:'Woda',                       kcal:0,   p:0,  c:0,   f:0,   s:250, pn:'szklanka'},
+{n:'Kawa czarna',                kcal:2,   p:0.3,c:0,   f:0,   s:250, pn:'szklanka'},
+{n:'Kawa z mlekiem',             kcal:45,  p:2.5,c:4,   f:1.5, s:250, pn:'szklanka'},
+{n:'Latte',                      kcal:120, p:6,  c:10,  f:5,   s:350, pn:'kubek'},
+{n:'Herbata',                    kcal:1,   p:0,  c:0.3, f:0,   s:250, pn:'szklanka'},
+{n:'Sok pomarańczowy',           kcal:45,  p:0.7,c:10,  f:0.2, s:200, pn:'szklanka'},
+{n:'Sok jabłkowy',               kcal:46,  p:0.1,c:11,  f:0.1, s:200, pn:'szklanka'},
+{n:'Napój izotoniczny',          kcal:28,  p:0,  c:7,   f:0,   s:500, pn:'butelka'},
+// Fast food i gotowe
+{n:'Pizza Margherita',           kcal:266, p:11, c:33,  f:10,  s:100, pn:'100g'},
+{n:'Hamburger (duży)',           kcal:540, p:28, c:45,  f:26,  s:200, pn:'szt'},
+{n:'Kanapka z kurczakiem',       kcal:450, p:32, c:42,  f:16,  s:200, pn:'szt'},
+{n:'Kebab w bułce',              kcal:480, p:25, c:48,  f:20,  s:250, pn:'porcja'},
+{n:'Sushi (10 szt)',             kcal:380, p:18, c:68,  f:4,   s:200, pn:'porcja'},
+{n:'Zupa pomidorowa',            kcal:60,  p:2,  c:10,  f:1.5, s:300, pn:'talerz'},
+{n:'Zupa jarzynowa',             kcal:45,  p:1.5,c:8,   f:1,   s:300, pn:'talerz'},
+{n:'Omlet 2 jajka',              kcal:220, p:14, c:2,   f:17,  s:1,   pn:'szt'},
+{n:'Naleśnik',                   kcal:150, p:4,  c:22,  f:5,   s:1,   pn:'szt'},
+{n:'Owsianka z bananem',         kcal:320, p:9,  c:60,  f:5,   s:1,   pn:'porcja'},
+{n:'Ryż z kurczakiem (meal)',    kcal:420, p:38, c:46,  f:7,   s:1,   pn:'porcja'},
+{n:'Kanapka z tuńczykiem',       kcal:320, p:25, c:30,  f:9,   s:1,   pn:'szt'},
+// Słodycze i przekąski
+{n:'Czekolada mleczna',          kcal:535, p:7.7,c:59,  f:30,  s:40,  pn:'porcja'},
+{n:'Czekolada gorzka 70%',       kcal:600, p:8,  c:46,  f:43,  s:40,  pn:'porcja'},
+{n:'Baton proteinowy',           kcal:200, p:20, c:22,  f:7,   s:60,  pn:'szt'},
+{n:'Baton Snickers',             kcal:488, p:8.5,c:62,  f:24,  s:100, pn:'100g'},
+{n:'Chipsy ziemniaczane',        kcal:536, p:6,  c:53,  f:34,  s:30,  pn:'garść'},
+{n:'Popcorn solony',             kcal:387, p:13, c:78,  f:4.5, s:30,  pn:'porcja'},
+{n:'Miód',                       kcal:304, p:0.3,c:82,  f:0,   s:21,  pn:'łyżka'},
+{n:'Dżem truskawkowy',           kcal:250, p:0.5,c:63,  f:0.1, s:20,  pn:'łyżka'},
 ];
 
 function parseQty(text){
@@ -5042,7 +5096,7 @@ function calNavDay(dir){
   const date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
   date.setDate(date.getDate() + dir);
   const today = new Date(); today.setHours(0,0,0,0);
-  if(date > today) return;
+  if(date > today) date.setTime(today.getTime()); // max = dziś, nie blokuj
   const newKey = date.toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
   _calViewDate = (newKey === _calDateKey()) ? null : newKey;
   loadCalLog();
@@ -5681,8 +5735,8 @@ function _onScreenChange(screen) {
     <!-- TABS -->
     <div class="stabs">
   <button class="stab active" data-tab="profile"  onclick="switchSettingsTab('profile')">Profil</button>
-  <button class="stab"        data-tab="trening"  onclick="switchSettingsTab('trening')">Trening</button>
-  <button class="stab"        data-tab="kalorie"  onclick="switchSettingsTab('kalorie')">Kalorie</button>
+  <button class="stab"        data-tab="trening"  onclick="closeSettings();setTimeout(()=>navOpenExLog(),200)">Trening</button>
+  <button class="stab"        data-tab="kalorie"  onclick="closeSettings();setTimeout(()=>navOpenCalories(),200)">Kalorie</button>
   <button class="stab"        data-tab="progress" onclick="switchSettingsTab('progress')">Postępy</button>
   <button class="stab"        data-tab="ai"       onclick="switchSettingsTab('ai')">AI</button>
   <button class="stab"        data-tab="backup"   onclick="switchSettingsTab('backup')">Backup</button>
@@ -5718,71 +5772,22 @@ function _onScreenChange(screen) {
       <button class="settings-danger-btn" onclick="confirmReset()">Usuń wszystkie dane</button>
     </div>
 
-    <!-- TAB: TRENING -->
-    <div class="stab-content" id="stab-trening">
-      <div class="settings-section">
-        <div class="settings-section-title">Plan treningowy</div>
-        <div class="settings-row">
-          <span class="settings-row-label">Aktywny plan</span>
-          <span class="settings-row-value" id="st-plan-name">—</span>
-        </div>
-        <div class="settings-row">
-          <span class="settings-row-label">Dni treningowe</span>
-          <span class="settings-row-value" id="st-plan-days">—</span>
-        </div>
-        <div class="settings-row">
-          <span class="settings-row-label">Cel</span>
-          <span class="settings-row-value" id="st-plan-goal">—</span>
-        </div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Zmień plan</div>
-        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
-          <button class="bt-save-btn" onclick="closeSettings();setTimeout(()=>{window._skipPaywall=true;show('quiz')},200)">Zmień cel i wygeneruj nowy plan →</button>
-        </div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Streak i odznaki</div>
-        <div id="st-streak-content" style="padding:12px 16px"></div>
-      </div>
-    </div>
-
-    <!-- TAB: KALORIE -->
-    <div class="stab-content" id="stab-kalorie">
-      <div class="settings-section">
-        <div class="settings-section-title">Dzisiejsze makra</div>
-        <div id="st-cal-summary" style="padding:12px 16px"></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Szybki wpis</div>
-        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
-          <input type="text" id="st-cal-name" placeholder="Nazwa produktu..."
-            style="background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:14px;padding:10px;border-radius:6px;outline:none;width:100%">
-          <input type="number" id="st-cal-kcal" placeholder="Kalorie (kcal)"
-            style="background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:20px;font-weight:800;padding:10px;border-radius:6px;outline:none;width:100%;text-align:center">
-          <button class="bt-save-btn" onclick="stQuickCalAdd()">+ Dodaj</button>
-        </div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Historia dziś</div>
-        <div id="st-cal-entries" style="padding:0 16px 12px"></div>
-      </div>
-    </div>
     <!-- TAB: POSTĘPY (Body Timeline) -->
     <div class="stab-content" id="stab-progress">
       <div class="bt-form">
-        <div class="bt-form-row">
-          <div class="bt-field"><label>Waga (kg)</label>
-            <input type="number" id="bt-weight" placeholder="75.5" step="0.1" inputmode="decimal"></div>
-          <div class="bt-field"><label>Pas (cm)</label>
-            <input type="number" id="bt-waist"  placeholder="82"   step="0.5" inputmode="decimal"></div>
-        </div>
-        <div class="bt-form-row">
-          <div class="bt-field"><label>Klatka (cm)</label>
-            <input type="number" id="bt-chest"  placeholder="100"  step="0.5" inputmode="decimal"></div>
-          <div class="bt-field"><label>Bicep (cm)</label>
-            <input type="number" id="bt-bicep"  placeholder="36"   step="0.5" inputmode="decimal"></div>
-        </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+    <div class="bt-field"><label>Waga kg</label>
+      <input type="number" id="bt-weight" placeholder="75" step="0.1" inputmode="decimal"></div>
+    <div class="bt-field"><label>Pas cm</label>
+      <input type="number" id="bt-waist"  placeholder="82" step="0.5" inputmode="decimal"></div>
+    <div class="bt-field"><label>Klatka cm</label>
+      <input type="number" id="bt-chest"  placeholder="100" step="0.5" inputmode="decimal"></div>
+    <div class="bt-field"><label>Bicep cm</label>
+      <input type="number" id="bt-bicep"  placeholder="36" step="0.5" inputmode="decimal"></div>
+  </div>
+  <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)..." style="margin-bottom:8px">
+  <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
+</div>
         <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)...">
         <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
       </div>
