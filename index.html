@@ -5693,12 +5693,12 @@ function _onScreenChange(screen) {
       <div class="settings-section" style="margin-top:16px">
         <div class="settings-section-title">Import danych</div>
         <p class="settings-desc">Przywróć dane z pliku backup. Nadpisze obecne dane.</p>
-        <label class="btn-secondary" style="display:block;text-align:center;margin-top:8px;cursor:pointer;padding:12px;border-radius:10px">
+        <label class="btn-secondary" style="display:block;text-align:center;margin-top:8px;cursor:pointer">
           ⬆ Wczytaj backup
-          <input type="file" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
-          </label>
-        </div>
+          <input type="file" accept=".json" style="display:none" onchange="importBackup(event)">
+        </label>
       </div>
+    </div>
 
     </div>
   </div>
