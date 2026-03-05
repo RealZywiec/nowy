@@ -3109,7 +3109,7 @@ async function callAnthropic(body) {
     parts: [{ text: m.content }]
   }));
   const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -5659,7 +5659,7 @@ function _onScreenChange(screen) {
   <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
 </div>
         <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)...">
-        <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
+      <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
       </div>
       <div id="bt-content" class="bt-content-area">
         <div class="bt-empty"><div class="bt-empty-icon">📊</div>
@@ -5702,7 +5702,6 @@ function _onScreenChange(screen) {
 
     </div>
   </div>
-</button>
 
 </body>
 </html>
