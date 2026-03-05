@@ -953,6 +953,374 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   backdrop-filter: blur(4px) !important;
 }
 
+/* ═══════════════════════════════════════════════════════
+   PANEL BASE — wspólne style dla wszystkich paneli
+═══════════════════════════════════════════════════════ */
+.panel-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.panel-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.panel-inner {
+  background: var(--bg2, #1a1a1a);
+  border-radius: 20px 20px 0 0;
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 0 20px 32px;
+  transform: translateY(100%);
+  transition: transform .38s cubic-bezier(.32,.72,0,1);
+  overscroll-behavior: contain;
+}
+.panel-overlay.open .panel-inner {
+  transform: translateY(0);
+}
+.panel-handle {
+  width: 40px; height: 4px;
+  background: var(--border2, #333);
+  border-radius: 100px;
+  margin: 12px auto 6px;
+}
+.panel-close {
+  background: var(--bg3, #242424);
+  border: none; color: var(--t2, #888);
+  width: 32px; height: 32px;
+  border-radius: 50%; cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.panel-close:hover { background: var(--border2, #333); }
+
+/* ═══════════════════════════════════════════════════════
+   BODY TIMELINE
+═══════════════════════════════════════════════════════ */
+.bt-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; padding: 16px 0 12px;
+}
+.bt-title {
+  font-size: 20px; font-weight: 700;
+  color: var(--t1, #fff); margin: 0 0 2px;
+}
+.bt-sub {
+  font-size: 13px; color: var(--t3, #555); margin: 0;
+}
+.bt-form {
+  background: var(--bg3, #1e1e1e);
+  border-radius: 14px; padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border1, #2a2a2a);
+}
+.bt-form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 10px;
+}
+.bt-field { display: flex; flex-direction: column; gap: 4px; }
+.bt-field label {
+  font-size: 11px; color: var(--t3, #555);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.bt-field input {
+  background: var(--bg1, #111); border: 1px solid var(--border1, #2a2a2a);
+  border-radius: 8px; padding: 9px 12px;
+  color: var(--t1, #fff); font-size: 15px; font-weight: 600;
+  outline: none; transition: border-color .2s;
+}
+.bt-field input:focus { border-color: var(--acc, #4ade80); }
+.bt-note-input {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg1, #111); border: 1px solid var(--border1, #2a2a2a);
+  border-radius: 8px; padding: 9px 12px;
+  color: var(--t2, #888); font-size: 14px;
+  outline: none; margin-bottom: 12px;
+  transition: border-color .2s;
+}
+.bt-note-input:focus { border-color: var(--acc, #4ade80); }
+.bt-save-btn {
+  width: 100%; padding: 12px;
+  background: var(--acc, #4ade80); color: #000;
+  border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.bt-save-btn:active { opacity: .8; }
+
+/* Stats row */
+.bt-stats-row {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 8px; margin-bottom: 16px;
+}
+.bt-stat-card {
+  background: var(--bg3, #1e1e1e);
+  border: 1px solid var(--border1, #2a2a2a);
+  border-radius: 12px; padding: 12px 10px;
+  display: flex; flex-direction: column; gap: 4px; text-align: center;
+}
+.bt-stat-label { font-size: 11px; color: var(--t3, #555); }
+.bt-stat-value {
+  font-size: 20px; font-weight: 800; color: var(--t1, #fff);
+}
+.bt-stat-value.down { color: #4ade80; }
+.bt-stat-value.up { color: #f87171; }
+
+/* Chart */
+.bt-chart-wrap {
+  background: var(--bg3, #1e1e1e);
+  border: 1px solid var(--border1, #2a2a2a);
+  border-radius: 12px; padding: 12px 8px 4px;
+  margin-bottom: 16px;
+}
+.bt-chart { display: block; overflow: visible; }
+
+/* History list */
+.bt-history { display: flex; flex-direction: column; gap: 6px; }
+.bt-entry {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3, #1e1e1e);
+  border-radius: 10px; padding: 10px 14px;
+  border: 1px solid var(--border1, #2a2a2a);
+}
+.bt-entry-date { font-size: 12px; color: var(--t3, #555); min-width: 60px; }
+.bt-entry-weight { font-size: 16px; font-weight: 700; color: var(--t1, #fff); min-width: 60px; }
+.bt-entry-stat { font-size: 12px; color: var(--t2, #888); }
+.bt-entry-note { font-size: 12px; color: var(--acc, #4ade80); margin-left: auto; }
+.bt-empty { text-align: center; padding: 40px 20px; color: var(--t3, #555); }
+.bt-empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+/* ═══════════════════════════════════════════════════════
+   PR TOAST STACK
+═══════════════════════════════════════════════════════ */
+.pr-toast-stack {
+  position: fixed; top: 70px; right: 16px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.pr-toast {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000; border-radius: 12px;
+  padding: 10px 16px; font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(251,191,36,.4);
+  animation: prSlideIn .4s cubic-bezier(.32,.72,0,1) forwards,
+             prFadeOut .4s 3.5s forwards;
+  pointer-events: all;
+}
+.pr-toast .pr-exercise { font-size: 11px; font-weight: 500; opacity: .8; }
+@keyframes prSlideIn {
+  from { opacity:0; transform: translateX(120%); }
+  to   { opacity:1; transform: translateX(0); }
+}
+@keyframes prFadeOut {
+  to { opacity:0; transform: translateX(120%); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAGNATION ALERT
+═══════════════════════════════════════════════════════ */
+.stag-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 0 12px;
+}
+.stag-icon { font-size: 24px; }
+.stag-header h2 {
+  flex: 1; font-size: 18px; color: var(--t1, #fff); margin: 0;
+}
+.stag-item {
+  background: var(--bg3, #1e1e1e);
+  border: 1px solid var(--border1, #2a2a2a);
+  border-radius: 12px; padding: 16px; margin-bottom: 10px;
+}
+.stag-item-name {
+  font-size: 13px; color: var(--t3, #555);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.stag-weeks {
+  font-size: 22px; font-weight: 800;
+  color: #f87171; margin-bottom: 4px;
+}
+.stag-weeks span { font-size: 14px; font-weight: 500; }
+.stag-tip {
+  font-size: 13px; color: var(--t2, #888);
+  padding: 10px 14px; background: rgba(248,113,113,.08);
+  border-radius: 8px; margin-top: 8px;
+  border-left: 3px solid #f87171;
+}
+.stag-dismiss {
+  width: 100%; padding: 14px; margin-top: 8px;
+  background: var(--acc, #4ade80); color: #000;
+  border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+/* ── AI Analysis Result ─────────────────────────── */
+#analysis-panel {
+  display: none; margin-top: 16px;
+}
+#analysis-panel.analysis-visible { display: block; }
+
+.analysis-result {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.analysis-card {
+  background: var(--bg3,#1e1e1e);
+  border: 1px solid var(--border1,#2a2a2a);
+  border-radius: 12px; padding: 14px;
+}
+.analysis-card-header {
+  font-size: 11px; font-weight: 700;
+  color: var(--t3,#555); text-transform: uppercase;
+  letter-spacing: .08em; margin-bottom: 6px;
+}
+.analysis-card-body {
+  font-size: 14px; color: var(--t1,#fff);
+  line-height: 1.5;
+}
+
+/* Backup row */
+.backup-row {
+  display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;
+}
+.btn-secondary {
+  flex: 1; padding: 12px;
+  background: var(--bg3,#1e1e1e);
+  border: 1px solid var(--border1,#2a2a2a);
+  color: var(--t1,#fff); border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; text-align: center;
+  transition: background .2s;
+}
+.btn-secondary:hover { background: var(--bg2,#222); }
+/* ═══════════════════════════════════════════════════════
+   SETTINGS PANEL
+═══════════════════════════════════════════════════════ */
+.settings-inner {
+  max-height: 92vh;
+}
+.settings-header {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 14px 0 10px;
+}
+.settings-title {
+  font-size: 20px; font-weight: 700;
+  color: var(--t1,#fff); margin: 0;
+}
+
+/* Tabs */
+.stabs {
+  display: flex; gap: 4px;
+  background: var(--bg1,#111);
+  border-radius: 10px; padding: 4px;
+  margin-bottom: 16px;
+}
+.stab {
+  flex: 1; padding: 8px 4px;
+  background: none; border: none;
+  color: var(--t3,#555); font-size: 12px; font-weight: 600;
+  border-radius: 7px; cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.stab.active {
+  background: var(--bg3,#222);
+  color: var(--t1,#fff);
+}
+.stab-content { display: none; }
+.stab-content.active { display: block; }
+
+/* Sections */
+.settings-section {
+  background: var(--bg3,#1e1e1e);
+  border: 1px solid var(--border1,#2a2a2a);
+  border-radius: 14px; overflow: hidden;
+  margin-bottom: 12px;
+}
+.settings-section-title {
+  font-size: 11px; font-weight: 700;
+  color: var(--t3,#555); text-transform: uppercase;
+  letter-spacing: .07em;
+  padding: 12px 16px 4px;
+}
+.settings-desc {
+  font-size: 13px; color: var(--t2,#777);
+  line-height: 1.5; margin: 0; padding: 6px 16px 12px;
+}
+.settings-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border1,#2a2a2a);
+}
+.settings-row:first-of-type { border-top: none; }
+.settings-row-label { font-size: 14px; color: var(--t1,#fff); }
+.settings-row-value { font-size: 13px; color: var(--t3,#555); }
+.settings-row-btn {
+  background: none; border: none;
+  color: var(--acc,#4ade80);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* Toggle switch */
+.toggle-switch { position: relative; width: 44px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border1,#333); border-radius: 100px;
+  transition: background .25s; cursor: pointer;
+}
+.toggle-track::before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; top: 3px; left: 3px;
+  transition: transform .25s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--acc,#4ade80); }
+.toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); }
+
+/* Theme buttons */
+.theme-btns { display: flex; gap: 6px; }
+.theme-btn {
+  padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--border1,#333);
+  background: var(--bg1,#111); color: var(--t2,#888);
+  font-size: 12px; cursor: pointer; transition: all .2s;
+}
+.theme-btn.active {
+  border-color: var(--acc,#4ade80);
+  color: var(--acc,#4ade80);
+}
+
+/* Danger */
+.settings-danger-btn {
+  width: 100%; padding: 13px;
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.3);
+  color: #f87171; border-radius: 12px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-top: 4px;
+  transition: background .2s;
+}
+.settings-danger-btn:hover { background: rgba(248,113,113,.18); }
+
+/* ── Chat FAB (tylko podczas treningu) ─────────────── */
+.chat-fab {
+  position: fixed; bottom: 80px; right: 16px;
+  width: 52px; height: 52px;
+  background: var(--acc,#4ade80); color: #000;
+  border: none; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(74,222,128,.35);
+  cursor: pointer; z-index: 800;
+  transition: transform .2s, opacity .2s;
+}
+.chat-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.7); }
+.chat-fab:active { transform: scale(0.92); }
 </style>
 </head>
 <body>
@@ -1144,24 +1512,25 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   BOTTOM NAV — zastąp istniejący <nav class="bottom-nav">
 ════════════════════════════════════════════════════════ -->
 <nav class="bottom-nav hidden" id="bottom-nav">
-  <button class="bn-btn" onclick="navOpenSettings()">
-    <span class="bn-ico">⚙️</span>
-    <span>Ustaw.</span>
+  <button class="nav-btn" id="nav-plan"     onclick="showScreen('plan')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Plan</span>
   </button>
-  <button class="bn-btn" onclick="navOpenCalories()">
-    <span class="bn-ico">🍽</span>
-    <span>Kalorie</span>
-  </button>
-  <button class="bn-btn center-btn" onclick="navOpenScanner()">
-    <span class="bn-ico">📷</span>
-  </button>
-  <button class="bn-btn" onclick="navOpenExLog()">
-    <span class="bn-ico">📓</span>
+  <button class="nav-btn" id="nav-workout"  onclick="showScreen('workout')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4"/></svg>
     <span>Trening</span>
   </button>
-  <button class="bn-btn" onclick="navToggleChat()">
-    <span class="bn-ico">🤖</span>
-    <span>Trener</span>
+  <button class="nav-btn" id="nav-calories" onclick="showScreen('calories')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+    <span>Kalorie</span>
+  </button>
+  <button class="nav-btn" id="nav-progress" onclick="showScreen('progress')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Postępy</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="openSettings()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Ustawienia</span>
   </button>
 </nav>
 
@@ -2780,7 +3149,34 @@ async function callAnthropic(body) {
 // ═══════════════════════════════════════════════════════════
 // CHATBOT — używa callAnthropic()
 // ═══════════════════════════════════════════════════════════
-async function sendChatMessage() {
+// ═══════════════════════════════════════════════════════════════
+// RATE LIMITER — paste before sendChatMessage / analyzeFood / etc.
+// ═══════════════════════════════════════════════════════════════
+
+const _rl = {
+  chat:     { max: 20,  window: 60 * 60 * 1000,  key: 'rl_chat' },
+  scan:     { max: 10,  window: 60 * 60 * 1000,  key: 'rl_scan' },
+  analysis: { max: 5,   window: 24 * 60 * 60 * 1000, key: 'rl_analysis' },
+};
+
+function rlCheck(type) {
+  const cfg  = _rl[type];
+  if (!cfg) return true;
+  const now  = Date.now();
+  let   log  = JSON.parse(localStorage.getItem(cfg.key) || '[]');
+  log = log.filter(ts => now - ts < cfg.window);          // wyczyść stare
+  if (log.length >= cfg.max) {
+    const wait = Math.ceil((cfg.window - (now - log[0])) / 60000);
+    showToast(`Limit zapytań. Odczekaj ~${wait} min.`);
+    return false;
+  }
+  log.push(now);
+  localStorage.setItem(cfg.key, JSON.stringify(log));
+  return true;
+}
+
+function sendChatMessage() {
+  if (!rlCheck('chat')) return;
   const inp = document.getElementById('chat-input');
   if (!inp) return;
   const msg = inp.value.trim();
@@ -2823,6 +3219,7 @@ async function sendChatMessage() {
 // SKANER JEDZENIA — używa callAnthropic()
 // ═══════════════════════════════════════════════════════════
 async function analyzeFood(dataUrl){
+  if (!rlCheck('scan')) return;
   const base64 = dataUrl.split(',')[1];
   try {
     const data = await callAnthropic({
@@ -3469,6 +3866,13 @@ function saveExSet(){
   saveExData(_exLogKey,sessions);
   updateStreak();
   renderExLogBody();
+  // ─── PR check — DODAJ TO NA KOŃCU saveExSet ───────────
+  const exName = /* tutaj nazwa ćwiczenia z Twojego kodu */ 
+    (currentSet?.name || currentExercise?.name || '');
+  const exWeight = parseFloat(/* Twój input ciężaru */ document.getElementById('set-weight')?.value || 0);
+  const exReps   = parseInt(/* Twój input powtórzeń */ document.getElementById('set-reps')?.value || 0);
+  if (exName && exWeight) checkPR(exName, exWeight, exReps);
+  // ──────────────────────────────────────────────────────
 }
 
 function delExSession(idx){
@@ -4620,20 +5024,690 @@ function calNavDay(dir){
   loadCalLog();
   renderCalLog();
 }
+// ═══════════════════════════════════════════════════════════════
+// BODY TIMELINE
+// ═══════════════════════════════════════════════════════════════
 
+const BT_KEY = 'fp_body_measurements';
+
+function _btData() {
+  try { return JSON.parse(localStorage.getItem(BT_KEY)) || []; }
+  catch { return []; }
+}
+function _btSave(data) {
+  localStorage.setItem(BT_KEY, JSON.stringify(data));
+}
+
+function toggleBodyTimeline() {
+  const ov = document.getElementById('bt-overlay');
+  const open = ov.classList.toggle('open');
+  if (open) renderBodyTimeline();
+}
+
+function logBodyMeasurement() {
+  const weight = vNum(document.getElementById('bt-weight').value, 'weight');
+  if (weight === null) return;
+  const waist  = parseFloat(document.getElementById('bt-waist').value)  || null;
+  const chest  = parseFloat(document.getElementById('bt-chest').value)  || null;
+  const bicep  = parseFloat(document.getElementById('bt-bicep').value)  || null;
+  const note   = document.getElementById('bt-note').value.trim();
+
+  if (!weight || isNaN(weight)) { showToast('Podaj wagę'); return; }
+
+  const data  = _btData();
+  const today = new Date().toLocaleDateString('pl-PL');
+  const clean = data.filter(e => e.date !== today);
+  clean.push({ date: today, weight, waist, chest, bicep, note, ts: Date.now() });
+  clean.sort((a, b) => a.ts - b.ts);
+  _btSave(clean);
+
+  ['bt-weight','bt-waist','bt-chest','bt-bicep','bt-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderBodyTimeline();
+  showToast('Zapisano pomiar ✓');
+}
+
+function renderBodyTimeline() {
+  const data = _btData();
+  const c    = document.getElementById('bt-content');
+  if (!c) return;
+
+  if (!data.length) {
+    c.innerHTML = `<div class="bt-empty">
+      <div class="bt-empty-icon">📊</div>
+      <p>Zacznij śledzić swoje postępy.<br>Pierwszy pomiar to punkt startowy.</p>
+    </div>`;
+    return;
+  }
+
+  const latest = data[data.length - 1];
+  const oldest = data[0];
+  const rawDiff = (latest.weight - oldest.weight).toFixed(1);
+  const diff    = rawDiff > 0 ? `+${rawDiff}` : rawDiff;
+  const cls     = rawDiff > 0 ? 'up' : 'down';
+
+  const weightSeries = data.filter(d => d.weight).slice(-60);
+  const chartHTML = weightSeries.length >= 2 ? _btBuildChart(weightSeries) : '';
+
+  const histHTML = [...data].reverse().slice(0, 12).map(e => `
+    <div class="bt-entry">
+      <span class="bt-entry-date">${e.date}</span>
+      <span class="bt-entry-weight">${e.weight} kg</span>
+      ${e.waist ? `<span class="bt-entry-stat">pas: ${e.waist}cm</span>` : ''}
+      ${e.note  ? `<span class="bt-entry-note">${e.note}</span>` : ''}
+    </div>`).join('');
+
+  c.innerHTML = `
+    <div class="bt-stats-row">
+      <div class="bt-stat-card">
+        <span class="bt-stat-label">Teraz</span>
+        <span class="bt-stat-value">${latest.weight} kg</span>
+      </div>
+      <div class="bt-stat-card">
+        <span class="bt-stat-label">Zmiana</span>
+        <span class="bt-stat-value ${cls}">${diff} kg</span>
+      </div>
+      <div class="bt-stat-card">
+        <span class="bt-stat-label">Pomiarów</span>
+        <span class="bt-stat-value">${data.length}</span>
+      </div>
+    </div>
+    ${chartHTML}
+    <div class="bt-history">${histHTML}</div>`;
+}
+
+function _btBuildChart(data) {
+  const W = 320, H = 90, P = 12;
+  const ws  = data.map(d => d.weight);
+  const min = Math.min(...ws) - 1;
+  const max = Math.max(...ws) + 1;
+  const sx  = i => P + (i / (data.length - 1)) * (W - P * 2);
+  const sy  = v => P + ((max - v) / (max - min)) * (H - P * 2);
+
+  const pts  = data.map((d, i) => `${sx(i)},${sy(d.weight)}`).join(' ');
+  const area = `${sx(0)},${H} ${pts} ${sx(data.length-1)},${H}`;
+  const dots = data.map((d, i) =>
+    `<circle cx="${sx(i)}" cy="${sy(d.weight)}" r="2.5" fill="var(--acc,#4ade80)"/>`).join('');
+
+  const labelFirst = `<text x="${sx(0)}" y="${H+12}" font-size="9" fill="var(--t3,#555)" text-anchor="middle">${data[0].date.slice(0,5)}</text>`;
+  const labelLast  = `<text x="${sx(data.length-1)}" y="${H+12}" font-size="9" fill="var(--t3,#555)" text-anchor="middle">${data[data.length-1].date.slice(0,5)}</text>`;
+
+  return `<div class="bt-chart-wrap">
+    <svg viewBox="0 0 ${W} ${H+16}" width="100%" class="bt-chart">
+      <defs>
+        <linearGradient id="btGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--acc,#4ade80)" stop-opacity=".25"/>
+          <stop offset="100%" stop-color="var(--acc,#4ade80)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${area}" fill="url(#btGrad)"/>
+      <polyline points="${pts}" fill="none" stroke="var(--acc,#4ade80)"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+      ${labelFirst}${labelLast}
+    </svg>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PR TRACKER — Personal Records
+// ═══════════════════════════════════════════════════════════════
+
+const PR_KEY  = 'fp_personal_records';
+const STG_KEY = 'fp_stagnation_log';
+
+function _prData() {
+  try { return JSON.parse(localStorage.getItem(PR_KEY)) || {}; }
+  catch { return {}; }
+}
+function _prSave(d) { localStorage.setItem(PR_KEY, JSON.stringify(d)); }
+function _stgData() {
+  try { return JSON.parse(localStorage.getItem(STG_KEY)) || {}; }
+  catch { return {}; }
+}
+function _stgSave(d) { localStorage.setItem(STG_KEY, JSON.stringify(d)); }
+
+// Wywołaj tę funkcję ZARAZ PO zapisaniu serii (np. na końcu saveExSet)
+// Parametry: nazwa ćwiczenia, ciężar (kg), ilość powtórzeń
+function checkPR(exerciseName, weight, reps) {
+  if (!exerciseName || !weight) return;
+  const prs  = _prData();
+  const key  = exerciseName.toLowerCase().replace(/\s+/g,'_');
+  const e1rm = _calc1RM(weight, reps);               // szacowane 1RM
+  const prev = prs[key];
+  const now  = Date.now();
+
+  // Init jeśli pierwsze podejście
+  if (!prev) {
+    prs[key] = { best1rm: e1rm, bestWeight: weight, bestReps: reps,
+                 lastPRDate: now, history: [{date: now, weight, reps, e1rm}] };
+    _prSave(prs);
+    _stgUpdate(key);
+    return;
+  }
+
+  // Dodaj do historii
+  prev.history = prev.history || [];
+  prev.history.push({ date: now, weight, reps, e1rm });
+  if (prev.history.length > 100) prev.history = prev.history.slice(-100);
+
+  // Nowy PR?
+  if (e1rm > prev.best1rm) {
+    const diff = ((e1rm - prev.best1rm) / prev.best1rm * 100).toFixed(1);
+    prev.best1rm    = e1rm;
+    prev.bestWeight = weight;
+    prev.bestReps   = reps;
+    prev.lastPRDate = now;
+    _prSave(prs);
+    _stgUpdate(key);
+    _showPRToast(exerciseName, weight, reps, diff);
+  } else {
+    prs[key] = prev;
+    _prSave(prs);
+    _stgUpdate(key);
+  }
+}
+
+function _calc1RM(weight, reps) {
+  // Epley formula
+  if (reps === 1) return weight;
+  return Math.round(weight * (1 + reps / 30));
+}
+
+function _showPRToast(name, weight, reps, diff) {
+  const stack = document.getElementById('pr-toast-stack');
+  if (!stack) return;
+  const t = document.createElement('div');
+  t.className = 'pr-toast';
+  t.innerHTML = `
+    🏆 Nowy rekord! ${weight}kg × ${reps}
+    <span class="pr-exercise">${name} (+${diff}% 1RM)</span>`;
+  stack.appendChild(t);
+  setTimeout(() => t.remove(), 4200);
+}
+
+// ─── Stagnation detection ─────────────────────────────────────
+
+function _stgUpdate(exerciseKey) {
+  const prs = _prData();
+  const rec = prs[exerciseKey];
+  if (!rec || !rec.lastPRDate) return;
+
+  const stg    = _stgData();
+  const daysSince = Math.floor((Date.now() - rec.lastPRDate) / 86400000);
+  stg[exerciseKey] = { daysSince, lastPRDate: rec.lastPRDate };
+  _stgSave(stg);
+
+  // Sprawdź po zapisaniu czy warto pokazać alert (21+ dni bez PR na głównych ćwiczeniach)
+  checkStagnationAlert();
+}
+
+// Główne ćwiczenia które śledzimy (możesz rozszerzyć)
+const MAIN_LIFTS = ['wyciskanie','squat','martwy','podciąganie','press'];
+
+function checkStagnationAlert() {
+  const stg  = _stgData();
+  const prs  = _prData();
+  const bad  = [];
+
+  Object.entries(stg).forEach(([key, val]) => {
+    const isMain = MAIN_LIFTS.some(l => key.includes(l));
+    if (isMain && val.daysSince >= 21) {
+      const rec = prs[key];
+      bad.push({
+        name: key.replace(/_/g,' '),
+        days: val.daysSince,
+        best: rec ? `${rec.bestWeight}kg × ${rec.bestReps}` : '—'
+      });
+    }
+  });
+
+  if (bad.length === 0) return;
+
+  // Pokaż raz na 7 dni, nie spamuj
+  const lastShown = parseInt(localStorage.getItem('fp_stag_last_shown') || '0');
+  if (Date.now() - lastShown < 7 * 86400000) return;
+
+  localStorage.setItem('fp_stag_last_shown', Date.now().toString());
+  showStagnationAlert(bad);
+}
+
+function showStagnationAlert(items) {
+  const c = document.getElementById('stag-content');
+  if (!c) return;
+
+  const tips = [
+    'Zmień zakres powtórzeń (np. z 5×5 na 3×8).',
+    'Dodaj tydzień deload — zmniejsz ciężar o 40%, objętość o 50%.',
+    'Sprawdź czy kaloryk i białko nie są za niskie.',
+    'Zmień kolejność ćwiczeń w planie.',
+    'Wstaw 1 dodatkowy dzień odpoczynku.'
+  ];
+
+  c.innerHTML = items.map((it, i) => `
+    <div class="stag-item">
+      <div class="stag-item-name">${it.name}</div>
+      <div class="stag-weeks">${it.days} dni <span>bez nowego rekordu</span></div>
+      <div>Ostatni PR: <strong>${it.best}</strong></div>
+      <div class="stag-tip">💡 ${tips[i % tips.length]}</div>
+    </div>`).join('') +
+    `<button class="stag-dismiss" onclick="closeStagnation()">Rozumiem, zmienię podejście</button>`;
+
+  document.getElementById('stag-overlay').classList.add('open');
+}
+
+function closeStagnation() {
+  document.getElementById('stag-overlay').classList.remove('open');
+}
+// ═══════════════════════════════════════════════════════════════
+// SECURITY — sanityzacja i walidacja
+// ═══════════════════════════════════════════════════════════════
+
+function sanitize(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .trim()
+    .slice(0, 500); // max długość
+}
+
+function validateNumber(val, min, max, label) {
+  const n = parseFloat(val);
+  if (isNaN(n))           { showToast(`${label}: podaj liczbę`); return null; }
+  if (n < min)            { showToast(`${label}: minimum ${min}`); return null; }
+  if (n > max)            { showToast(`${label}: maksimum ${max}`); return null; }
+  return n;
+}
+
+// Limity dla pól — używaj przy każdym inpucie
+const LIMITS = {
+  weight:    { min: 20,   max: 300,   label: 'Waga' },
+  height:    { min: 100,  max: 250,   label: 'Wzrost' },
+  age:       { min: 13,   max: 100,   label: 'Wiek' },
+  liftKg:    { min: 0,    max: 600,   label: 'Ciężar' },
+  reps:      { min: 1,    max: 100,   label: 'Powtórzenia' },
+  sets:      { min: 1,    max: 20,    label: 'Serie' },
+  calories:  { min: 0,    max: 5000,  label: 'Kalorie' },
+  waist:     { min: 40,   max: 200,   label: 'Obwód pasa' },
+  chest:     { min: 50,   max: 200,   label: 'Klatka' },
+};
+
+// Helper — waliduj pole z obiektu LIMITS
+function vNum(val, key) {
+  const l = LIMITS[key];
+  return l ? validateNumber(val, l.min, l.max, l.label) : parseFloat(val);
+}
+// ═══════════════════════════════════════════════════════════════
+// BACKUP — eksport i import JSON
+// ═══════════════════════════════════════════════════════════════
+
+const BACKUP_KEYS = [
+  'fp_body_measurements',
+  'fp_personal_records',
+  'fp_stagnation_log',
+  'fp_cal_log',
+  'fp_ex_log',
+  'fp_answers',
+  'fp_split',
+];
+
+function exportBackup() {
+  const data  = {};
+  BACKUP_KEYS.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v) data[k] = JSON.parse(v);
+  });
+  data._exported = new Date().toISOString();
+  data._version  = '1';
+
+  const blob = new Blob([JSON.stringify(data, null, 2)],
+    { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `formulaplan-backup-${new Date().toLocaleDateString('pl-PL').replace(/\./g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup pobrany ✓');
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data._version) { showToast('Nieprawidłowy plik'); return; }
+
+      const count = Object.keys(data).filter(k => !k.startsWith('_')).length;
+      if (!confirm(`Importować backup z ${data._exported?.slice(0,10)}?\n(${count} zbiorów danych)`)) return;
+
+      Object.entries(data).forEach(([k, v]) => {
+        if (!k.startsWith('_') && BACKUP_KEYS.includes(k)) {
+          localStorage.setItem(k, JSON.stringify(v));
+        }
+      });
+      showToast(`Import zakończony — ${count} zbiorów przywrócono`);
+      setTimeout(() => location.reload(), 1200);
+    } catch {
+      showToast('Błąd: nieprawidłowy plik JSON');
+    }
+  };
+  reader.readAsText(file);
+}
+// ═══════════════════════════════════════════════════════════════
+// AI PROGRESS ANALYSIS — analiza tygodniowa
+// ═══════════════════════════════════════════════════════════════
+
+async function runProgressAnalysis() {
+  if (!rlCheck('analysis')) return;
+
+  const btn = document.getElementById('analysis-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Analizuję...'; }
+
+  // Zbierz dane
+  const prs   = _prData();
+  const bt    = _btData().slice(-8);
+  const stg   = _stgData();
+  const D     = getComputed();
+
+  // Objętość treningowa z ostatnich 7 dni
+  let weekVolume = 0;
+  try {
+    const exLog = JSON.parse(localStorage.getItem('fp_ex_log') || '{}');
+    const today = Date.now();
+    Object.values(exLog).forEach(day => {
+      if (!Array.isArray(day)) return;
+      const age = today - (day[0]?.ts || 0);
+      if (age < 7 * 86400000) {
+        day.forEach(s => { if (s.weight && s.reps) weekVolume += s.weight * s.reps; });
+      }
+    });
+  } catch {}
+
+  // Plateau data
+  const plateauList = Object.entries(stg)
+    .filter(([,v]) => v.daysSince >= 14)
+    .map(([k,v]) => `${k.replace(/_/g,' ')}: ${v.daysSince} dni bez PR`)
+    .join('; ') || 'brak';
+
+  // Trend wagi
+  let weightTrend = 'brak danych';
+  if (bt.length >= 2) {
+    const diff = (bt[bt.length-1].weight - bt[0].weight).toFixed(1);
+    weightTrend = `${diff > 0 ? '+' : ''}${diff} kg w ostatnich ${bt.length} pomiarach`;
+  }
+
+  const prompt = `Jesteś doświadczonym trenerem. Analizuj dane i odpowiedz WYŁĄCZNIE po polsku, w 4 sekcjach.
+Format odpowiedzi (dosłownie te nagłówki):
+POSTĘP: [1-2 zdania o trendzie wagi i PR]
+STAGNACJA: [konkretna diagnoza lub "brak problemów"]
+DELOAD: [czy potrzebny i kiedy, lub "nie teraz"]
+PRIORYTET: [jedno zdanie — co zmienić w przyszłym tygodniu]
+
+Dane:
+- Cel: ${D.glabs?.[D.goal] || D.goal}, ${D.cal} kcal/dzień
+- Trend wagi: ${weightTrend}
+- Tygodniowa objętość: ${Math.round(weekVolume)} kg×powt łącznie
+- Plateau (dni bez PR): ${plateauList}
+- Doświadczenie: ${D.exp || 'nieznane'}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: prompt,
+        messages: [{ role: 'user', content: 'Przeprowadź analizę.' }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Brak odpowiedzi.';
+    _renderAnalysisResult(text);
+  } catch {
+    showToast('Błąd połączenia z AI');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 Analizuj postęp'; }
+  }
+}
+
+function _renderAnalysisResult(text) {
+  const sections = ['POSTĘP','STAGNACJA','DELOAD','PRIORYTET'];
+  const icons    = { POSTĘP:'📈', STAGNACJA:'⚠️', DELOAD:'🔄', PRIORYTET:'🎯' };
+
+  let html = '<div class="analysis-result">';
+  sections.forEach(sec => {
+    const regex = new RegExp(`${sec}:\\s*(.+?)(?=\\n[A-ZĘŃÓŚŹ]+:|$)`, 's');
+    const match = text.match(regex);
+    if (match) {
+      html += `<div class="analysis-card">
+        <div class="analysis-card-header">${icons[sec]} ${sec}</div>
+        <div class="analysis-card-body">${sanitize(match[1].trim())}</div>
+      </div>`;
+    }
+  });
+  html += '</div>';
+
+  let panel = document.getElementById('analysis-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'analysis-panel';
+    document.body.appendChild(panel);
+  }
+  panel.innerHTML = html;
+  panel.classList.add('analysis-visible');
+}
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS PANEL
+// ═══════════════════════════════════════════════════════════════
+
+function openSettings() {
+  document.getElementById('settings-overlay').classList.add('open');
+  _updateStorageSize();
+  // Renderuj Body Timeline jeśli zakładka postępy była aktywna
+  const activeTab = document.querySelector('.stab.active')?.dataset?.tab;
+  if (activeTab === 'progress') renderBodyTimeline();
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function switchSettingsTab(tab) {
+  document.querySelectorAll('.stab').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.stab-content').forEach(c =>
+    c.classList.toggle('active', c.id === `stab-${tab}`));
+  if (tab === 'progress') renderBodyTimeline();
+}
+
+function _updateStorageSize() {
+  try {
+    let total = 0;
+    for (let k in localStorage) {
+      if (!localStorage.hasOwnProperty(k)) continue;
+      total += (localStorage[k].length + k.length) * 2;
+    }
+    const kb = (total / 1024).toFixed(1);
+    const el = document.getElementById('storage-size');
+    if (el) el.textContent = `${kb} KB`;
+  } catch {}
+}
+
+function confirmReset() {
+  if (!confirm('Usunąć WSZYSTKIE dane? Tej akcji nie można cofnąć.')) return;
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('fp_'));
+  keys.forEach(k => localStorage.removeItem(k));
+  showToast('Dane usunięte');
+  setTimeout(() => location.reload(), 1000);
+}
+
+function toggleNotifications(on) {
+  if (on && 'Notification' in window) {
+    Notification.requestPermission().then(p => {
+      if (p !== 'granted') {
+        document.getElementById('toggle-notif').checked = false;
+        showToast('Brak zgody na powiadomienia');
+      }
+    });
+  }
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('fp_theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.includes(theme === 'dark' ? 'Ciemny' : 'Jasny')));
+}
+
+// ─── Pokaż/ukryj Chat FAB — wywołuj przy zmianie ekranu ──────
+function _updateChatFab(screenName) {
+  const fab = document.getElementById('chat-fab');
+  if (!fab) return;
+  // FAB widoczny tylko na ekranie treningu
+  fab.classList.toggle('hidden', screenName !== 'workout');
+}
+
+// ─── Patch do Twojej funkcji showScreen ───────────────────────
+// Znajdź swoją funkcję showScreen() i NA KOŃCU dodaj:
+// _updateChatFab(screen);
+// Jeśli nie masz showScreen, użyj tej jako bazę:
+function _onScreenChange(screen) {
+  _updateChatFab(screen);
+  // tu możesz dorzucić inne akcje przy zmianie ekranu
+}
+
+// ─── Wczytaj motyw przy starcie ───────────────────────────────
+(function initTheme() {
+  const saved = localStorage.getItem('fp_theme') || 'dark';
+  setTheme(saved);
+})();
 </script>
-<div class="mobile-settings" id="mobile-settings" onclick="event.stopPropagation()">
-  <div class="ms-handle"></div>
-  <div class="ms-title">Ustawienia</div>
-  <div id="mobile-settings-body"></div>
+<!-- ═══════════════════════════════════════════════
+     SETTINGS PANEL
+═══════════════════════════════════════════════ -->
+<div class="panel-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="panel-inner settings-inner">
+    <div class="panel-handle"></div>
+
+    <div class="settings-header">
+      <h2 class="settings-title">Ustawienia</h2>
+      <button class="panel-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="stabs">
+      <button class="stab active" data-tab="profile"   onclick="switchSettingsTab('profile')">Profil</button>
+      <button class="stab"        data-tab="progress"  onclick="switchSettingsTab('progress')">Postępy</button>
+      <button class="stab"        data-tab="ai"        onclick="switchSettingsTab('ai')">AI Analiza</button>
+      <button class="stab"        data-tab="backup"    onclick="switchSettingsTab('backup')">Backup</button>
+    </div>
+
+    <!-- TAB: PROFIL -->
+    <div class="stab-content active" id="stab-profile">
+      <div class="settings-section">
+        <div class="settings-row">
+          <span class="settings-row-label">Plan treningowy</span>
+          <button class="settings-row-btn" onclick="closeSettings(); setTimeout(()=>showScreen('quiz'),200)">Zmień cel →</button>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Powiadomienia</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-notif" onchange="toggleNotifications(this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Motyw</span>
+          <div class="theme-btns">
+            <button onclick="setTheme('dark')"  class="theme-btn" id="theme-dark">🌑 Ciemny</button>
+            <button onclick="setTheme('light')" class="theme-btn" id="theme-light">☀️ Jasny</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Informacje</div>
+        <div class="settings-row"><span class="settings-row-label">Wersja</span><span class="settings-row-value">1.0.0</span></div>
+        <div class="settings-row"><span class="settings-row-label">Dane lokalne</span><span class="settings-row-value" id="storage-size">—</span></div>
+      </div>
+      <button class="settings-danger-btn" onclick="confirmReset()">Usuń wszystkie dane</button>
+    </div>
+
+    <!-- TAB: POSTĘPY (Body Timeline) -->
+    <div class="stab-content" id="stab-progress">
+      <div class="bt-form">
+        <div class="bt-form-row">
+          <div class="bt-field"><label>Waga (kg)</label>
+            <input type="number" id="bt-weight" placeholder="75.5" step="0.1" inputmode="decimal"></div>
+          <div class="bt-field"><label>Pas (cm)</label>
+            <input type="number" id="bt-waist"  placeholder="82"   step="0.5" inputmode="decimal"></div>
+        </div>
+        <div class="bt-form-row">
+          <div class="bt-field"><label>Klatka (cm)</label>
+            <input type="number" id="bt-chest"  placeholder="100"  step="0.5" inputmode="decimal"></div>
+          <div class="bt-field"><label>Bicep (cm)</label>
+            <input type="number" id="bt-bicep"  placeholder="36"   step="0.5" inputmode="decimal"></div>
+        </div>
+        <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)...">
+        <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
+      </div>
+      <div id="bt-content" class="bt-content-area">
+        <div class="bt-empty"><div class="bt-empty-icon">📊</div>
+          <p>Brak pomiarów. Dodaj pierwszy.</p></div>
+      </div>
+    </div>
+
+    <!-- TAB: AI ANALIZA -->
+    <div class="stab-content" id="stab-ai">
+      <div class="settings-section">
+        <div class="settings-section-title">Analiza tygodniowa</div>
+        <p class="settings-desc">AI sprawdza Twój postęp, wykrywa stagnację i sugeruje zmiany w planie. Dostępna 5× dziennie.</p>
+        <button id="analysis-btn" class="bt-save-btn" style="margin-top:8px" onclick="runProgressAnalysis()">
+          🔍 Analizuj mój postęp
+        </button>
+        <div id="analysis-panel" style="margin-top:12px"></div>
+      </div>
+      <div class="settings-section" style="margin-top:16px">
+        <div class="settings-section-title">AI Trener (chat)</div>
+        <p class="settings-desc">Czat z trenerem dostępny z ekranu treningu — przycisk pojawia się podczas aktywnej sesji.</p>
+      </div>
+    </div>
+
+    <!-- TAB: BACKUP -->
+    <div class="stab-content" id="stab-backup">
+      <div class="settings-section">
+        <div class="settings-section-title">Eksport danych</div>
+        <p class="settings-desc">Pobierz plik JSON ze wszystkimi swoimi danymi. Przechowaj go bezpiecznie.</p>
+        <button class="bt-save-btn" onclick="exportBackup()" style="margin-top:8px">⬇ Pobierz backup</button>
+      </div>
+      <div class="settings-section" style="margin-top:16px">
+        <div class="settings-section-title">Import danych</div>
+        <p class="settings-desc">Przywróć dane z pliku backup. Nadpisze obecne dane.</p>
+        <label class="btn-secondary" style="display:block;text-align:center;margin-top:8px;cursor:pointer;padding:12px;border-radius:10px">
+          ⬆ Wczytaj backup
+          <input type="file" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
+        </label>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div class="stats-panel" id="stats-panel">
-  <div class="sp-header">
-    <div class="sp-title">Twoje dane</div>
-    <button class="sp-close" onclick="toggleStats()">✕</button>
-  </div>
-  <div class="sp-body" id="sp-body"></div>
-</div>
+<!-- CHAT FAB — tylko na ekranie treningu -->
+<button class="chat-fab hidden" id="chat-fab" onclick="toggleChat()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
 </body>
 </html>
