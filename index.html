@@ -3175,7 +3175,7 @@ function rlCheck(type) {
   return true;
 }
 
-function sendChatMessage() {
+async function sendChatMessage() {
   if (!rlCheck('chat')) return;
   const inp = document.getElementById('chat-input');
   if (!inp) return;
@@ -3566,10 +3566,6 @@ function clearCalLog() {
 }
 
 
-
-function delCalEntry(i){calLog.splice(i,1);saveCalLog();renderCalLog();}
-function clearCalLog(){calLog=[];saveCalLog();renderCalLog();}
-
 // ═══════════════════════════════════════════════════════════
 // ZAPISYWANIE PLANU PRZEZ URL
 // ═══════════════════════════════════════════════════════════
@@ -3866,13 +3862,10 @@ function saveExSet(){
   saveExData(_exLogKey,sessions);
   updateStreak();
   renderExLogBody();
-  // ─── PR check — DODAJ TO NA KOŃCU saveExSet ───────────
-  const exName = /* tutaj nazwa ćwiczenia z Twojego kodu */ 
-    (currentSet?.name || currentExercise?.name || '');
-  const exWeight = parseFloat(/* Twój input ciężaru */ document.getElementById('set-weight')?.value || 0);
-  const exReps   = parseInt(/* Twój input powtórzeń */ document.getElementById('set-reps')?.value || 0);
-  if (exName && exWeight) checkPR(exName, exWeight, exReps);
-  // ──────────────────────────────────────────────────────
+  // PR check
+  const exWeight = parseFloat(document.getElementById('exl-w')?.value) || 0;
+  const exReps   = parseInt(document.getElementById('exl-r')?.value)   || 0;
+  if (_exLogName && exWeight) checkPR(_exLogName, exWeight, exReps);
 }
 
 function delExSession(idx){
@@ -4816,20 +4809,6 @@ function filterExSearch(q){
   });
 }
 
-function _swapDays(aIdx,bIdx){
-  const days=window.__split.days;
-  if(!days[aIdx]||!days[bIdx]) return;
-  const tmp={label:days[aIdx].label,tr:days[aIdx].tr,ex:days[aIdx].ex};
-  days[aIdx].label=days[bIdx].label;
-  days[aIdx].tr=days[bIdx].tr;
-  days[aIdx].ex=days[bIdx].ex;
-  days[bIdx].label=tmp.label;
-  days[bIdx].tr=tmp.tr;
-  days[bIdx].ex=tmp.ex;
-  showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
-  renderPlan();
-}
-
 // ═══════════════════════════════════════════════════════════
 // FAQ
 // ═══════════════════════════════════════════════════════════
@@ -5460,25 +5439,19 @@ Dane:
 - Doświadczenie: ${D.exp || 'nieznane'}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: prompt,
-        messages: [{ role: 'user', content: 'Przeprowadź analizę.' }]
-      })
+    const data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: prompt,
+      messages: [{ role: 'user', content: 'Przeprowadź analizę.' }]
     });
-    const data = await res.json();
     const text = data.content?.[0]?.text || 'Brak odpowiedzi.';
     _renderAnalysisResult(text);
-  } catch {
-    showToast('Błąd połączenia z AI');
+  } catch(e) {
+    showToast('Błąd połączenia z AI: ' + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Analizuj postęp'; }
   }
-}
 
 function _renderAnalysisResult(text) {
   const sections = ['POSTĘP','STAGNACJA','DELOAD','PRIORYTET'];
@@ -5695,18 +5668,12 @@ function _onScreenChange(screen) {
         <label class="btn-secondary" style="display:block;text-align:center;margin-top:8px;cursor:pointer;padding:12px;border-radius:10px">
           ⬆ Wczytaj backup
           <input type="file" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
-        </label>
+          </label>
+        </div>
       </div>
+
     </div>
-
   </div>
-</div>
-
-<!-- CHAT FAB — tylko na ekranie treningu -->
-<button class="chat-fab hidden" id="chat-fab" onclick="toggleChat()">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
 </button>
 
 </body>
