@@ -18,6 +18,11 @@
   --fb:'Syne',sans-serif;
   --fm:'JetBrains Mono',monospace;
 }
+[data-theme="light"]{
+  --bg:#f4f4f4;--bg2:#ffffff;--bg3:#ececec;--card:#fff;
+  --border:#ddd;--border2:#ccc;
+  --text:#111;--muted:#888;--muted2:#555;
+}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
@@ -1215,92 +1220,103 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   align-items: center; padding: 14px 0 10px;
 }
 .settings-title {
-  font-size: 20px; font-weight: 700;
-  color: var(--t1,#fff); margin: 0;
+  font-family: var(--fd); font-size: 22px; font-weight: 900;
+  text-transform: uppercase; color: var(--text); margin: 0;
 }
-
-/* Tabs */
 .stabs {
   display: flex; gap: 4px;
-  background: var(--bg1,#111);
-  border-radius: 10px; padding: 4px;
+  background: var(--bg3);
+  border-radius: 8px; padding: 4px;
   margin-bottom: 16px;
 }
 .stab {
   flex: 1; padding: 8px 4px;
   background: none; border: none;
-  color: var(--t3,#555); font-size: 12px; font-weight: 600;
-  border-radius: 7px; cursor: pointer;
+  color: var(--muted); font-family: var(--fm); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  border-radius: 6px; cursor: pointer;
   transition: background .2s, color .2s;
   white-space: nowrap;
 }
 .stab.active {
-  background: var(--bg3,#222);
-  color: var(--t1,#fff);
+  background: var(--border2);
+  color: var(--accent);
 }
 .stab-content { display: none; }
 .stab-content.active { display: block; }
-
-/* Sections */
 .settings-section {
-  background: var(--bg3,#1e1e1e);
-  border: 1px solid var(--border1,#2a2a2a);
-  border-radius: 14px; overflow: hidden;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
   margin-bottom: 12px;
 }
 .settings-section-title {
-  font-size: 11px; font-weight: 700;
-  color: var(--t3,#555); text-transform: uppercase;
-  letter-spacing: .07em;
+  font-family: var(--fm); font-size: 10px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: .12em;
   padding: 12px 16px 4px;
 }
 .settings-desc {
-  font-size: 13px; color: var(--t2,#777);
+  font-size: 13px; color: var(--muted2);
   line-height: 1.5; margin: 0; padding: 6px 16px 12px;
 }
 .settings-row {
   display: flex; align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-top: 1px solid var(--border1,#2a2a2a);
+  border-top: 1px solid var(--border);
 }
 .settings-row:first-of-type { border-top: none; }
-.settings-row-label { font-size: 14px; color: var(--t1,#fff); }
-.settings-row-value { font-size: 13px; color: var(--t3,#555); }
+.settings-row-label { font-size: 14px; color: var(--text); }
+.settings-row-value { font-size: 13px; color: var(--muted); }
 .settings-row-btn {
   background: none; border: none;
-  color: var(--acc,#4ade80);
-  font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--accent);
+  font-family: var(--fd); font-size: 14px; font-weight: 700;
+  text-transform: uppercase; cursor: pointer;
 }
-
-/* Toggle switch */
 .toggle-switch { position: relative; width: 44px; height: 24px; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-track {
   position: absolute; inset: 0;
-  background: var(--border1,#333); border-radius: 100px;
+  background: var(--border2); border-radius: 100px;
   transition: background .25s; cursor: pointer;
 }
 .toggle-track::before {
   content: ''; position: absolute;
   width: 18px; height: 18px; border-radius: 50%;
-  background: #fff; top: 3px; left: 3px;
+  background: var(--muted2); top: 3px; left: 3px;
   transition: transform .25s;
 }
-.toggle-switch input:checked + .toggle-track { background: var(--acc,#4ade80); }
-.toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); }
-
-/* Theme buttons */
+.toggle-switch input:checked + .toggle-track { background: var(--accent); }
+.toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); background: #000; }
+.bt-save-btn {
+  width: 100%; padding: 13px;
+  background: var(--accent); color: #000;
+  border: none; border-radius: 6px;
+  font-family: var(--fd); font-size: 16px; font-weight: 800;
+  text-transform: uppercase; cursor: pointer; transition: opacity .2s;
+}
+.bt-save-btn:hover { opacity: .85; }
+.settings-danger-btn {
+  width: 100%; padding: 13px;
+  background: rgba(255,77,0,.08);
+  border: 1px solid rgba(255,77,0,.3);
+  color: var(--accent2); border-radius: 6px;
+  font-family: var(--fd); font-size: 15px; font-weight: 700;
+  text-transform: uppercase; cursor: pointer; margin-top: 8px;
+}
 .theme-btns { display: flex; gap: 6px; }
 .theme-btn {
-  padding: 5px 10px; border-radius: 7px;
-  border: 1px solid var(--border1,#333);
-  background: var(--bg1,#111); color: var(--t2,#888);
-  font-size: 12px; cursor: pointer; transition: all .2s;
+  padding: 6px 12px; border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--bg3); color: var(--muted2);
+  font-family: var(--fd); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
 }
 .theme-btn.active {
-  border-color: var(--acc,#4ade80);
-  color: var(--acc,#4ade80);
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(200,255,0,.07);
 }
 
 /* Danger */
@@ -1678,7 +1694,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </div>
 
 <!-- CHAT FAB -->
-<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny">🤖</button>
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny" style="display:none">🤖</button>
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -2391,6 +2407,11 @@ function buildResults(){
   const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,exp,wc}=D;
   const split=applyWeakPoints(buildSplit(answers.days||4,goal,exp), answers.weakPoints||[]);
   window.__split=split;
+  if(window._skipPaywall){
+    window._skipPaywall=false;
+    openPlan();
+    return;
+  }
   const trDays=split.days.filter(d=>d.tr).length;
   const pPct=Math.round((mac.prot*4/cal)*100),cPct=Math.round((mac.carb*4/cal)*100),fPct=100-pPct-cPct;
 
@@ -3125,7 +3146,7 @@ async function exportPDF(){
 // HELPER — wszystkie zapytania do Anthropic przez tę funkcję
 // ═══════════════════════════════════════════════════════════
 // Twój klucz — wstaw swój prawdziwy klucz między apostrofy
-const _k = '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';
+const _k = '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';
 
 async function callAnthropic(body) {
   try {
@@ -3350,6 +3371,8 @@ function renderCalLog(){
       <button onclick="calNavDay(1)" ${!canGoNext ? 'disabled style="opacity:.3;cursor:default"' : ''}
         style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);
                font-size:18px;width:36px;height:36px;border-radius:4px;cursor:pointer">›</button>
+      ${!isToday ? `<button onclick="calJumpToday()"
+        style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:11px;font-weight:800;padding:4px 8px;border-radius:4px;cursor:pointer;text-transform:uppercase">Dziś</button>` : ''}
     </div>
 
     <!-- Podsumowanie -->
@@ -3919,6 +3942,8 @@ function _updateNav(screenId) {
   ['plan','workout','calories','progress','settings'].forEach(id => {
     const btn = document.getElementById('nav-' + id);
     if (btn) btn.classList.toggle('act', id === screenId);
+    const fab = document.getElementById('chat-fab');
+   if (fab) fab.style.display = onPlan ? 'flex' : 'none';
   });
 }
 // ═══════════════════════════════════════════════════════════
@@ -5023,6 +5048,11 @@ function calNavDay(dir){
   loadCalLog();
   renderCalLog();
 }
+function calJumpToday(){
+  _calViewDate = null;
+  loadCalLog();
+  renderCalLog();
+}
 // ═══════════════════════════════════════════════════════════════
 // BODY TIMELINE
 // ═══════════════════════════════════════════════════════════════
@@ -5523,6 +5553,55 @@ function switchSettingsTab(tab) {
   document.querySelectorAll('.stab-content').forEach(c =>
     c.classList.toggle('active', c.id === `stab-${tab}`));
   if (tab === 'progress') renderBodyTimeline();
+  if (tab === 'trening') _renderSettingsTrening();
+  if (tab === 'kalorie') _renderSettingsKalorie();
+}
+
+function _renderSettingsTrening(){
+  const D = getComputed();
+  const el = document.getElementById('st-plan-name');
+  const el2 = document.getElementById('st-plan-days');
+  const el3 = document.getElementById('st-plan-goal');
+  if(el) el.textContent = window.__split?.name || 'Brak planu';
+  if(el2) el2.textContent = (answers.days||4) + ' dni/tydz';
+  if(el3) el3.textContent = D.glabs?.[D.goal] || '—';
+  const sc = document.getElementById('st-streak-content');
+  if(sc) sc.innerHTML = buildStreakWidget();
+}
+
+function _renderSettingsKalorie(){
+  const D = getComputed();
+  const tot = calLog.reduce((s,e)=>({kcal:s.kcal+e.kcal,p:s.p+(e.p||0),c:s.c+(e.c||0),f:s.f+(e.f||0)}),{kcal:0,p:0,c:0,f:0});
+  const rem = D.cal - tot.kcal;
+  const over = tot.kcal > D.cal;
+  const sc = document.getElementById('st-cal-summary');
+  if(sc) sc.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span style="font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase">Spożyte</span>
+      <span style="font-family:var(--fd);font-size:20px;font-weight:900;color:var(--accent)">${tot.kcal} <span style="font-size:12px;color:var(--muted2)">kcal</span></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span style="font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase">${over?'Przekroczone':'Pozostało'}</span>
+      <span style="font-family:var(--fd);font-size:20px;font-weight:900;color:${over?'var(--accent2)':'var(--text)'}">${Math.abs(rem)} kcal</span>
+    </div>
+    <div style="height:4px;background:var(--border);border-radius:100px;overflow:hidden">
+      <div style="width:${Math.min(100,Math.round(tot.kcal/D.cal*100))}%;height:100%;background:${over?'var(--accent2)':'var(--accent)'};border-radius:100px"></div>
+    </div>`;
+  const ec = document.getElementById('st-cal-entries');
+  if(ec) ec.innerHTML = calLog.length===0
+    ? '<p style="font-size:12px;color:var(--muted);padding:8px 0">Brak wpisów dziś</p>'
+    : calLog.map((e,i)=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px">${e.name}</span><span style="font-family:var(--fd);font-size:15px;font-weight:800;color:var(--accent)">${e.kcal}</span></div>`).join('');
+}
+
+function stQuickCalAdd(){
+  const name = document.getElementById('st-cal-name')?.value.trim();
+  const kcal = parseInt(document.getElementById('st-cal-kcal')?.value);
+  if(!name||!kcal||kcal<1) return;
+  calLog.push({name,kcal,p:0,c:0,f:0,ts:Date.now()});
+  saveCalLog();
+  document.getElementById('st-cal-name').value='';
+  document.getElementById('st-cal-kcal').value='';
+  _renderSettingsKalorie();
 }
 
 function _updateStorageSize() {
@@ -5601,11 +5680,13 @@ function _onScreenChange(screen) {
 
     <!-- TABS -->
     <div class="stabs">
-      <button class="stab active" data-tab="profile"   onclick="switchSettingsTab('profile')">Profil</button>
-      <button class="stab"        data-tab="progress"  onclick="switchSettingsTab('progress')">Postępy</button>
-      <button class="stab"        data-tab="ai"        onclick="switchSettingsTab('ai')">AI Analiza</button>
-      <button class="stab"        data-tab="backup"    onclick="switchSettingsTab('backup')">Backup</button>
-    </div>
+  <button class="stab active" data-tab="profile"  onclick="switchSettingsTab('profile')">Profil</button>
+  <button class="stab"        data-tab="trening"  onclick="switchSettingsTab('trening')">Trening</button>
+  <button class="stab"        data-tab="kalorie"  onclick="switchSettingsTab('kalorie')">Kalorie</button>
+  <button class="stab"        data-tab="progress" onclick="switchSettingsTab('progress')">Postępy</button>
+  <button class="stab"        data-tab="ai"       onclick="switchSettingsTab('ai')">AI</button>
+  <button class="stab"        data-tab="backup"   onclick="switchSettingsTab('backup')">Backup</button>
+</div>
 
     <!-- TAB: PROFIL -->
     <div class="stab-content active" id="stab-profile">
@@ -5637,6 +5718,56 @@ function _onScreenChange(screen) {
       <button class="settings-danger-btn" onclick="confirmReset()">Usuń wszystkie dane</button>
     </div>
 
+    <!-- TAB: TRENING -->
+    <div class="stab-content" id="stab-trening">
+      <div class="settings-section">
+        <div class="settings-section-title">Plan treningowy</div>
+        <div class="settings-row">
+          <span class="settings-row-label">Aktywny plan</span>
+          <span class="settings-row-value" id="st-plan-name">—</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Dni treningowe</span>
+          <span class="settings-row-value" id="st-plan-days">—</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Cel</span>
+          <span class="settings-row-value" id="st-plan-goal">—</span>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Zmień plan</div>
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+          <button class="bt-save-btn" onclick="closeSettings();setTimeout(()=>{window._skipPaywall=true;show('quiz')},200)">Zmień cel i wygeneruj nowy plan →</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Streak i odznaki</div>
+        <div id="st-streak-content" style="padding:12px 16px"></div>
+      </div>
+    </div>
+
+    <!-- TAB: KALORIE -->
+    <div class="stab-content" id="stab-kalorie">
+      <div class="settings-section">
+        <div class="settings-section-title">Dzisiejsze makra</div>
+        <div id="st-cal-summary" style="padding:12px 16px"></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Szybki wpis</div>
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+          <input type="text" id="st-cal-name" placeholder="Nazwa produktu..."
+            style="background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:14px;padding:10px;border-radius:6px;outline:none;width:100%">
+          <input type="number" id="st-cal-kcal" placeholder="Kalorie (kcal)"
+            style="background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:20px;font-weight:800;padding:10px;border-radius:6px;outline:none;width:100%;text-align:center">
+          <button class="bt-save-btn" onclick="stQuickCalAdd()">+ Dodaj</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Historia dziś</div>
+        <div id="st-cal-entries" style="padding:0 16px 12px"></div>
+      </div>
+    </div>
     <!-- TAB: POSTĘPY (Body Timeline) -->
     <div class="stab-content" id="stab-progress">
       <div class="bt-form">
