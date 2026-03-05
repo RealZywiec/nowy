@@ -693,8 +693,15 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 
 /* ── CHATBOT ── */
 .chat-fab {
-  display: none !important; /* usunięty — przycisk jest w navbarze */
+  position:fixed;bottom:90px;right:20px;z-index:900;
+  width:52px;height:52px;border-radius:50%;border:none;
+  background:var(--accent);color:#000;font-size:22px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(200,255,0,.4);
+  display:none;align-items:center;justify-content:center;
+  transition:.2s;
 }
+.chat-fab.visible{display:flex}
+.chat-fab:hover{transform:scale(1.08);background:#fff}
 .chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(100%);opacity:0;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
 .chat-panel.open{transform:translateY(0);opacity:1;pointer-events:all}
 .chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -1512,25 +1519,25 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   BOTTOM NAV — zastąp istniejący <nav class="bottom-nav">
 ════════════════════════════════════════════════════════ -->
 <nav class="bottom-nav hidden" id="bottom-nav">
-  <button class="nav-btn" id="nav-plan"     onclick="showScreen('plan')">
+  <button class="bn-btn" id="nav-plan" onclick="show('plan')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    <span>Plan</span>
+    <span class="bn-lbl">Plan</span>
   </button>
-  <button class="nav-btn" id="nav-workout"  onclick="showScreen('workout')">
+  <button class="bn-btn" id="nav-workout" onclick="navOpenExLog()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4"/></svg>
-    <span>Trening</span>
+    <span class="bn-lbl">Trening</span>
   </button>
-  <button class="nav-btn" id="nav-calories" onclick="showScreen('calories')">
+  <button class="bn-btn" id="nav-calories" onclick="navOpenCalories()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
-    <span>Kalorie</span>
+    <span class="bn-lbl">Kalorie</span>
   </button>
-  <button class="nav-btn" id="nav-progress" onclick="showScreen('progress')">
+  <button class="bn-btn" id="nav-progress" onclick="openSettings();switchSettingsTab('progress')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    <span>Postępy</span>
+    <span class="bn-lbl">Postępy</span>
   </button>
-  <button class="nav-btn" id="nav-settings" onclick="openSettings()">
+  <button class="bn-btn" id="nav-settings" onclick="openSettings()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span>Ustawienia</span>
+    <span class="bn-lbl">Ustawienia</span>
   </button>
 </nav>
 
@@ -3878,28 +3885,41 @@ function delExSession(idx){
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
-const __origShow=window.show;
-window.show=function(id){
+const __origShow = window.show;
+window.show = function(id) {
   __origShow(id);
   _updateNav(id);
 };
-window.addEventListener('resize',()=>{
-  const a=document.querySelector('.screen.active');
-  if(a) _updateNav(a.id);
+window.addEventListener('resize', () => {
+  const a = document.querySelector('.screen.active');
+  if (a) _updateNav(a.id);
 });
 
-function _updateNav(screenId){
+// alias dla kompatybilności
+function showScreen(id) { show(id); }
+
+function _updateNav(screenId) {
   const onPlan = screenId === 'plan';
   const mob = window.innerWidth <= 768;
 
   const mNav = document.getElementById('bottom-nav');
-  if(mNav) mNav.classList.toggle('hidden', !onPlan || !mob);
+  if (mNav) mNav.classList.toggle('hidden', !onPlan || !mob);
 
   const dSide = document.getElementById('desktop-sidebar');
-  if(dSide) dSide.classList.toggle('visible', onPlan && !mob);
+  if (dSide) dSide.classList.toggle('visible', onPlan && !mob);
 
   const planEl = document.getElementById('plan');
-  if(planEl) planEl.classList.toggle('with-sidebar', onPlan && !mob);
+  if (planEl) planEl.classList.toggle('with-sidebar', onPlan && !mob);
+
+  // chat fab — tylko na planie
+  const fab = document.getElementById('chat-fab');
+  if (fab) fab.classList.toggle('visible', onPlan);
+
+  // aktywny przycisk nawy
+  ['plan','workout','calories','progress','settings'].forEach(id => {
+    const btn = document.getElementById('nav-' + id);
+    if (btn) btn.classList.toggle('act', id === screenId);
+  });
 }
 // ═══════════════════════════════════════════════════════════
 // SETTINGS — SHARED RENDERER
