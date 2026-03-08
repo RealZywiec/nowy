@@ -2063,9 +2063,17 @@ const QUESTIONS = [
   {id:"age",       cat:"Dane podstawowe",  text:"Ile masz lat?",                 hint:"Wiek wpływa na regenerację, intensywność i objętość.", type:"slider", min:14,max:70,def:25,unit:"lat"},
   {id:"height",    cat:"Dane podstawowe",  text:"Twój wzrost?",                  hint:"Potrzebny do obliczenia BMI i idealnej masy ciała.", type:"slider", min:150,max:220,def:175,unit:"cm"},
   {id:"weight",    cat:"Dane podstawowe",  text:"Aktualna waga?",                hint:"Podstawa wszystkich obliczeń kalorycznych i białkowych.", type:"slider", min:45,max:150,def:75,unit:"kg"},
-  {id:"goal",      cat:"Cel treningowy",   text:"Twój główny cel?",              hint:"Cel definiuje kalorykę, split i zakresy powtórzeń.", type:"opts", grid:"c2",
-   opts:[{v:"bulk",l:"Budowa masy",s:"Nadwyżka kaloryczna"},{v:"cut",l:"Redukcja tłuszczu",s:"Deficyt kaloryczny"},{v:"strength",l:"Siła maksymalna",s:"Ciężkie obciążenia"},{v:"recomp",l:"Rekompozyacja",s:"Masa + redukcja"}]},
-  {id:"weeklyChange",cat:"Cel",           text:"Ile kg na tydzień?",             hint:"0.25kg/tydz = ~270 kcal surplus. 0.5kg/tydz = ~550 kcal. Zbyt szybko = więcej tłuszczu niż mięśni.", type:"slider", min:0.1,max:1.5,def:0.25,unit:"kg/tydz",step:0.05},
+  {id:"weeklyChange", cat:"Cel", text:"Tempo zmiany wagi?",
+   hintFn: function(ans) {
+    if(ans.goal==='bulk') return ans.sex==='F'
+      ? 'Kobiety: 0.1–0.25 kg/tydz = czysta masa. Powyżej 0.25 = głównie tłuszcz.'
+      : 'Mężczyźni: 0.25–0.5 kg/tydz = lean bulk. Powyżej 0.5 = więcej tłuszczu niż mięśni.';
+    if(ans.goal==='cut') return ans.sex==='F'
+      ? 'Kobiety: 0.25–0.5 kg/tydz = bezpieczna redukcja. Powyżej 0.75 = ryzyko utraty mięśni i hormonów.'
+      : 'Mężczyźni: 0.5–1.0 kg/tydz = agresywna redukcja. Powyżej 1.0 = katabolizm mięśni.';
+    return 'Dla siły i rekompozyacji tempo wagi jest drugorzędne — skup się na postępach siłowych.';
+   },
+   type:"slider", min:0.1, max:1.5, def:0.25, unit:"kg/tydz", step:0.05},
   {id:"experience",cat:"Doświadczenie",   text:"Jak długo trenujesz?",           hint:"Determinuje objętość, intensywność i dobór ćwiczeń.", type:"opts", grid:"c3",
    opts:[{v:"beginner",l:"Początkujący",s:"Poniżej 1 roku"},{v:"intermediate",l:"Średniozaawansowany",s:"1–3 lata"},{v:"advanced",l:"Zaawansowany",s:"Ponad 3 lata"}]},
   {id:"days",      cat:"Harmonogram",      text:"Ile dni w tygodniu?",           hint:"Realistyczna liczba, którą utrzymasz przez miesiące.", type:"opts", grid:"c2",
@@ -2088,30 +2096,52 @@ const QUESTIONS = [
 // ═══════════════════════════════════════════════
 // ALGORITHM — Mifflin-St Jeor + poprawione limity
 // ═══════════════════════════════════════════════
-function calcBMR(w,h,a,s){const b=10*w+6.25*h-5*a;return s==='M'?b+5:b-161;}
-function calcTDEE(bmr,act){const m={sedentary:1.2,light:1.375,moderate:1.55,active:1.725};return bmr*(m[act]||1.55);}
+function calcBMR(w, h, a, s) {
+  // Mifflin-St Jeor (1990) — najdokładniejsza formuła dla aktywnych
+  const base = 10 * w + 6.25 * h - 5 * a;
+  return s === 'M' ? base + 5 : base - 161;
+}
 
-function calcCal(tdee, goal, weeklyChange, sex){
-  const wc  = Math.min(parseFloat(weeklyChange)||0.25, 1.5);
-  // Bezpieczne podłogi kaloryczne (WHO/ACSM)
-  const minCal = (sex==='F') ? 1450 : 1650;
+function calcTDEE(bmr, act) {
+  const m = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
+  return bmr * (m[act] || 1.55);
+}
 
-  if(goal==='bulk'){
-    // 1g tłuszczu = 7.7 kcal, ale realny lean bulk to max 500-600 surplus
-    // Powyżej 0.5kg/tydz → głównie tłuszcz, nie mięśnie
-    const surplus = Math.min(Math.round(wc * 7700 / 7), 600);
-    return Math.round(tdee + surplus);
+function calcCal(tdee, goal, weeklyChange, sex) {
+  const wc = Math.max(0.1, Math.min(parseFloat(weeklyChange) || 0.25, 1.5));
+
+  // Podłogi kaloryczne (WHO + ACSM) — różne dla kobiet i mężczyzn
+  const minCal = sex === 'F' ? 1400 : 1600;
+
+  if (goal === 'bulk') {
+    // 1 kg tkanki → ok. 5000–7700 kcal (zależy ile mięśni vs tłuszczu)
+    // Realistyczny split u naturalnego: ~50% mięśnie, ~50% tłuszcz
+    // Dlatego efektywny przelicznik to ok. 6000 kcal/kg dla bulk
+    const rawSurplus = Math.round(wc * 6000 / 7);
+
+    // Kobiety rosną wolniej (mniej testosteronu) — max efektywny surplus ~300 kcal
+    // Mężczyźni — max efektywny surplus ~500 kcal (powyżej = głównie tłuszcz)
+    // Ale NIE blokujemy — użytkownik decyduje, tylko ostrzeżenie (w buildResults)
+    return Math.round(tdee + rawSurplus);
   }
-  if(goal==='cut'){
-    // Deficyt surowy wg tempa
-    const rawDeficit = Math.round(wc * 7700 / 7);
-    // Ogranicz do 22% TDEE (bezpieczny pułap dla zachowania mięśni)
-    const maxPctDeficit = Math.round(tdee * 0.22);
-    const deficit = Math.min(rawDeficit, maxPctDeficit, tdee - minCal);
-    return Math.max(Math.round(tdee - Math.max(deficit, 0)), minCal);
+
+  if (goal === 'cut') {
+    const rawDeficit = Math.round(wc * 7700 / 7); // 1 kg tłuszczu = 7700 kcal
+    // Bezpieczny max deficyt: 25% TDEE (powyżej = katabolizm mięśni)
+    const maxSafeDeficit = Math.round(tdee * 0.25);
+    // Absolutny limit: nie zejść poniżej minCal
+    const maxFloorDeficit = tdee - minCal;
+    const deficit = Math.min(rawDeficit, maxSafeDeficit, Math.max(maxFloorDeficit, 0));
+    return Math.max(Math.round(tdee - deficit), minCal);
   }
-  if(goal==='strength') return Math.round(tdee + 150);
-  return Math.round(tdee); // recomp
+
+  if (goal === 'strength') {
+    // Mała nadwyżka dla podparcia siły bez gromadzenia tłuszczu
+    return Math.round(tdee + 200);
+  }
+
+  // recomp — TDEE, ciało samo przechodzi redistribucję
+  return Math.round(tdee);
 }
 
 function calcMacros(cal, w, goal){
@@ -2153,35 +2183,41 @@ function bmiStatus(b){if(b<18.5)return"Niedobór masy ciała";if(b<25)return"Pra
 // ═══════════════════════════════════════════════
 // MAKRA PER POSIŁEK
 // ═══════════════════════════════════════════════
-function calcMeals(cal, mac, isTrainingDay){
-  // Schemat posiłków: śniadanie / lunch / przekąska / obiad / kolacja
-  // W dniu treningowym: więcej węgli przed/po treningu
+// ZAMIEŃ całą funkcję calcMeals:
+function calcMeals(cal, mac, isTrainingDay) {
   const meals = isTrainingDay ? [
-    {name:'Śniadanie',     pPct:.22, cPct:.20, fPct:.25, ico:'🍳'},
+    {name:'Śniadanie',        pPct:.22, cPct:.20, fPct:.25, ico:'🍳'},
     {name:'Przed treningiem', pPct:.18, cPct:.28, fPct:.10, ico:'🍌'},
-    {name:'Po treningu',   pPct:.28, cPct:.30, fPct:.10, ico:'🥛'},
-    {name:'Obiad',         pPct:.20, cPct:.15, fPct:.30, ico:'🍗'},
-    {name:'Kolacja',       pPct:.12, cPct:.07, fPct:.25, ico:'🥗'},
+    {name:'Po treningu',      pPct:.28, cPct:.30, fPct:.10, ico:'🥛'},
+    {name:'Obiad',            pPct:.20, cPct:.15, fPct:.30, ico:'🍗'},
+    {name:'Kolacja',          pPct:.12, cPct:.07, fPct:.25, ico:'🥗'},
   ] : [
-    {name:'Śniadanie',     pPct:.25, cPct:.30, fPct:.25, ico:'🍳'},
-    {name:'Lunch',         pPct:.30, cPct:.30, fPct:.25, ico:'🥙'},
-    {name:'Przekąska',     pPct:.15, cPct:.15, fPct:.20, ico:'🍎'},
-    {name:'Kolacja',       pPct:.30, cPct:.25, fPct:.30, ico:'🍗'},
+    {name:'Śniadanie', pPct:.25, cPct:.30, fPct:.25, ico:'🍳'},
+    {name:'Lunch',     pPct:.30, cPct:.30, fPct:.25, ico:'🥙'},
+    {name:'Przekąska', pPct:.15, cPct:.15, fPct:.20, ico:'🍎'},
+    {name:'Kolacja',   pPct:.30, cPct:.25, fPct:.30, ico:'🍗'},
   ];
-  return meals.map(m => ({
-    name: m.name,
-    ico:  m.ico,
-    kcal: Math.round(cal * (m.pPct*4*mac.prot/cal*0 + m.cPct + m.fPct) / meals.reduce((s,x)=>s+x.cPct+x.fPct,0) * 0 )
-      || Math.round((mac.prot*m.pPct*4 + mac.carb*m.cPct*4 + mac.fat*m.fPct*9)),
-    prot: Math.round(mac.prot * m.pPct),
-    carb: Math.round(mac.carb * m.cPct),
-    fat:  Math.round(mac.fat  * m.fPct),
-  }));
+
+  return meals.map(m => {
+    const p    = Math.round(mac.prot * m.pPct);
+    const c    = Math.round(mac.carb * m.cPct);
+    const f    = Math.round(mac.fat  * m.fPct);
+    const kcal = Math.round(p * 4 + c * 4 + f * 9);
+    return { name: m.name, ico: m.ico, prot: p, carb: c, fat: f, kcal };
+  });
 }
 
-function buildMealPlanHtml(cal, mac){
+function buildMealPlanHtml(cal, mac, restCalArg, restMacArg){
+  // Użyj przekazanych wartości, nie zewnętrznych zmiennych
+  const rCal = restCalArg || Math.round(cal - (mac.carb - Math.round(mac.carb * 0.85)) * 4);
+  const rMac = restMacArg || {
+    prot: mac.prot,
+    carb: Math.round(mac.carb * 0.85),
+    fat:  mac.fat,
+  };
+
   const trainMeals = calcMeals(cal, mac, true);
-  const restMeals  = calcMeals(cal, mac, false);
+  const restMeals  = calcMeals(rCal, rMac, false);
 
   const renderMeals = (meals) => meals.map(m => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
@@ -2202,7 +2238,7 @@ function buildMealPlanHtml(cal, mac){
         ${renderMeals(trainMeals)}
       </div>
       <div>
-        <div style="font-family:var(--fm);font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Dzień odpoczynku · ${restCal} kcal</div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Dzień odpoczynku · ${rCal} kcal</div>
         ${renderMeals(restMeals)}
       </div>
     </div>
@@ -2318,7 +2354,7 @@ function renderQ(){
   document.getElementById('prog-pct').textContent=`${pct}%`;
   document.getElementById('prog-fill').style.width=`${pct}%`;
 
-  let html=`<div class="q-cat">${q.cat}</div><div class="q-text">${q.text}</div><div class="q-hint">${q.hint}</div>`;
+  let html=`<div class="q-cat">${q.cat}</div><div class="q-text">${q.text}</div><div class="q-hint">${q.hintFn ? q.hintFn(answers) : (q.hint||'')}</div>`;
 
   if(q.type==='opts'){
     html+=`<div class="opts ${q.grid}">`;
@@ -2457,14 +2493,31 @@ function buildResults(){
     const prev=localStorage.getItem('fp_answers');
     if(prev) localStorage.setItem('fp_prev_answers',prev);
   }catch(e){}
-  const D=getComputed();
-  const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,exp,wc}=D;
-  const deficitPerDay = goal==='cut' ? Math.round(D.tdee - cal) : 0;
-  const deficitWarning = (goal==='cut' && deficitPerDay > 500)
-  ? `<div style="background:rgba(255,77,0,.08);border:1px solid rgba(255,77,0,.35);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--accent2)">
-      ⚠️ <strong>Agresywne tempo:</strong> deficyt ${deficitPerDay} kcal/dzień = ${answers.weeklyChange||0.25} kg/tydzień.
-      Powyżej 0.5 kg/tydzień ryzyko utraty mięśni wzrasta. Rozważ <strong>0.25–0.5 kg/tydz</strong>.
-    </div>` : '';
+  const D = getComputed();
+  const {cal, mac, goal, glabs, gcol, bmi, bs, iw, bmr, tdee, exp, wc} = D;
+  const sex = D.s;
+  // Kalkuluj surplus/deficyt dla ostrzeżeń
+const surplusPerDay  = goal === 'bulk' ? cal - D.tdee : 0;
+const deficitPerDay  = goal === 'cut'  ? D.tdee - cal : 0;
+const maxNatBulk     = sex === 'F' ? 0.25 : 0.5; // kg/tydz — max czysta masa bez nadmiernego tłuszczu
+
+let calWarning = '';
+if (goal === 'bulk' && wc > maxNatBulk) {
+  calWarning = `<div style="background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.3);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px">
+    ⚡ <strong>Agresywny bulk:</strong> ${surplusPerDay} kcal/dzień nadwyżki.
+    Dla ${sex === 'F' ? 'kobiet' : 'mężczyzn'} optymalne tempo to <strong>${maxNatBulk} kg/tydz</strong>
+    — powyżej tego większość przyrostu to tłuszcz, nie mięśnie.
+  </div>`;
+} else if (goal === 'cut' && deficitPerDay > 500) {
+  calWarning = `<div style="background:rgba(255,77,0,.08);border:1px solid rgba(255,77,0,.35);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--accent2)">
+    ⚠️ <strong>Agresywna redukcja:</strong> deficyt ${deficitPerDay} kcal/dzień.
+    Powyżej 500 kcal/dzień rośnie ryzyko utraty mięśni. Zalecane: <strong>0.25–0.5 kg/tydz</strong>.
+  </div>`;
+} else if (goal === 'cut' && cal <= (sex === 'F' ? 1450 : 1650)) {
+  calWarning = `<div style="background:rgba(255,77,0,.08);border:1px solid rgba(255,77,0,.35);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--accent2)">
+    ⚠️ Bardzo niskie kalorie (${cal} kcal). Przy tak niskim TDEE zmniejsz tempo do <strong>0.25 kg/tydz</strong>.
+  </div>`;
+}
   const split=applyWeakPoints(buildSplit(answers.days||4,goal,exp), answers.weakPoints||[]);
   window.__split=split;
   if(window._skipPaywall){
@@ -2487,7 +2540,7 @@ function buildResults(){
     <h2 class="res-h2">Analiza<br><span>Twojego ciała</span></h2>
     <p class="res-sub">Algorytm oparty na 6 metodach naukowych</p>
   </div>
-  ${deficitWarning}
+  ${calWarning}
   <div class="metrics-grid">
     <div class="m-card"><div class="m-lbl">BMI</div><div class="m-val">${bmi}</div><div class="m-sub">${bs}</div></div>
     <div class="m-card acc"><div class="m-lbl">Kalorie dziennie</div><div class="m-val green">${cal.toLocaleString()} <span class="u">kcal</span></div><div class="m-sub">${glabs[goal]}</div></div>
@@ -2516,7 +2569,7 @@ function buildResults(){
       <p>Kompletny ${trDays}-dniowy harmonogram z możliwością zamiany ćwiczeń, opisami wykonania i edycją danych.</p>
       <div class="price-tag"><span class="curr">PLN</span><span class="amount">29</span><span class="cents">,99</span></div>
       <div class="price-old">Regularna cena: 59,99 PLN</div>
-      <button class="btn-buy" onclick="openPlan()">Kup i odbierz plan →</button>
+      <button class="btn-buy" onclick="openPlan()">Przejdź do pełnego planu →</button>
       <div class="guarantees">
         <div class="guarantee"><span class="gck">✓</span> Stripe / BLIK</div>
         <div class="guarantee"><span class="gck">✓</span> Natychmiastowy dostęp</div>
@@ -2532,11 +2585,28 @@ function buildResults(){
 // ═══════════════════════════════════════════════════════════
 // FULL PLAN
 // ═══════════════════════════════════════════════════════════
-function openPlan(){
-  const D=getComputed();
-  const {cal,mac,goal,glabs,gcol,wc}=D;
-  if(!window.__split) window.__split=applyWeakPoints(buildSplit(answers.days||4,goal,D.exp),answers.weakPoints||[]);
-  renderPlan();
+function openPlan() {
+  try {
+    const D = getComputed();
+    const { goal, exp } = D;
+    if (!window.__split) {
+      window.__split = applyWeakPoints(
+        buildSplit(answers.days || 4, goal, exp),
+        answers.weakPoints || []
+      );
+    }
+    renderPlan();
+  } catch(e) {
+    console.error('openPlan error:', e);
+    // Fallback: pokaż ekran planu bez crashu
+    show('plan');
+    document.getElementById('plan-inner').innerHTML = `
+      <div style="padding:40px;text-align:center">
+        <div style="font-family:var(--fd);font-size:24px;margin-bottom:12px">⚠️ Błąd ładowania planu</div>
+        <div style="color:var(--muted2);font-size:13px;margin-bottom:20px">${e.message}</div>
+        <button onclick="show('quiz')" class="btn-cta">Wygeneruj plan od nowa →</button>
+      </div>`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2613,7 +2683,7 @@ function renderPlan() {
   <div class="section">
     <div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>
     <div class="nutri-grid">
-      ${buildMealPlanHtml(cal, mac)}
+      ${buildMealPlanHtml(cal, mac, restCal, {prot: mac.prot, carb: restCarb, fat: mac.fat})}
       <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div>
         <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
       </div>
