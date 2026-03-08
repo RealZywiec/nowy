@@ -522,33 +522,35 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     width:auto!important;
   }
 }
-/* DESKTOP */
+/* Dodaj do @media(min-width:769px) */
 @media(min-width:769px){
-  .stats-fab,.cal-fab{display:none!important}
-  .desktop-sidebar{
-    position:fixed;left:0;top:0;bottom:0;width:72px;z-index:500;
-    background:var(--bg2);border-right:1px solid var(--border2);
-    display:none;flex-direction:column;align-items:center;padding:20px 0;
-    gap:4px;box-shadow:4px 0 20px rgba(0,0,0,.3);
+  /* Plan zajmuje całą dostępną szerokość obok sidebara */
+  #plan.with-sidebar {
+    padding-left: 80px;
   }
-  .desktop-sidebar.visible{display:flex}
-  .dsb-btn{
-    display:flex;flex-direction:column;align-items:center;gap:4px;
-    background:none;border:none;color:var(--muted2);cursor:pointer;
-    font-family:var(--fm);font-size:8px;text-transform:uppercase;letter-spacing:.08em;
-    padding:10px 8px;border-radius:8px;transition:.15s;width:64px;
-  }
-  .dsb-btn:hover,.dsb-btn.act{color:var(--accent);background:rgba(200,255,0,.06)}
-  .dsb-btn .dsb-ico{font-size:22px;line-height:1}
-  .dsb-btn.center-btn{
-    background:var(--accent);color:#000;border-radius:10px;
-    padding:10px;margin:4px 0;width:52px;
-  }
-  .dsb-btn.center-btn:hover{background:#fff;color:#000}
-  .dsb-divider{width:40px;height:1px;background:var(--border);margin:6px 0}
-  /* przesunięcie zawartości gdy sidebar widoczny */
   #plan.with-sidebar .plan-inner,
-  #results.with-sidebar .res-inner{margin-left:72px}
+  #results.with-sidebar .res-inner {
+    margin-left: 0;
+    max-width: 860px;
+  }
+  /* Keyboard shortcut hint w sidebarie */
+  .dsb-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 80px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: var(--fm);
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--text);
+    z-index: 9999;
+    box-shadow: 4px 4px 16px rgba(0,0,0,.4);
+    pointer-events: none;
+  }
+  .desktop-sidebar { position: relative; }
 }
 /* Mobile settings panel */
 .mobile-settings{
@@ -1534,22 +1536,35 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   </button>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════════
-  DESKTOP SIDEBAR — zastąp istniejący <div class="desktop-sidebar">
-════════════════════════════════════════════════════════ -->
 <div class="desktop-sidebar" id="desktop-sidebar">
-  <button class="dsb-btn" onclick="openDesktopSettings()" title="Ustawienia">
-    <span class="dsb-ico">⚙️</span><span>Ustaw.</span>
+  <div style="font-family:var(--fd);font-size:9px;font-weight:800;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;text-align:center">FP</div>
+
+  <button class="dsb-btn" id="dsb-plan" onclick="show('plan')" title="Plan treningowy">
+    <span class="dsb-ico">📋</span><span>Plan</span>
+  </button>
+  <button class="dsb-btn center-btn" onclick="navOpenExLog()" title="Dziennik treningu">
+    <span class="dsb-ico">🏋️</span><span>Trening</span>
   </button>
   <button class="dsb-btn" onclick="navOpenCalories()" title="Dziennik kalorii">
     <span class="dsb-ico">🍽</span><span>Kalorie</span>
   </button>
-  <button class="dsb-btn center-btn" onclick="navOpenExLog()" title="Dziennik treningu">
-    <span class="dsb-ico">📓</span><span>Trening</span>
-  </button>
+
   <div class="dsb-divider"></div>
-  <button class="dsb-btn" onclick="toggleStats()" title="Twoje dane">
-    <span class="dsb-ico">📊</span><span>Dane</span>
+
+  <button class="dsb-btn" onclick="openSettings();switchSettingsTab('progress')" title="Postępy / pomiary">
+    <span class="dsb-ico">📊</span><span>Postępy</span>
+  </button>
+  <button class="dsb-btn" onclick="toggleStats()" title="Twoje statystyki">
+    <span class="dsb-ico">⚡</span><span>Dane</span>
+  </button>
+
+  <div class="dsb-divider"></div>
+
+  <button class="dsb-btn" onclick="openDesktopSettings()" title="Ustawienia">
+    <span class="dsb-ico">⚙️</span><span>Ustaw.</span>
+  </button>
+  <button class="dsb-btn" onclick="setTheme(document.documentElement.dataset.theme==='light'?'dark':'light')" title="Zmień motyw">
+    <span class="dsb-ico" id="dsb-theme-ico">🌑</span><span>Motyw</span>
   </button>
 </div>
 
@@ -2070,46 +2085,132 @@ const QUESTIONS = [
   {id:"targetWeight",cat:"Cel wagowy",    text:"Docelowa waga?",                hint:"Realnie: ~0.5–1 kg masy miesięcznie lub ~0.5–1% ciała tygodniowo w redukcji.", type:"slider", min:45,max:150,def:80,unit:"kg"},
 ];
 
-// ═══════════════════════════════════════════════════════════
-// ALGORITHM
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// ALGORITHM — Mifflin-St Jeor + poprawione limity
+// ═══════════════════════════════════════════════
 function calcBMR(w,h,a,s){const b=10*w+6.25*h-5*a;return s==='M'?b+5:b-161;}
 function calcTDEE(bmr,act){const m={sedentary:1.2,light:1.375,moderate:1.55,active:1.725};return bmr*(m[act]||1.55);}
-function calcCal(tdee,goal,weeklyChange){
-  const wc=parseFloat(weeklyChange)||0.25;
+
+function calcCal(tdee, goal, weeklyChange, sex){
+  const wc  = Math.min(parseFloat(weeklyChange)||0.25, 1.5);
+  // Bezpieczne podłogi kaloryczne (WHO/ACSM)
+  const minCal = (sex==='F') ? 1450 : 1650;
+
   if(goal==='bulk'){
-    const surplus=Math.round(wc*1100);
-    return Math.round(tdee+surplus);
+    // 1g tłuszczu = 7.7 kcal, ale realny lean bulk to max 500-600 surplus
+    // Powyżej 0.5kg/tydz → głównie tłuszcz, nie mięśnie
+    const surplus = Math.min(Math.round(wc * 7700 / 7), 600);
+    return Math.round(tdee + surplus);
   }
   if(goal==='cut'){
-    const daily=Math.round(wc*1100);
-    // max deficyt: mniejszy z (dzienny wyliczony, TDEE-1200, 1500 kcal)
-    const maxDef=Math.min(daily, tdee-1200, 1500);
-    const deficit=Math.max(maxDef,0);
-    return Math.round(tdee-deficit);
+    // Deficyt surowy wg tempa
+    const rawDeficit = Math.round(wc * 7700 / 7);
+    // Ogranicz do 22% TDEE (bezpieczny pułap dla zachowania mięśni)
+    const maxPctDeficit = Math.round(tdee * 0.22);
+    const deficit = Math.min(rawDeficit, maxPctDeficit, tdee - minCal);
+    return Math.max(Math.round(tdee - Math.max(deficit, 0)), minCal);
   }
-  if(goal==='strength') return Math.round(tdee+200);
+  if(goal==='strength') return Math.round(tdee + 150);
   return Math.round(tdee); // recomp
 }
-function calcMacros(cal,w,goal){
-  // Białko: 2.4g/kg w deficycie (ochrona mięśni), 2.0g/kg w masie, 2.2g/kg w sile
-  const pm=goal==='cut'?2.4:goal==='strength'?2.0:goal==='bulk'?1.9:2.2;
-  const prot=Math.round(w*pm);
-  const protKcal=prot*4;
-  // Tłuszcze: min 0.8g/kg dla zdrowia hormonalnego, max 35% kalorii
-  const fatMin=Math.round(w*0.8);
-  const fatFromPct=Math.round((cal*(goal==='cut'?0.27:0.25))/9);
-  const fat=Math.max(fatMin,fatFromPct);
-  const fatKcal=fat*9;
-  // Węglowodany: reszta kalorii
-  const carbKcal=cal-protKcal-fatKcal;
-  const carb=Math.max(Math.round(carbKcal/4),50);
-  return{prot,fat,carb};
+
+function calcMacros(cal, w, goal){
+  // PRIORYTET: kalorie → białko (do 35% kcal) → tłuszcz (min 0.7g/kg) → węgle reszta
+  const pmTarget = goal==='cut'?2.4 : goal==='strength'?2.2 : goal==='bulk'?2.0 : 2.2;
+
+  // Białko — target, ale max 35% kalorii (żeby nie wypchnąć tłuszczu i węgli)
+  const protTarget  = Math.round(w * pmTarget);
+  const protMaxKcal = Math.round(cal * 0.35);
+  const prot = Math.min(protTarget, Math.round(protMaxKcal / 4));
+  const protKcal = prot * 4;
+
+  // Tłuszcz — 25-27% kalorii, min 0.7g/kg
+  const fatPct   = goal==='cut' ? 0.27 : 0.25;
+  const fatFromPct = Math.round(cal * fatPct / 9);
+  const fatMin     = Math.round(w * 0.7);
+  const fat        = Math.max(fatFromPct, fatMin);
+  const fatKcal    = fat * 9;
+
+  // Węgle — reszta, min 50g
+  const carbKcal = cal - protKcal - fatKcal;
+  const carb     = Math.max(Math.round(carbKcal / 4), 50);
+
+  // Korekta: jeśli prot+fat+carb > cal, przytnij węgle (już min 50g)
+  // lub przytnij tłuszcz do minimum
+  const totalKcal = protKcal + fat*9 + carb*4;
+  if(totalKcal > cal + 20){
+    // Przytnij tłuszcz do min
+    const fatAdj = Math.max(Math.round((cal - protKcal - carb*4) / 9), fatMin);
+    return {prot, fat: fatAdj, carb};
+  }
+  return {prot, fat, carb};
 }
+
 function calcBMI(w,h){return(w/((h/100)**2)).toFixed(1);}
 function idealW(h,s){const b=s==='M'?50:45.5,e=2.3*((h-152.4)/2.54);return Math.round(b+e);}
 function bmiStatus(b){if(b<18.5)return"Niedobór masy ciała";if(b<25)return"Prawidłowa masa ciała";if(b<30)return"Nadwaga";return"Otyłość";}
 
+// ═══════════════════════════════════════════════
+// MAKRA PER POSIŁEK
+// ═══════════════════════════════════════════════
+function calcMeals(cal, mac, isTrainingDay){
+  // Schemat posiłków: śniadanie / lunch / przekąska / obiad / kolacja
+  // W dniu treningowym: więcej węgli przed/po treningu
+  const meals = isTrainingDay ? [
+    {name:'Śniadanie',     pPct:.22, cPct:.20, fPct:.25, ico:'🍳'},
+    {name:'Przed treningiem', pPct:.18, cPct:.28, fPct:.10, ico:'🍌'},
+    {name:'Po treningu',   pPct:.28, cPct:.30, fPct:.10, ico:'🥛'},
+    {name:'Obiad',         pPct:.20, cPct:.15, fPct:.30, ico:'🍗'},
+    {name:'Kolacja',       pPct:.12, cPct:.07, fPct:.25, ico:'🥗'},
+  ] : [
+    {name:'Śniadanie',     pPct:.25, cPct:.30, fPct:.25, ico:'🍳'},
+    {name:'Lunch',         pPct:.30, cPct:.30, fPct:.25, ico:'🥙'},
+    {name:'Przekąska',     pPct:.15, cPct:.15, fPct:.20, ico:'🍎'},
+    {name:'Kolacja',       pPct:.30, cPct:.25, fPct:.30, ico:'🍗'},
+  ];
+  return meals.map(m => ({
+    name: m.name,
+    ico:  m.ico,
+    kcal: Math.round(cal * (m.pPct*4*mac.prot/cal*0 + m.cPct + m.fPct) / meals.reduce((s,x)=>s+x.cPct+x.fPct,0) * 0 )
+      || Math.round((mac.prot*m.pPct*4 + mac.carb*m.cPct*4 + mac.fat*m.fPct*9)),
+    prot: Math.round(mac.prot * m.pPct),
+    carb: Math.round(mac.carb * m.cPct),
+    fat:  Math.round(mac.fat  * m.fPct),
+  }));
+}
+
+function buildMealPlanHtml(cal, mac){
+  const trainMeals = calcMeals(cal, mac, true);
+  const restMeals  = calcMeals(cal, mac, false);
+
+  const renderMeals = (meals) => meals.map(m => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600">${m.ico} ${m.name}</div>
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px">
+          B:${m.prot}g · W:${m.carb}g · T:${m.fat}g
+        </div>
+      </div>
+      <div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--accent)">${m.kcal}<span style="font-size:10px;color:var(--muted)">kcal</span></div>
+    </div>`).join('');
+
+  return `<div class="macros-card" style="margin-top:20px">
+    <div class="macros-title">🍽 Rozkład posiłków</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Dzień treningowy · ${cal} kcal</div>
+        ${renderMeals(trainMeals)}
+      </div>
+      <div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Dzień odpoczynku · ${restCal} kcal</div>
+        ${renderMeals(restMeals)}
+      </div>
+    </div>
+    <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:10px">
+      * Rozkład orientacyjny. Dopasuj do swojego rytmu dnia.
+    </div>
+  </div>`;
+}
 // ═══════════════════════════════════════════════════════════
 // SPLIT BUILDER
 // ═══════════════════════════════════════════════════════════
@@ -2338,7 +2439,7 @@ function getComputed(ans){
   const wc=A.weeklyChange||0.25;
   const bmr=Math.round(calcBMR(w,h,a,s));
   const tdee=Math.round(calcTDEE(bmr,act));
-  const cal=calcCal(tdee,goal,wc);
+  const cal=calcCal(tdee,goal,wc,s);
   const mac=calcMacros(cal,w,goal);
   const bmi=calcBMI(w,h);
   const iw=idealW(h,s);
@@ -2358,6 +2459,12 @@ function buildResults(){
   }catch(e){}
   const D=getComputed();
   const {cal,mac,goal,glabs,gcol,bmi,bs,iw,bmr,tdee,exp,wc}=D;
+  const deficitPerDay = goal==='cut' ? Math.round(D.tdee - cal) : 0;
+  const deficitWarning = (goal==='cut' && deficitPerDay > 500)
+  ? `<div style="background:rgba(255,77,0,.08);border:1px solid rgba(255,77,0,.35);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--accent2)">
+      ⚠️ <strong>Agresywne tempo:</strong> deficyt ${deficitPerDay} kcal/dzień = ${answers.weeklyChange||0.25} kg/tydzień.
+      Powyżej 0.5 kg/tydzień ryzyko utraty mięśni wzrasta. Rozważ <strong>0.25–0.5 kg/tydz</strong>.
+    </div>` : '';
   const split=applyWeakPoints(buildSplit(answers.days||4,goal,exp), answers.weakPoints||[]);
   window.__split=split;
   if(window._skipPaywall){
@@ -2380,6 +2487,7 @@ function buildResults(){
     <h2 class="res-h2">Analiza<br><span>Twojego ciała</span></h2>
     <p class="res-sub">Algorytm oparty na 6 metodach naukowych</p>
   </div>
+  ${deficitWarning}
   <div class="metrics-grid">
     <div class="m-card"><div class="m-lbl">BMI</div><div class="m-val">${bmi}</div><div class="m-sub">${bs}</div></div>
     <div class="m-card acc"><div class="m-lbl">Kalorie dziennie</div><div class="m-val green">${cal.toLocaleString()} <span class="u">kcal</span></div><div class="m-sub">${glabs[goal]}</div></div>
@@ -2406,8 +2514,8 @@ function buildResults(){
     <div class="paywall-cta">
       <h3>Odblokuj pełny plan</h3>
       <p>Kompletny ${trDays}-dniowy harmonogram z możliwością zamiany ćwiczeń, opisami wykonania i edycją danych.</p>
-      <div class="price-tag"><span class="curr">PLN</span><span class="amount">29</span><span class="cents">,90</span></div>
-      <div class="price-old">Regularna cena: 79,90 PLN</div>
+      <div class="price-tag"><span class="curr">PLN</span><span class="amount">29</span><span class="cents">,99</span></div>
+      <div class="price-old">Regularna cena: 59,99 PLN</div>
       <button class="btn-buy" onclick="openPlan()">Kup i odbierz plan →</button>
       <div class="guarantees">
         <div class="guarantee"><span class="gck">✓</span> Stripe / BLIK</div>
@@ -2439,7 +2547,9 @@ function renderPlan() {
   const { cal, mac, goal, glabs, gcol, wc } = D;
   const split = window.__split;
   const _todayName = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'][new Date().getDay()];
-
+  // W renderPlan, przed generowaniem weekHtml, dodaj:
+  const restCarb = Math.round(mac.carb * 0.85);
+  const restCal  = Math.round(cal - (mac.carb - restCarb) * 4);
   const weekHtml = split.days.map((day, di) => {
     const _isToday = day.name && day.name.startsWith(_todayName.slice(0,3));
     if (!day.tr) return `
@@ -2503,12 +2613,19 @@ function renderPlan() {
   <div class="section">
     <div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>
     <div class="nutri-grid">
+      ${buildMealPlanHtml(cal, mac)}
       <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div>
         <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
       </div>
-      <div class="nc"><div class="nc-day">Dzień odpoczynku</div><div class="nc-kcal">${(cal - 200).toLocaleString()} <span>kcal</span></div>
-        <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${Math.round(mac.carb * .85)}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
-      </div>
+      <!-- I w szablonie zastąp dzień odpoczynku: -->
+<div class="nc"><div class="nc-day">Dzień odpoczynku</div>
+  <div class="nc-kcal">${restCal.toLocaleString()} <span>kcal</span></div>
+  <div class="nc-macros">
+    <div class="nm">Białko <strong>${mac.prot}g</strong></div>
+    <div class="nm">Węgle <strong>${restCarb}g</strong></div>
+    <div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div>
+  </div>
+</div>
     </div>
   </div>
   <div class="section">
@@ -3790,23 +3907,21 @@ function buildWeeklySummary(){
 
 
 function saveExSet(){
-  const w=parseFloat(document.getElementById('exl-w')?.value)||0;
-  const r=parseInt(document.getElementById('exl-r')?.value)||0;
-  const rpe=parseFloat(document.getElementById('exl-rpe')?.value)||null;
-  const note=document.getElementById('exl-note')?.value.trim()||'';
-  if(!r) return;
-  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const sessions=getExData(_exLogKey);
-  let sess=sessions.find(s=>s.date===today);
-  if(!sess){sess={date:today,sets:[]};sessions.push(sess);}
-  sess.sets.push({w,r,rpe,note});
-  saveExData(_exLogKey,sessions);
+  const w   = parseFloat(document.getElementById('exl-w')?.value)   || 0;
+  const r   = parseInt(document.getElementById('exl-r')?.value)     || 0;
+  const rpe = parseFloat(document.getElementById('exl-rpe')?.value) || null;
+  const note = document.getElementById('exl-note')?.value.trim()    || '';
+  if (!r) return;
+  const today = new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const sessions = getExData(_exLogKey);
+  let sess = sessions.find(s => s.date === today);
+  if (!sess) { sess = {date:today, sets:[]}; sessions.push(sess); }
+  sess.sets.push({w, r, rpe, note});
+  saveExData(_exLogKey, sessions);
+  _exViewDate = null;
   updateStreak();
   renderExLogBody();
-  // PR check
-  const exWeight = parseFloat(document.getElementById('exl-w')?.value) || 0;
-  const exReps   = parseInt(document.getElementById('exl-r')?.value)   || 0;
-  if (_exLogName && exWeight) checkPR(_exLogName, exWeight, exReps);
+  if (_exLogName && w) checkPR(_exLogName, w, r);
 }
 
 function delExSession(idx){
@@ -3856,6 +3971,13 @@ function _updateNav(screenId) {
     const fab = document.getElementById('chat-fab');
    if (fab) fab.style.display = onPlan ? 'flex' : 'none';
   });
+  ['plan'].forEach(id => {
+  const dsbBtn = document.getElementById('dsb-' + id);
+  if(dsbBtn) dsbBtn.classList.toggle('act', id === screenId);
+});
+// Aktualizuj ikonę motywu
+const themeIco = document.getElementById('dsb-theme-ico');
+if(themeIco) themeIco.textContent = document.documentElement.dataset.theme==='light' ? '☀️' : '🌑';
 }
 // ═══════════════════════════════════════════════════════════
 // SETTINGS — SHARED RENDERER
@@ -4143,24 +4265,48 @@ function renderExLogBody(){
       <button class="btn-exlog-save" onclick="saveExSet()">+ Zapisz serię</button>
     </div>`:'';
 
-  // 1RM kalkulator
-  const ormHtml=`
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px">
-      <div class="exlog-hist-lbl">🏋️ Kalkulator 1RM — Brzycki</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-        <div style="flex:1;min-width:70px">
-          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">CIĘŻAR KG</div>
-          <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" value="${pr>0?pr:''}">
-        </div>
-        <div style="font-family:var(--fd);font-size:20px;color:var(--muted);padding-top:16px">×</div>
-        <div style="flex:1;min-width:70px">
-          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">POWTÓRZENIA</div>
-          <input class="exlog-input" id="orm-r" type="number" min="1" max="36" placeholder="rp" value="${lastSet?.r||''}">
-        </div>
-        <button onclick="calc1RM()" style="flex:none;margin-top:16px;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 16px;border-radius:4px;cursor:pointer">= 1RM</button>
+  // Znajdź: const ormHtml=`...` i zastąp:
+const prWeight = pr > 0 ? pr : 0;
+// Oblicz warmup na podstawie PR lub wpisanego ciężaru
+const warmupSets = [
+  {pct:40, reps:8,  label:'Aktywacja'},
+  {pct:60, reps:5,  label:'Rozgrzewka'},
+  {pct:75, reps:3,  label:'Przejście'},
+  {pct:85, reps:2,  label:'Aktywacja nerwowa'},
+  {pct:90, reps:1,  label:'Ostatni warmup'},
+];
+const warmupHtml = prWeight > 0
+  ? warmupSets.map(s => {
+      const kg = Math.round(prWeight * s.pct/100 * 2)/2; // zaokrąglij do 0.5
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted);font-family:var(--fm);width:32px">${s.pct}%</span>
+        <span style="font-family:var(--fd);font-size:17px;font-weight:800;color:var(--accent)">${kg} kg</span>
+        <span style="color:var(--muted2)">${s.reps} powt</span>
+        <span style="font-family:var(--fm);font-size:9px;color:var(--muted)">${s.label}</span>
+      </div>`;
+    }).join('')
+  : '<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0">Zapisz pierwszą serię żeby zobaczyć serie rozgrzewkowe</div>';
+
+const ormHtml=`
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px">
+    <div class="exlog-hist-lbl">🔥 Serie rozgrzewkowe${prWeight>0?` (bazując na PR: ${prWeight} kg)`:''}</div>
+    ${warmupHtml}
+    <div style="height:1px;background:var(--border);margin:12px 0"></div>
+    <div class="exlog-hist-lbl">🏋️ Kalkulator 1RM (Epley + Brzycki)</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <div style="flex:1;min-width:70px">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">CIĘŻAR KG</div>
+        <input class="exlog-input" id="orm-w" type="number" step="0.5" min="0" placeholder="kg" value="${prWeight>0?prWeight:''}">
       </div>
-      <div id="orm-result"></div>
-    </div>`;
+      <div style="font-family:var(--fd);font-size:20px;color:var(--muted);padding-top:16px">×</div>
+      <div style="flex:1;min-width:70px">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:4px">POWTÓRZENIA</div>
+        <input class="exlog-input" id="orm-r" type="number" min="1" max="30" placeholder="rp" value="${lastSet?.r||''}">
+      </div>
+      <button onclick="calc1RM()" style="flex:none;margin-top:16px;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;font-weight:800;padding:12px 16px;border-radius:4px;cursor:pointer">= 1RM</button>
+    </div>
+    <div id="orm-result"></div>
+  </div>`;
 
   document.getElementById('exlog-body').innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
@@ -4748,40 +4894,50 @@ function updateWarmupKg(val){
 // ═══════════════════════════════════════════════════════════
 // KALKULATOR 1RM (Brzycki)
 // ═══════════════════════════════════════════════════════════
+// ZAMIEŃ funkcję calc1RM() — kalkulator UI:
 function calc1RM(){
-  const w=parseFloat(document.getElementById('orm-w')?.value)||0;
-  const r=parseInt(document.getElementById('orm-r')?.value)||0;
-  const el=document.getElementById('orm-result');
-  if(!el) return;
-  if(!w||!r||r<1||r>36){
-    el.innerHTML='<span style="color:var(--muted2);font-size:12px">Podaj ciężar i liczbę powtórzeń (1–36)</span>';
+  const w = parseFloat(document.getElementById('orm-w')?.value) || 0;
+  const r = parseInt(document.getElementById('orm-r')?.value)   || 0;
+  const el = document.getElementById('orm-result');
+  if (!el) return;
+  if (!w || !r || r < 1 || r > 30) {
+    el.innerHTML = '<span style="color:var(--muted2);font-size:12px">Podaj ciężar i 1–30 powtórzeń (>30 reps = nierzetelne)</span>';
     el.classList.add('show');
     return;
   }
-  if(r===1){
-    el.innerHTML=`<div class="orm-label">Szacowany 1RM</div><div class="orm-val">${w} kg <span style="font-size:16px;color:var(--muted2)">(to twoje 1RM)</span></div>`;
+  if (r === 1) {
+    el.innerHTML = `<div class="orm-label">1RM (bezpośredni)</div><div class="orm-val">${w} kg</div>`;
     el.classList.add('show');
     return;
   }
-  const orm=Math.round(w*(36/(37-r))*10)/10;
-  const zones=[
-    {pct:95, reps:'1–2',   label:'Siła max'},
-    {pct:85, reps:'4–6',   label:'Siła / moc'},
-    {pct:75, reps:'8–12',  label:'Hipertrofia'},
-    {pct:65, reps:'15–20', label:'Wytrzymałość'},
-    {pct:55, reps:'20+',   label:'Kondycja'},
+  // Epley: W × (1 + r/30)  —  najbardziej cytowany wzór (O'Conner 1989)
+  // Brzycki: W × 36/(37-r) —  mniej stabilny przy r > 10
+  const epley   = Math.round(w * (1 + r/30) * 10) / 10;
+  const brzycki = (r < 37) ? Math.round(w * (36/(37-r)) * 10) / 10 : null;
+  const avg     = brzycki ? Math.round((epley + brzycki) / 2 * 10) / 10 : epley;
+
+  const zones = [
+    {pct:97.5, reps:'1',    label:'1RM'},
+    {pct:90,   reps:'3–4',  label:'Siła max'},
+    {pct:82.5, reps:'5–6',  label:'Siła'},
+    {pct:75,   reps:'8–10', label:'Hipertrofia'},
+    {pct:67.5, reps:'12–15',label:'Objętość'},
+    {pct:60,   reps:'15–20',label:'Wytrzymałość'},
   ];
-  const zonesHtml=zones.map(z=>`
+  const zonesHtml = zones.map(z => `
     <div class="orm-zone">
       <div class="orm-zone-pct">${z.pct}% · ${z.reps} powt</div>
-      <div class="orm-zone-val">${Math.round(orm*z.pct/100*2)/2} kg</div>
+      <div class="orm-zone-val">${Math.round(avg * z.pct/100 * 2)/2} kg</div>
       <div style="font-family:var(--fm);font-size:8px;color:var(--muted)">${z.label}</div>
     </div>`).join('');
-  el.innerHTML=`
-    <div class="orm-label">Szacowany 1RM (Brzycki)</div>
-    <div class="orm-val">${orm} kg</div>
-    <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin:4px 0 8px">Na podstawie: ${w}kg × ${r} powt</div>
-    <div class="orm-zones" style="grid-template-columns:repeat(5,1fr)">${zonesHtml}</div>`;
+
+  el.innerHTML = `
+    <div class="orm-label">Szacowany 1RM (średnia Epley + Brzycki)</div>
+    <div class="orm-val">${avg} kg</div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin:4px 0 8px">
+      Epley: ${epley} kg &nbsp;·&nbsp; Brzycki: ${brzycki ?? '—'} kg &nbsp;·&nbsp; z ${w}kg × ${r} powt
+    </div>
+    <div class="orm-zones" style="grid-template-columns:repeat(3,1fr)">${zonesHtml}</div>`;
   el.classList.add('show');
 }
 
@@ -4885,6 +5041,67 @@ function updateStreak(){
     setTimeout(()=>showToast(`🔥 ${data.current} dni z rzędu! Niesamowite!`),500);
   }
   return data;
+  checkDeloadAlert();
+}
+
+// ═══════════════════════════════════════════════
+// DELOAD ALERT — po 4 tygodniach bez deloadu
+// ═══════════════════════════════════════════════
+function checkDeloadAlert(){
+  const DELOAD_INTERVAL_DAYS = 28; // 4 tygodnie
+  const lastDeload = parseInt(localStorage.getItem('fp_last_deload') || '0');
+  const daysSince  = Math.floor((Date.now() - lastDeload) / 86400000);
+
+  // Policz ile treningów w ostatnich 28 dniach
+  let trainCount = 0;
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('fp_ex_'));
+  const cutoff = Date.now() - DELOAD_INTERVAL_DAYS * 86400000;
+  keys.forEach(k => {
+    try {
+      const sessions = JSON.parse(localStorage.getItem(k) || '[]');
+      sessions.forEach(s => {
+        const [d,m,y] = s.date.split('.');
+        if(new Date(`${y}-${m}-${d}`).getTime() >= cutoff) trainCount++;
+      });
+    } catch(e){}
+  });
+
+  // Pokaż alert jeśli: 28+ dni bez deloadu I min 12 treningów (realnie trenuje)
+  if(daysSince >= DELOAD_INTERVAL_DAYS && trainCount >= 12){
+    const existing = document.getElementById('deload-alert');
+    if(existing) return; // już widoczny
+
+    const alert = document.createElement('div');
+    alert.id = 'deload-alert';
+    alert.style.cssText = `
+      position:fixed;top:16px;right:16px;z-index:9000;
+      background:var(--bg2);border:1px solid rgba(255,77,0,.5);
+      border-radius:8px;padding:16px 18px;max-width:300px;
+      box-shadow:0 8px 32px rgba(0,0,0,.6);
+      animation:slideIn .3s ease;
+    `;
+    alert.innerHTML = `
+      <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--accent2);margin-bottom:6px">⚡ Czas na deload!</div>
+      <div style="font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:12px">
+        Trenujesz <strong>${trainCount} razy</strong> przez ostatnie 4 tygodnie bez deloadu.<br>
+        1 tydzień −40% objętości = lepsza superkompensacja i mniej ryzyka kontuzji.
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="markDeloadDone()" style="flex:1;background:var(--accent2);color:#fff;border:none;font-family:var(--fd);font-size:13px;font-weight:800;padding:8px;border-radius:4px;cursor:pointer">
+          Zaczynam deload ✓
+        </button>
+        <button onclick="this.closest('#deload-alert').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-size:12px;padding:8px 12px;border-radius:4px;cursor:pointer;white-space:nowrap">
+          Pomiń
+        </button>
+      </div>`;
+    document.body.appendChild(alert);
+  }
+}
+
+function markDeloadDone(){
+  localStorage.setItem('fp_last_deload', Date.now().toString());
+  document.getElementById('deload-alert')?.remove();
+  showToast('Deload zaplanowany — trenuj z 40% mniejszą objętością przez 7 dni 💪');
 }
 
 function getAllPRs(){
@@ -5201,10 +5418,13 @@ function checkPR(exerciseName, weight, reps) {
   }
 }
 
+// ZAMIEŃ _calc1RM — PR tracking (Epley, spójne z kalkulatorem):
 function _calc1RM(weight, reps) {
-  // Epley formula
+  if (reps <= 0) return weight;
   if (reps === 1) return weight;
-  return Math.round(weight * (1 + reps / 30));
+  // Clamp: powyżej 15 reps 1RM jest bardzo przybliżony — ogranicz
+  const r = Math.min(reps, 15);
+  return Math.round(weight * (1 + r / 30) * 10) / 10;
 }
 
 function _showPRToast(name, weight, reps, diff) {
@@ -5692,9 +5912,6 @@ function _onScreenChange(screen) {
   <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)..." style="margin-bottom:8px">
   <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
 </div>
-        <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)...">
-      <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
-      </div>
       <div id="bt-content" class="bt-content-area">
         <div class="bt-empty"><div class="bt-empty-icon">📊</div>
           <p>Brak pomiarów. Dodaj pierwszy.</p></div>
