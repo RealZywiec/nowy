@@ -302,7 +302,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .sp-weekly-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .sp-weekly-val{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--accent)}
 
-/* SITE FOOTER */
+/* Footer tylko na hero */
+.site-footer{display:none}
+#hero .site-footer{display:block;text-align:center;padding:20px 0 40px;font-size:12px;color:var(--muted)}
 .site-footer{width:100%;border-top:1px solid var(--border);padding:28px 24px;text-align:center;position:relative;z-index:1}
 .site-footer p{font-size:12px;color:var(--muted)}
 .site-footer strong{color:var(--muted2)}
@@ -358,7 +360,14 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   box-shadow:0 -20px 60px rgba(0,0,0,.6);
 }
 @media(max-width:768px){
-  .cal-panel-inner{border-radius:12px 12px 0 0;max-height:80vh;padding-bottom:env(safe-area-inset-bottom)}
+  .cal-panel-inner{
+    border-radius:12px 12px 0 0;
+    max-height:calc(100vh - 60px - env(safe-area-inset-bottom));
+    padding-bottom:env(safe-area-inset-bottom)
+  }
+  .cal-panel{
+    padding-bottom:calc(60px + env(safe-area-inset-bottom))
+  }
 }
 .cal-panel-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .cal-panel-title{font-family:var(--fd);font-size:18px;font-weight:800;text-transform:uppercase}
@@ -392,7 +401,8 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .btn-copy:hover{background:#fff}
 .btn-copy.copied{background:#00d4ff;color:#000}
 /* ── FAQ ── */
-.faq-wrap{max-width:720px;width:100%;padding:0 24px 60px;margin:0 auto}
+.faq-wrap{max-width:720px;width:100%;padding:0 24px 60px;margin:0 auto;display:none}
+#hero .faq-wrap{display:block}
 .faq-item{border-bottom:1px solid var(--border)}
 .faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;gap:12px;user-select:none}
 .faq-q:hover,.faq-q.active{color:var(--accent)}
@@ -1092,6 +1102,23 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 }
 .bt-save-btn:active { opacity: .8; }
 
+.bt-entry{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 4px;border-bottom:1px solid var(--border);gap:8px
+}
+.bt-entry-main{flex:1;min-width:0}
+.bt-entry-date{font-family:var(--fm);font-size:10px;color:var(--muted);display:block;margin-bottom:2px}
+.bt-entry-weight{font-family:var(--fd);font-size:17px;font-weight:800}
+.bt-entry-stat{font-family:var(--fm);font-size:10px;color:var(--muted2);margin-left:6px}
+.bt-entry-note{font-size:11px;color:var(--muted2);margin-top:2px;display:block}
+.bt-entry-actions{display:flex;gap:4px;flex-shrink:0}
+.bt-entry-btn{
+  background:none;border:1px solid var(--border2);color:var(--muted2);
+  font-size:10px;padding:3px 7px;border-radius:4px;cursor:pointer;
+  font-family:var(--fm);white-space:nowrap;transition:.12s
+}
+.bt-entry-btn:hover{color:var(--text);border-color:var(--border2)}
+.bt-entry-btn.del:hover{color:var(--accent2);border-color:rgba(255,77,0,.4)}
 /* Stats row */
 .bt-stats-row {
   display: grid; grid-template-columns: repeat(3,1fr);
@@ -1379,6 +1406,12 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   flex-shrink: 0;
   scroll-snap-align: start;
 }
+#reviews-carousel::-webkit-scrollbar{display:none}
+#reviews-carousel .review-card{
+  min-width:240px;max-width:260px;flex-shrink:0;scroll-snap-align:start;
+  background:var(--card);border:1px solid var(--border);border-radius:6px;
+  padding:18px;position:relative;display:flex;flex-direction:column
+}
 </style>
 </head>
 <body>
@@ -1442,43 +1475,46 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     </div>
   </div>
 
-  <!-- OPINIE -->
-<div class="how-wrap" style="padding-top:0">
-  <div class="sec-label">Co mówią użytkownicy</div>
+<!-- OPINIE -->
+  <div class="how-wrap" style="padding-top:0">
+    <div class="sec-label">Co mówią użytkownicy</div>
 
-  <!-- Statystyki -->
-  <div style="display:flex;justify-content:center;gap:32px;margin-bottom:24px;flex-wrap:wrap;
-    padding:20px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-    <div style="text-align:center">
-      <div id="review-stat-avg" style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">—</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Średnia ocen</div>
+    <!-- Statystyki -->
+    <div id="review-stats-bar"
+      style="display:flex;justify-content:center;gap:32px;margin-bottom:20px;flex-wrap:wrap;
+             padding:20px;background:var(--card);border:1px solid var(--border);border-radius:8px">
+      <div style="text-align:center">
+        <div id="review-stat-avg" style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">—</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Średnia ocen</div>
+      </div>
+      <div style="text-align:center">
+        <div id="review-stat-count" style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">—</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Opinii</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">4 000+</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Wygenerowanych planów</div>
+      </div>
     </div>
-    <div style="text-align:center">
-      <div id="review-stat-count" style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">—</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Opinii</div>
-    </div>
-    <div style="text-align:center">
-      <div id="review-stat-plans" style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">4 000+</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Wygenerowanych planów</div>
-    </div>
-  </div>
 
-  <!-- Karuzela opinii -->
-  <div style="position:relative;overflow:hidden">
-    <div id="reviews-carousel"
-      style="display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
-             -webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:none">
+    <!-- Karuzela -->
+    <div style="position:relative">
+      <div id="reviews-carousel"
+        style="display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+               -webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:none">
+      </div>
     </div>
-  </div>
-  <div style="display:flex;justify-content:center;gap:8px;margin-top:12px">
-    <button onclick="reviewsCarouselScroll(-1)"
-      style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);
-             width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">‹</button>
-    <button onclick="reviewsCarouselScroll(1)"
-      style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);
-             width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer">›</button>
-  </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:10px">
+      <button onclick="reviewsCarouselScroll(-1)"
+        style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);
+               width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;line-height:1">&#8249;</button>
+      <button onclick="reviewsCarouselScroll(1)"
+        style="background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);
+               width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;line-height:1">&#8250;</button>
+    </div>
 
+    <div id="reviews-grid" style="display:none"></div>
+  </div>
   <!-- Formularz nowej opinii — tylko po wygenerowaniu planu -->
   <div id="review-form-wrap"
     style="background:var(--card);border:1px solid var(--border);border-radius:8px;
@@ -4358,7 +4394,7 @@ function _buildSettingsHTML(){
     </div>
     <div class="ms-section" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px">
       <div class="ms-lbl" style="margin-bottom:6px">Twoje makra (przeliczone)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">
           <div style="font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent)">${D.cal.toLocaleString()}</div>
           <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">kcal/dzień</div>
@@ -5637,21 +5673,23 @@ function renderBodyTimeline() {
   const weightSeries = data.filter(d => d.weight).slice(-60);
   const chartHTML = weightSeries.length >= 2 ? _btBuildChart(weightSeries) : '';
 
-  const histHTML = [...data].reverse().slice(0, 12).map((e, i) => {
-  const realIdx = data.length - 1 - i;
-  return '<div class="bt-entry" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">'
-    + '<div>'
-    + '<span class="bt-entry-date" style="font-family:var(--fm);font-size:10px;color:var(--muted)">' + e.date + '</span>'
-    + ' <span class="bt-entry-weight" style="font-family:var(--fd);font-size:16px;font-weight:800">' + e.weight + ' kg</span>'
-    + (e.waist ? ' <span style="font-family:var(--fm);font-size:10px;color:var(--muted2)">pas: ' + e.waist + 'cm</span>' : '')
-    + (e.note  ? '<div style="font-size:11px;color:var(--muted2);margin-top:2px">' + e.note + '</div>' : '')
-    + '</div>'
-    + '<div style="display:flex;gap:6px">'
-    + '<button onclick="editBodyEntry(' + realIdx + ')" style="background:none;border:1px solid var(--border2);color:var(--muted2);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer">Edytuj</button>'
-    + '<button onclick="deleteBodyEntry(' + realIdx + ')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">✕</button>'
-    + '</div>'
-    + '</div>';
-}).join('');
+  const reversed = [...data].reverse().slice(0, 15);
+  const histHTML = reversed.map(function(e) {
+    const realIdx = data.indexOf(e);
+    return '<div class="bt-entry">'
+      + '<div class="bt-entry-main">'
+      + '<span class="bt-entry-date">' + e.date + '</span>'
+      + '<span class="bt-entry-weight">' + e.weight + ' kg</span>'
+      + (e.waist ? '<span class="bt-entry-stat">pas: ' + e.waist + 'cm</span>' : '')
+      + (e.bicep ? '<span class="bt-entry-stat">bicep: ' + e.bicep + 'cm</span>' : '')
+      + (e.note  ? '<span class="bt-entry-note">' + e.note + '</span>' : '')
+      + '</div>'
+      + '<div class="bt-entry-actions">'
+      + '<button class="bt-entry-btn" onclick="editBodyEntry(' + realIdx + ')">Edytuj</button>'
+      + '<button class="bt-entry-btn del" onclick="deleteBodyEntry(' + realIdx + ')">✕</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
 
   c.innerHTML = `
     <div class="bt-stats-row">
@@ -6208,94 +6246,215 @@ function _onScreenChange(screen) {
   const saved = localStorage.getItem('fp_theme') || 'dark';
   setTheme(saved);
 })();
+
+
 // ═══════════════════════════════════════════════
-// SYSTEM OPINII
+// SYSTEM OPINII — cross-device przez JSONBlob
 // ═══════════════════════════════════════════════
+
+// Ustaw ten ID po utworzeniu bloba na jsonblob.com (raz, deploy):
+// Utwórz: curl -X POST -H "Content-Type: application/json" -d "[]" https://jsonblob.com/api/jsonBlob
+// Skopiuj ID z nagłówka Location i wklej tutaj:
+const REVIEWS_BLOB_ID = ''; // np. '1234567890abcdef'
+const REVIEWS_BLOB_URL = REVIEWS_BLOB_ID
+  ? 'https://jsonblob.com/api/jsonBlob/' + REVIEWS_BLOB_ID
+  : null;
+
+const REVIEW_SEED = [
+  { name:'Maciej K.', text:'W 3 miesiące z 78 do 71 kg. Plan konkretny — żadnego lania wody.', stars:5, goal:'cut',      date:'Sty 2026', _seed:true },
+  { name:'Anna G.',   text:'Po 4 miesiącach robię martwy na 60 kg. Plan dla początkujących super.', stars:5, goal:'strength', date:'Lut 2026', _seed:true },
+  { name:'Piotr W.',  text:'5 lat trenuje i nigdy nie miałem tak dobrze ułożonego planu.', stars:5, goal:'bulk',     date:'Mar 2026', _seed:true },
+];
+
 let _selectedStars = 5;
+const GOAL_LABELS = { bulk:'Budowa masy', cut:'Redukcja', strength:'Siła', recomp:'Rekompozyacja' };
+const INITIALS_COLORS = ['#c8ff00','#00d4ff','#ff4d00','#a78bfa','#f59e0b'];
 
 function selectStar(n) {
   _selectedStars = n;
-  document.querySelectorAll('#star-select [data-star]').forEach(s => {
-    s.textContent = parseInt(s.dataset.star) <= n ? '★' : '☆';
-    s.style.color  = parseInt(s.dataset.star) <= n ? 'var(--accent)' : 'var(--muted)';
+  document.querySelectorAll('#star-select [data-star]').forEach(function(s) {
+    var v = parseInt(s.dataset.star) <= n;
+    s.textContent = v ? '★' : '☆';
+    s.style.color = v ? 'var(--accent)' : 'var(--muted)';
   });
 }
 
-function _getReviews() {
+function _getReviewsLocal() {
   try { return JSON.parse(localStorage.getItem('fp_reviews') || '[]'); }
   catch { return []; }
 }
 
-const GOAL_LABELS = { bulk:'Budowa masy', cut:'Redukcja', strength:'Siła', recomp:'Rekompozyacja' };
-const INITIALS_COLORS = ['#c8ff00','#00d4ff','#ff4d00','#a78bfa','#f59e0b'];
-
-function reviewsCarouselScroll(dir) {
-  const c = document.getElementById('reviews-carousel');
-  if (c) c.scrollBy({ left: dir * 280, behavior: 'smooth' });
+async function _getReviewsRemote() {
+  if (!REVIEWS_BLOB_URL) return null;
+  try {
+    const r = await fetch(REVIEWS_BLOB_URL, {
+      headers:{ 'Content-Type':'application/json' }
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    // cache lokalnie na 5 minut
+    localStorage.setItem('fp_reviews_cache', JSON.stringify({ ts: Date.now(), data }));
+    return data;
+  } catch { return null; }
 }
 
-function _renderReviews() {
+async function _saveReviewsRemote(reviews) {
+  if (!REVIEWS_BLOB_URL) return false;
+  try {
+    const r = await fetch(REVIEWS_BLOB_URL, {
+      method: 'PUT',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(reviews)
+    });
+    return r.ok;
+  } catch { return false; }
+}
+
+async function _getAllReviews() {
+  // Próbuj cache (5 min)
+  try {
+    const cached = JSON.parse(localStorage.getItem('fp_reviews_cache') || 'null');
+    if (cached && Date.now() - cached.ts < 5 * 60 * 1000) {
+      return cached.data;
+    }
+  } catch {}
+
+  const remote = await _getReviewsRemote();
+  if (remote) return remote;
+
+  // fallback: lokalny
+  return _getReviewsLocal();
+}
+
+async function _renderReviews() {
   const carousel = document.getElementById('reviews-carousel');
   if (!carousel) return;
 
-  const seed = [
-    { name:'Maciej K.', text:'W 3 miesiące z 78 do 71 kg. Plan konkretny — żadnego lania wody.', stars:5, goal:'cut',   date:'Sty 2026', _seed:true },
-    { name:'Anna G.',   text:'Po 4 miesiącach robię martwy na 60 kg. Plan dla początkujących super.', stars:5, goal:'strength', date:'Lut 2026', _seed:true },
-    { name:'Piotr W.',  text:'5 lat trenuje i nigdy nie miałem tak dobrze ułożonego planu.', stars:5, goal:'bulk', date:'Mar 2026', _seed:true },
-  ];
+  // Pokaż loading placeholder
+  carousel.innerHTML = '<div style="width:240px;height:120px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;flex-shrink:0;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px">Ładowanie...</div>';
 
-  const user = _getReviews();
-  const all  = [...user, ...seed].slice(0, 12);
+  const user = await _getAllReviews();
+  const all  = [...user, ...REVIEW_SEED].slice(0, 12);
 
   // Statystyki
-  const avg = all.length
+  var avg = all.length
     ? (all.reduce(function(s, r) { return s + r.stars; }, 0) / all.length).toFixed(1)
     : '—';
-  const avgEl   = document.getElementById('review-stat-avg');
-  const cntEl   = document.getElementById('review-stat-count');
+  var avgEl  = document.getElementById('review-stat-avg');
+  var cntEl  = document.getElementById('review-stat-count');
   if (avgEl)  avgEl.textContent  = avg + '/5';
   if (cntEl)  cntEl.textContent  = all.length;
 
   // Karty
   carousel.innerHTML = all.map(function(r, i) {
-    const initials = r.name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
-    const color    = INITIALS_COLORS[i % INITIALS_COLORS.length];
-    const stars    = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
-    const delBtn   = r._seed
-      ? ''
-      : '<button onclick="deleteReview(' + i + ')" '
-        + 'style="position:absolute;top:10px;right:10px;background:none;border:none;'
-        + 'color:var(--muted);font-size:11px;cursor:pointer">✕</button>';
+    var initials = r.name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+    var color    = INITIALS_COLORS[i % INITIALS_COLORS.length];
+    var stars    = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    var isLocal  = !r._seed && !r._remote;
+    var delBtn   = isLocal
+      ? '<button onclick="deleteReview(' + i + ')" style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer">✕</button>'
+      : '';
 
-    return '<div class="review-card step-card" style="padding:18px;position:relative">'
+    return '<div class="review-card step-card">'
       + delBtn
-      + '<div style="display:flex;gap:2px;margin-bottom:8px;color:#f59e0b;font-size:13px">' + stars + '</div>'
-      + '<p style="font-size:13px;line-height:1.6;margin-bottom:12px;color:var(--muted2)">"' + r.text + '"</p>'
-      + '<div style="display:flex;align-items:center;gap:8px;margin-top:auto">'
-      + '<div style="width:30px;height:30px;border-radius:50%;background:' + color
-        + ';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#000;flex-shrink:0">'
-        + initials + '</div>'
-      + '<div>'
-      + '<div style="font-size:12px;font-weight:700">' + r.name + '</div>'
-      + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted)">'
-        + (GOAL_LABELS[r.goal] || '') + ' · ' + r.date + '</div>'
-      + '</div></div></div>';
+      + '<div style="color:#f59e0b;font-size:13px;margin-bottom:8px">' + stars + '</div>'
+      + '<p style="font-size:12px;line-height:1.6;color:var(--muted2);flex:1;margin-bottom:10px">"' + r.text + '"</p>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + '<div style="width:28px;height:28px;border-radius:50%;background:' + color + ';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;color:#000;flex-shrink:0">' + initials + '</div>'
+      + '<div><div style="font-size:11px;font-weight:700">' + r.name + '</div>'
+      + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted)">' + (GOAL_LABELS[r.goal] || '') + ' · ' + r.date + '</div></div>'
+      + '</div></div>';
   }).join('');
 
-  // Przycisk dodania opinii — tylko jeśli plan wygenerowany
-  const btnWrap = document.getElementById('btn-add-review-wrap');
-  if (!btnWrap) return;
+  // Pokaż/ukryj formularz w ustawieniach
+  _updateReviewFormVisibility();
+}
 
-  const hasPlan = !!(localStorage.getItem('fp_answers') && window.__split);
-  if (hasPlan) {
-    btnWrap.innerHTML = '<button id="btn-add-review" onclick="openReviewForm()" '
-      + 'style="width:100%;background:none;border:1px solid var(--border2);color:var(--muted2);'
-      + 'font-family:var(--fd);font-size:14px;font-weight:700;padding:12px;border-radius:4px;cursor:pointer">'
-      + '+ Dodaj swoją opinię</button>';
-  } else {
-    btnWrap.innerHTML = '<div style="font-family:var(--fm);font-size:11px;color:var(--muted);'
-      + 'text-align:center;padding:8px">Wygeneruj plan, aby dodać opinię</div>';
+function _updateReviewFormVisibility() {
+  var locked = document.getElementById('review-settings-locked');
+  var form   = document.getElementById('review-settings-form');
+  if (!locked || !form) return;
+  var hasPlan = !!(window.__split);
+  locked.style.display = hasPlan ? 'none'  : 'block';
+  form.style.display   = hasPlan ? 'block' : 'none';
+}
+
+async function submitReview() {
+  if (!window.__split) {
+    showToast('Wygeneruj plan, aby dodać opinię');
+    return;
   }
+  var name = (document.getElementById('review-name')?.value.trim() || 'Anonim').slice(0, 40);
+  var text = (document.getElementById('review-text')?.value.trim() || '');
+  if (text.length < 10) { showToast('Napisz przynajmniej kilka słów'); return; }
+
+  // Max 1 opinia na 24h
+  var lastTs = parseInt(localStorage.getItem('fp_last_review') || '0');
+  if (Date.now() - lastTs < 24 * 3600000) {
+    showToast('Możesz dodać jedną opinię na 24 godziny');
+    return;
+  }
+
+  var review = {
+    name:   sanitize(name),
+    text:   sanitize(text).slice(0, 300),
+    stars:  _selectedStars,
+    goal:   answers.goal || 'bulk',
+    date:   new Date().toLocaleDateString('pl-PL', { month:'short', year:'numeric' }),
+    ts:     Date.now(),
+    _remote: !!REVIEWS_BLOB_URL,
+  };
+
+  // Zapisz lokalnie
+  var local = _getReviewsLocal();
+  local.unshift(review);
+  if (local.length > 50) local.pop();
+  localStorage.setItem('fp_reviews', JSON.stringify(local));
+  localStorage.setItem('fp_last_review', String(Date.now()));
+
+  // Zapisz zdalnie jeśli skonfigurowane
+  if (REVIEWS_BLOB_URL) {
+    var all = await _getAllReviews();
+    all.unshift({ ...review, _remote: true });
+    if (all.length > 100) all.pop();
+    await _saveReviewsRemote(all);
+    localStorage.removeItem('fp_reviews_cache'); // wyczyść cache
+  }
+
+  // Reset formularza
+  var ni = document.getElementById('review-name');
+  var ti = document.getElementById('review-text');
+  if (ni) ni.value = '';
+  if (ti) ti.value = '';
+  selectStar(5);
+
+  await _renderReviews();
+  showToast('Dziękujemy za opinię! ⭐');
+}
+
+async function deleteReview(idx) {
+  var local = _getReviewsLocal();
+  if (idx >= local.length) return;
+  if (!confirm('Usunąć tę opinię?')) return;
+  local.splice(idx, 1);
+  localStorage.setItem('fp_reviews', JSON.stringify(local));
+  localStorage.removeItem('fp_reviews_cache');
+  await _renderReviews();
+}
+
+function reviewsCarouselScroll(dir) {
+  var c = document.getElementById('reviews-carousel');
+  if (c) c.scrollBy({ left: dir * 270, behavior:'smooth' });
+}
+
+// Init przy starcie
+document.addEventListener('DOMContentLoaded', function() {
+  _renderReviews();
+  _updateReviewFormVisibility();
+});
+if (document.readyState !== 'loading') {
+  _renderReviews();
+  _updateReviewFormVisibility();
 }
 
 function openReviewForm() {
@@ -6305,51 +6464,6 @@ function openReviewForm() {
   if (btn) btn.style.display = 'none';
 }
 
-function submitReview() {
-  // Zabezpieczenie — plan musi być wygenerowany
-  if (!window.__split) {
-    showToast('Wygeneruj plan, aby dodać opinię');
-    return;
-  }
-  const name = document.getElementById('review-name').value.trim() || 'Anonim';
-  const text = document.getElementById('review-text').value.trim();
-  if (!text || text.length < 10) { showToast('Napisz przynajmniej kilka słów'); return; }
-
-  // Zabezpieczenie przed spamem — max 1 opinia na 24h
-  const lastReview = parseInt(localStorage.getItem('fp_last_review') || '0');
-  if (Date.now() - lastReview < 24 * 60 * 60 * 1000) {
-    showToast('Możesz dodać jedną opinię na 24 godziny');
-    return;
-  }
-
-  const reviews = _getReviews();
-  reviews.unshift({
-    name:  sanitize(name).slice(0, 40),
-    text:  sanitize(text).slice(0, 300),
-    stars: _selectedStars,
-    goal:  answers.goal || 'bulk',
-    date:  new Date().toLocaleDateString('pl-PL', { month: 'short', year: 'numeric' }),
-    ts:    Date.now(),
-  });
-  if (reviews.length > 50) reviews.pop();
-  localStorage.setItem('fp_reviews', JSON.stringify(reviews));
-  localStorage.setItem('fp_last_review', String(Date.now()));
-
-  document.getElementById('review-form-wrap').style.display = 'none';
-  document.getElementById('review-name').value = '';
-  document.getElementById('review-text').value = '';
-  _renderReviews();
-  showToast('Dziękujemy za opinię! ⭐');
-}
-
-function deleteReview(idx) {
-  const user = _getReviews();
-  if (idx >= user.length) return;
-  if (!confirm('Usunąć tę opinię?')) return;
-  user.splice(idx, 1);
-  localStorage.setItem('fp_reviews', JSON.stringify(user));
-  _renderReviews();
-}
 // ═══════════════════════════════════════════════
 // PIN SYSTEM
 // ═══════════════════════════════════════════════
@@ -6602,6 +6716,62 @@ function stAddFoodEntry() {
   _renderSettingsKalorie();
   showToast('Dodano: ' + label);
 }
+function deleteBodyEntry(idx) {
+  if (!confirm('Usunąć ten wpis?')) return;
+  const data = _btData();
+  data.splice(idx, 1);
+  _btSave(data);
+  renderBodyTimeline();
+  showToast('Wpis usunięty');
+}
+
+function editBodyEntry(idx) {
+  const data = _btData();
+  const e = data[idx];
+  if (!e) return;
+
+  const ids = ['bt-weight','bt-waist','bt-chest','bt-bicep','bt-note'];
+  const vals = [e.weight, e.waist, e.chest, e.bicep, e.note];
+  ids.forEach(function(id, i) {
+    const el = document.getElementById(id);
+    if (el) el.value = vals[i] || '';
+  });
+
+  const btn = document.querySelector('#stab-progress .bt-save-btn');
+  if (!btn) return;
+  const origText   = btn.textContent;
+  const origClick  = btn.onclick;
+
+  btn.textContent = '✓ Zaktualizuj pomiar';
+  btn.style.background = 'var(--accent3)';
+
+  btn.onclick = function() {
+    const weight = vNum(document.getElementById('bt-weight').value, 'weight');
+    if (weight === null) return;
+
+    data[idx] = {
+      date:   e.date,
+      ts:     e.ts,
+      weight: weight,
+      waist:  parseFloat(document.getElementById('bt-waist').value)  || null,
+      chest:  parseFloat(document.getElementById('bt-chest').value)  || null,
+      bicep:  parseFloat(document.getElementById('bt-bicep').value)  || null,
+      note:   document.getElementById('bt-note').value.trim(),
+    };
+    _btSave(data);
+    ids.forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    btn.textContent = origText;
+    btn.style.background = '';
+    btn.onclick = origClick;
+    renderBodyTimeline();
+    showToast('Pomiar zaktualizowany ✓');
+  };
+
+  document.querySelector('.bt-form')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 </script>
 <!-- ═══════════════════════════════════════════════
      SETTINGS PANEL
@@ -6696,6 +6866,33 @@ function stAddFoodEntry() {
       <span class="settings-row-value" id="storage-size">—</span>
     </div>
   </div>
+  <!-- OPINIA -->
+  <div class="settings-section" style="margin-top:14px" id="review-settings-wrap">
+    <div class="settings-section-title">Zostaw opinię</div>
+    <div id="review-settings-locked" style="padding:10px 16px 12px;font-size:13px;color:var(--muted2)">
+      Wygeneruj plan, aby dodać opinię.
+    </div>
+    <div id="review-settings-form" style="display:none;padding:0 16px 14px">
+      <div id="star-select" style="display:flex;gap:3px;margin-bottom:10px">
+        <span onclick="selectStar(1)" data-star="1" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
+        <span onclick="selectStar(2)" data-star="2" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
+        <span onclick="selectStar(3)" data-star="3" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
+        <span onclick="selectStar(4)" data-star="4" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
+        <span onclick="selectStar(5)" data-star="5" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
+      </div>
+      <input type="text" id="review-name" placeholder="Imię (opcjonalnie)"
+        style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);
+               font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;
+               outline:none;margin-bottom:8px;box-sizing:border-box"
+        onfocus="this.style.borderColor='var(--accent)'"
+        onblur="this.style.borderColor='var(--border2)'">
+      <textarea id="review-text" placeholder="Twoja opinia (min. 10 znaków)..." rows="3"
+        style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);
+               font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;
+               outline:none;resize:none;margin-bottom:8px;box-sizing:border-box"></textarea>
+      <button onclick="submitReview()" class="bt-save-btn">Wyślij opinię ⭐</button>
+    </div>
+  </div>
 
   <button class="settings-danger-btn" onclick="confirmReset()" style="margin-top:14px">
     Usuń wszystkie dane
@@ -6769,27 +6966,6 @@ function stAddFoodEntry() {
                font-size:15px;font-weight:800;padding:10px;border-radius:4px;cursor:pointer">
         + Dodaj
       </button>
-    </div>
-    <!-- Ręczne dodawanie -->
-    <div style="padding:0 10px 10px;border-top:1px solid var(--border);margin-top:4px">
-      <div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;
-                  margin:8px 0 6px">Lub wpisz ręcznie</div>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="st-cal-name" placeholder="Nazwa"
-          style="flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);
-                 font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;outline:none"
-          onfocus="this.style.borderColor='var(--accent)'"
-          onblur="this.style.borderColor='var(--border2)'">
-        <input type="number" id="st-cal-kcal" placeholder="kcal" min="1" max="5000"
-          style="width:68px;background:var(--bg);border:1px solid var(--border2);color:var(--text);
-                 font-family:var(--fd);font-size:15px;font-weight:800;padding:8px;border-radius:4px;
-                 outline:none;text-align:center"
-          onfocus="this.style.borderColor='var(--accent)'"
-          onblur="this.style.borderColor='var(--border2)'">
-        <button onclick="stQuickCalAdd()"
-          style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;
-                 font-weight:800;padding:8px 14px;border-radius:4px;cursor:pointer">+</button>
-      </div>
     </div>
     <div style="padding:0 10px 10px">
       <button onclick="closeSettings();setTimeout(()=>navOpenCalories(),200)"
