@@ -360,13 +360,14 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   box-shadow:0 -20px 60px rgba(0,0,0,.6);
 }
 @media(max-width:768px){
+  .cal-panel{
+    padding-bottom:0;
+    align-items:flex-end
+  }
   .cal-panel-inner{
     border-radius:12px 12px 0 0;
-    max-height:calc(100vh - 60px - env(safe-area-inset-bottom));
-    padding-bottom:env(safe-area-inset-bottom)
-  }
-  .cal-panel{
-    padding-bottom:calc(60px + env(safe-area-inset-bottom))
+    max-height:calc(100vh - 60px);
+    padding-bottom:calc(8px + env(safe-area-inset-bottom))
   }
 }
 .cal-panel-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
@@ -2874,6 +2875,14 @@ function renderPlan() {
   const chatFab = document.getElementById('chat-fab');
   if (chatFab) chatFab.classList.add('visible');
   setTimeout(startOnboarding, 800);
+
+  // Auto-scroll do dzisiejszego dnia
+  setTimeout(function() {
+    var todayCard = document.querySelector('.day-card.today');
+    if (todayCard) {
+      todayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 250);
 }
 
 // ═══════════════════════════════════════════════
@@ -3538,7 +3547,7 @@ async function callAnthropic(body) {
     contents.push({ role: 'user', parts: [{ text: 'Odpowiedz.' }] });
   }
 
-  const res = await fetch('/.netlify/functions/ai', {
+  const res = await fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -6411,13 +6420,10 @@ function _renderAnalysisResult(text) {
 function openSettings() {
   document.getElementById('settings-overlay').classList.add('open');
   _updateStorageSize();
-  // Renderuj Body Timeline jeśli zakładka postępy była aktywna
   const activeTab = document.querySelector('.stab.active')?.dataset?.tab;
   if (activeTab === 'progress') renderBodyTimeline();
-  // Pokaż/ukryj przycisk usunięcia PIN
   const pinRow = document.getElementById('pin-remove-row');
   if (pinRow) pinRow.style.display = _pinSaved() ? 'flex' : 'none';
-  // Aktualizuj profil tab
   const pn = document.getElementById('st-profile-plan-name');
   const pg = document.getElementById('st-profile-goal');
   const ps = document.getElementById('pin-status');
@@ -6427,6 +6433,8 @@ function openSettings() {
   if (pg) pg.textContent = D2.glabs?.[D2.goal] || '—';
   if (ps) ps.textContent = _pinSaved() ? '🔒 PIN aktywny' : '🔓 Brak PINu';
   if (pr) pr.style.display = _pinSaved() ? 'flex' : 'none';
+  // KLUCZOWE: pokaż/ukryj formularz opinii
+  _updateReviewFormVisibility();
 }
 
 function closeSettings() {
@@ -6751,7 +6759,21 @@ async function submitReview() {
     return;
   }
 
-  // Max 1 opinia na 24h
+  // ID urządzenia — generujemy raz i zapisujemy na zawsze
+  var deviceId = localStorage.getItem('fp_device_id');
+  if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('fp_device_id', deviceId);
+  }
+
+  // Sprawdź czy to urządzenie już dodało opinię
+  var deviceReviewed = localStorage.getItem('fp_device_reviewed');
+  if (deviceReviewed === '1') {
+    showToast('Z tego urządzenia już dodano opinię. Dziękujemy! ⭐');
+    return;
+  }
+
+  // Dodatkowy limit 24h (backup)
   var lastTs = parseInt(localStorage.getItem('fp_last_review') || '0');
   if (Date.now() - lastTs < 24 * 3600000) {
     showToast('Możesz dodać jedną opinię na 24 godziny');
@@ -6775,7 +6797,8 @@ async function deleteReview(idx) {
   if (!confirm('Usunąć tę opinię?')) return;
   local.splice(idx, 1);
   localStorage.setItem('fp_reviews', JSON.stringify(local));
-  localStorage.removeItem('fp_reviews_cache');
+  localStorage.setItem('fp_last_review', String(Date.now()));
+  localStorage.setItem('fp_device_reviewed', '1'); // blokada per urządzenie
   await _renderReviews();
 }
 
@@ -7318,13 +7341,13 @@ function editBodyEntry(idx) {
       <div class="bt-form">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
     <div class="bt-field"><label>Waga kg</label>
-      <input type="number" id="bt-weight" placeholder="75" step="0.1" inputmode="decimal"></div>
+      <input type="number" id="bt-weight" placeholder="75" step="0.1" inputmode="decimal" autocomplete="off"></div>
     <div class="bt-field"><label>Pas cm</label>
-      <input type="number" id="bt-waist"  placeholder="82" step="0.5" inputmode="decimal"></div>
+      <input type="number" id="bt-waist"  placeholder="82" step="0.5" inputmode="decimal" autocomplete="off"></div>
     <div class="bt-field"><label>Klatka cm</label>
-      <input type="number" id="bt-chest"  placeholder="100" step="0.5" inputmode="decimal"></div>
-    <div class="bt-field"><label>Bicep cm</label>
-      <input type="number" id="bt-bicep"  placeholder="36" step="0.5" inputmode="decimal"></div>
+      <input type="number" id="bt-chest"  placeholder="100" step="0.5" inputmode="decimal" autocomplete="off"></div>
+    <div class="bt-field"><label>Biceps cm</label>
+      <input type="number" id="bt-bicep"  placeholder="36" step="0.5" inputmode="decimal" autocomplete="off"></div>
   </div>
   <input type="text" id="bt-note" class="bt-note-input" placeholder="Notatka (opcjonalnie)..." style="margin-bottom:8px">
   <button class="bt-save-btn" onclick="logBodyMeasurement()">Zapisz pomiar</button>
