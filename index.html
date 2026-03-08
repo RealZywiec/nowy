@@ -735,14 +735,21 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 /* ── CHATBOT ── */
 .chat-fab {
   position:fixed;bottom:90px;right:20px;z-index:900;
-  width:52px;height:52px;border-radius:50%;border:none;
-  background:var(--accent);color:#000;font-size:22px;
-  cursor:pointer;box-shadow:0 4px 20px rgba(200,255,0,.4);
+  width:56px;height:56px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;font-size:24px;
+  cursor:pointer;
+  box-shadow:0 4px 24px rgba(99,102,241,.55), 0 0 0 0 rgba(99,102,241,.3);
   display:none;align-items:center;justify-content:center;
   transition:.2s;
+  animation:fabPulse 3s infinite;
+}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 4px 24px rgba(99,102,241,.55),0 0 0 0 rgba(99,102,241,.3)}
+  50%{box-shadow:0 4px 24px rgba(99,102,241,.55),0 0 0 8px rgba(99,102,241,0)}
 }
 .chat-fab.visible{display:flex}
-.chat-fab:hover{transform:scale(1.08);background:#fff}
+.chat-fab:hover{transform:scale(1.1);background:linear-gradient(135deg,#4f46e5,#7c3aed)}
 .chat-panel{position:fixed;bottom:0;right:0;z-index:700;width:min(400px,100vw);background:var(--bg2);border-left:1px solid var(--border2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;display:flex;flex-direction:column;transform:translateY(105%);opacity:0;visibility:hidden;pointer-events:none;transition:.3s cubic-bezier(.4,0,.2,1);box-shadow:-6px -6px 40px rgba(0,0,0,.5)}
 .chat-panel.open{transform:translateY(0);opacity:1;visibility:visible;pointer-events:all}
 .chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -1550,24 +1557,6 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   </div>
 
   <div id="btn-add-review-wrap" style="margin-top:12px"></div>
-</div>
-
-  <!-- Social proof bar -->
-  <div style="display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:8px">
-    <div style="text-align:center">
-      <div style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">0/5</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Średnia ocen</div>
-    </div>
-    <div style="text-align:center">
-      <div style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">3</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Wygenerowanych planów</div>
-    </div>
-    <div style="text-align:center">
-      <div style="font-family:var(--fd);font-size:36px;font-weight:900;color:var(--accent)">0%</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Wraca po 30 dniach</div>
-    </div>
-  </div>
-</div>
 
   <!-- FAQ -->
   <div class="faq-wrap">
@@ -1799,7 +1788,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </div>
 
 <!-- CHAT FAB -->
-<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny" style="display:none">🤖</button>
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny" style="display:none">💬</button>
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -4901,7 +4890,329 @@ const FOOD_DB=[
 {n:'Popcorn solony',             kcal:387, p:13, c:78,  f:4.5, s:30,  pn:'porcja'},
 {n:'Miód',                       kcal:304, p:0.3,c:82,  f:0,   s:21,  pn:'łyżka'},
 {n:'Dżem truskawkowy',           kcal:250, p:0.5,c:63,  f:0.1, s:20,  pn:'łyżka'},
+// ── MIĘSA i DRÓB dodatkowe ──
+{n:'Kurczak gotowany',           kcal:165, p:31,  c:0,   f:3.6, s:100, pn:'100g'},
+{n:'Kurczak smażony w oleju',    kcal:219, p:25,  c:0,   f:13,  s:100, pn:'100g'},
+{n:'Pierś z indyka',             kcal:104, p:22,  c:0,   f:1.6, s:100, pn:'100g'},
+{n:'Udziec z indyka',            kcal:145, p:21,  c:0,   f:6.5, s:100, pn:'100g'},
+{n:'Wołowina mielona 20% tł.',   kcal:254, p:21,  c:0,   f:18,  s:100, pn:'100g'},
+{n:'Wołowina mielona 5% tł.',    kcal:137, p:22,  c:0,   f:5,   s:100, pn:'100g'},
+{n:'Stek wołowy (ribeye)',        kcal:291, p:24,  c:0,   f:21,  s:100, pn:'100g'},
+{n:'Stek wołowy (polędwica)',     kcal:207, p:26,  c:0,   f:11,  s:100, pn:'100g'},
+{n:'Stek wołowy (rostbef)',       kcal:218, p:27,  c:0,   f:12,  s:100, pn:'100g'},
+{n:'Schab wieprzowy',             kcal:121, p:22,  c:0,   f:3.3, s:100, pn:'100g'},
+{n:'Karkówka wieprzowa',          kcal:258, p:17,  c:0,   f:21,  s:100, pn:'100g'},
+{n:'Żeberka wieprzowe',           kcal:277, p:19,  c:0,   f:22,  s:100, pn:'100g'},
+{n:'Boczek surowy',               kcal:417, p:12,  c:0,   f:41,  s:30,  pn:'plaster'},
+{n:'Boczek gotowany',             kcal:218, p:18,  c:0,   f:16,  s:30,  pn:'plaster'},
+{n:'Polędwica wołowa',            kcal:163, p:28,  c:0,   f:5.3, s:100, pn:'100g'},
+{n:'Antrykot wołowy',             kcal:250, p:25,  c:0,   f:17,  s:100, pn:'100g'},
+{n:'Kaczka (pierś bez skóry)',    kcal:140, p:23,  c:0,   f:5,   s:100, pn:'100g'},
+{n:'Jagnięcina (łopatka)',        kcal:235, p:20,  c:0,   f:17,  s:100, pn:'100g'},
+{n:'Cielęcina (gulaszowa)',        kcal:150, p:24,  c:0,   f:6,   s:100, pn:'100g'},
+{n:'Kiełbasa śląska',             kcal:314, p:14,  c:2,   f:28,  s:100, pn:'100g'},
+{n:'Kiełbasa kabanos',             kcal:412, p:22,  c:2,   f:36,  s:50,  pn:'szt'},
+{n:'Parówki wieprzowe',            kcal:290, p:12,  c:2,   f:26,  s:50,  pn:'szt'},
+{n:'Szynka gotowana (chuda)',      kcal:107, p:17,  c:1.5, f:4,   s:30,  pn:'plaster'},
+{n:'Salami',                       kcal:425, p:18,  c:2,   f:39,  s:30,  pn:'5 plastrów'},
+{n:'Pepperoni',                    kcal:494, p:20,  c:2,   f:45,  s:30,  pn:'5 plastrów'},
+{n:'Pasztet wieprzowy',            kcal:265, p:13,  c:4,   f:22,  s:50,  pn:'porcja'},
+{n:'Wątroba wołowa',              kcal:135, p:21,  c:4,   f:3.8, s:100, pn:'100g'},
+{n:'Wątroba drobiowa',            kcal:119, p:17,  c:0.8, f:4.8, s:100, pn:'100g'},
+
+// ── RYBY i OWOCE MORZA dodatkowe ──
+{n:'Dorsz gotowany',              kcal:105, p:23,  c:0,   f:1,   s:100, pn:'100g'},
+{n:'Dorsz pieczony',              kcal:116, p:25,  c:0,   f:1.5, s:100, pn:'100g'},
+{n:'Halibut',                     kcal:116, p:23,  c:0,   f:2.3, s:100, pn:'100g'},
+{n:'Pstrąg tęczowy',              kcal:148, p:22,  c:0,   f:6.6, s:100, pn:'100g'},
+{n:'Pstrąg pieczony',             kcal:180, p:27,  c:0,   f:8,   s:100, pn:'100g'},
+{n:'Sandacz',                     kcal:84,  p:19,  c:0,   f:0.8, s:100, pn:'100g'},
+{n:'Mintaj',                      kcal:82,  p:18,  c:0,   f:0.9, s:100, pn:'100g'},
+{n:'Karmazyn',                    kcal:109, p:22,  c:0,   f:2.4, s:100, pn:'100g'},
+{n:'Flądra',                      kcal:91,  p:19,  c:0,   f:1.5, s:100, pn:'100g'},
+{n:'Łosoś wędzony',               kcal:117, p:18,  c:0,   f:4.3, s:50,  pn:'porcja'},
+{n:'Makrela wędzona',             kcal:305, p:19,  c:0,   f:25,  s:100, pn:'100g'},
+{n:'Śledź solony',                kcal:158, p:16,  c:0,   f:10,  s:100, pn:'100g'},
+{n:'Śledź marynowany',            kcal:190, p:14,  c:5,   f:13,  s:100, pn:'100g'},
+{n:'Szprotki w oleju (puszka)',   kcal:208, p:17,  c:0,   f:15,  s:90,  pn:'puszka'},
+{n:'Tuńczyk w wodzie (puszka)',   kcal:109, p:25,  c:0,   f:0.6, s:160, pn:'puszka'},
+{n:'Tuńczyk w oleju (puszka)',    kcal:198, p:23,  c:0,   f:11,  s:160, pn:'puszka'},
+{n:'Sardynki w pomidorach',       kcal:151, p:15,  c:4,   f:8,   s:120, pn:'puszka'},
+{n:'Krewetki gotowane',           kcal:99,  p:21,  c:0.9, f:1.1, s:100, pn:'100g'},
+{n:'Krewetki smażone',            kcal:135, p:19,  c:3,   f:5,   s:100, pn:'100g'},
+{n:'Kalmary',                     kcal:92,  p:16,  c:3.1, f:1.4, s:100, pn:'100g'},
+{n:'Małże gotowane',              kcal:172, p:24,  c:7,   f:4.5, s:100, pn:'100g'},
+{n:'Ostrygi',                     kcal:69,  p:8,   c:3.9, f:2.5, s:6,   pn:'6 szt'},
+{n:'Rak gotowany',                kcal:77,  p:16,  c:0,   f:1,   s:100, pn:'100g'},
+{n:'Łosoś z puszki',              kcal:142, p:20,  c:0,   f:6,   s:200, pn:'puszka'},
+{n:'Anchois w oleju',             kcal:210, p:29,  c:0,   f:10,  s:30,  pn:'porcja'},
+
+// ── NABIAŁ dodatkowy ──
+{n:'Twaróg półtłusty',            kcal:105, p:15,  c:3,   f:4,   s:100, pn:'100g'},
+{n:'Twaróg chudy',                kcal:72,  p:15,  c:1.4, f:0.4, s:100, pn:'100g'},
+{n:'Twaróg tłusty',               kcal:168, p:13,  c:2.4, f:12,  s:100, pn:'100g'},
+{n:'Quark (twarożek 0%)',         kcal:59,  p:12,  c:3.2, f:0.2, s:100, pn:'100g'},
+{n:'Mascarpone',                  kcal:429, p:7,   c:4,   f:43,  s:30,  pn:'łyżka'},
+{n:'Ricotta',                     kcal:174, p:11,  c:3,   f:13,  s:100, pn:'100g'},
+{n:'Mozzarella light',            kcal:171, p:19,  c:1,   f:10,  s:100, pn:'100g'},
+{n:'Brie',                        kcal:334, p:21,  c:0.5, f:28,  s:30,  pn:'plaster'},
+{n:'Camembert',                   kcal:300, p:20,  c:0.5, f:24,  s:30,  pn:'plaster'},
+{n:'Gouda',                       kcal:356, p:25,  c:2.2, f:27,  s:30,  pn:'plaster'},
+{n:'Edam',                        kcal:357, p:25,  c:1.4, f:27,  s:30,  pn:'plaster'},
+{n:'Cheddar',                     kcal:403, p:25,  c:1.3, f:33,  s:30,  pn:'plaster'},
+{n:'Parmezan',                    kcal:431, p:38,  c:3.2, f:29,  s:15,  pn:'łyżka'},
+{n:'Feta',                        kcal:264, p:14,  c:4,   f:21,  s:30,  pn:'porcja'},
+{n:'Mleko 0,5%',                  kcal:38,  p:3.5, c:5,   f:0.5, s:250, pn:'szklanka'},
+{n:'Mleko 3,2%',                  kcal:60,  p:3.2, c:4.7, f:3.2, s:250, pn:'szklanka'},
+{n:'Mleko owsiane',               kcal:46,  p:1,   c:7,   f:1.5, s:250, pn:'szklanka'},
+{n:'Mleko migdałowe (bez cukru)', kcal:13,  p:0.4, c:0.3, f:1.1, s:250, pn:'szklanka'},
+{n:'Mleko kokosowe (puszka)',     kcal:230, p:2.3, c:3.3, f:24,  s:100, pn:'100ml'},
+{n:'Napój sojowy',                kcal:33,  p:3,   c:1.5, f:1.6, s:250, pn:'szklanka'},
+{n:'Jogurt islandzki skyr 0%',    kcal:63,  p:11,  c:4,   f:0.2, s:150, pn:'porcja'},
+{n:'Jogurt bałkański',            kcal:100, p:5,   c:4.8, f:7,   s:150, pn:'porcja'},
+{n:'Maślanka',                    kcal:40,  p:3.5, c:4.8, f:0.9, s:250, pn:'szklanka'},
+{n:'Kefir 2%',                    kcal:52,  p:3.5, c:5,   f:2,   s:250, pn:'szklanka'},
+{n:'Śmietana 18%',                kcal:181, p:3,   c:3.6, f:18,  s:30,  pn:'łyżka'},
+{n:'Śmietana 30%',                kcal:292, p:2.2, c:3,   f:30,  s:30,  pn:'łyżka'},
+{n:'Śmietanka do kawy 12%',       kcal:118, p:3,   c:4,   f:10,  s:30,  pn:'łyżka'},
+{n:'Masło klarowane (ghee)',       kcal:900, p:0,   c:0,   f:99,  s:10,  pn:'łyżeczka'},
+{n:'Serek homogenizowany wanilia',kcal:125, p:9,   c:15,  f:3,   s:100, pn:'100g'},
+{n:'Białko jaja (samo)',           kcal:52,  p:11,  c:0.7, f:0.2, s:100, pn:'100g'},
+{n:'Żółtko jaja',                  kcal:322, p:16,  c:3.6, f:27,  s:18,  pn:'szt'},
+
+// ── ZBOŻA i PIECZYWO dodatkowe ──
+{n:'Kasza gryczana gotowana',     kcal:92,  p:3.4, c:20,  f:0.6, s:100, pn:'100g'},
+{n:'Kasza bulgur gotowana',       kcal:83,  p:3,   c:18,  f:0.2, s:100, pn:'100g'},
+{n:'Kasza pęczak gotowany',       kcal:123, p:3.5, c:28,  f:0.4, s:100, pn:'100g'},
+{n:'Kasza manna',                 kcal:360, p:10,  c:75,  f:1,   s:40,  pn:'porcja'},
+{n:'Kasza kuskus gotowana',       kcal:112, p:3.8, c:23,  f:0.2, s:100, pn:'100g'},
+{n:'Ryż basmati gotowany',        kcal:121, p:2.7, c:25,  f:0.4, s:100, pn:'100g'},
+{n:'Ryż brązowy gotowany',        kcal:111, p:2.6, c:23,  f:0.9, s:100, pn:'100g'},
+{n:'Ryż dziki',                   kcal:101, p:4,   c:21,  f:0.3, s:100, pn:'100g'},
+{n:'Ryż jaśminowy',               kcal:129, p:2.5, c:28,  f:0.3, s:100, pn:'100g'},
+{n:'Tortilla pszenna (20cm)',     kcal:218, p:5.8, c:37,  f:5.4, s:50,  pn:'szt'},
+{n:'Tortilla pełnoziarnista',     kcal:195, p:6,   c:35,  f:4.5, s:50,  pn:'szt'},
+{n:'Pita',                        kcal:265, p:9,   c:55,  f:1.2, s:60,  pn:'szt'},
+{n:'Bagietka',                    kcal:263, p:9,   c:51,  f:1.5, s:60,  pn:'kawałek'},
+{n:'Chleb żytni razowy',          kcal:206, p:7,   c:41,  f:1.8, s:40,  pn:'kromka'},
+{n:'Chleb pszenny zwykły',        kcal:239, p:8,   c:46,  f:2,   s:40,  pn:'kromka'},
+{n:'Chleb graham',                kcal:218, p:8.5, c:42,  f:2.5, s:40,  pn:'kromka'},
+{n:'Chleb pumpernikiel',          kcal:218, p:8,   c:45,  f:1.3, s:40,  pn:'kromka'},
+{n:'Bułka kajzerka',              kcal:270, p:9,   c:53,  f:2,   s:50,  pn:'szt'},
+{n:'Mąka pszenna typ 500',        kcal:364, p:10,  c:76,  f:1,   s:30,  pn:'łyżka'},
+{n:'Mąka owsiana',                kcal:379, p:13,  c:66,  f:7,   s:30,  pn:'łyżka'},
+{n:'Płatki owsiane górskie',      kcal:366, p:13,  c:63,  f:7,   s:50,  pn:'porcja'},
+{n:'Musli bez cukru',             kcal:350, p:9,   c:58,  f:8,   s:50,  pn:'porcja'},
+{n:'Granola (z miodem)',          kcal:421, p:9,   c:67,  f:13,  s:50,  pn:'porcja'},
+{n:'Corn flakes',                 kcal:357, p:8,   c:78,  f:0.8, s:30,  pn:'porcja'},
+{n:'Ryż dmuchany (cakes)',        kcal:387, p:8,   c:83,  f:1,   s:10,  pn:'1 krążek'},
+{n:'Wafle ryżowe',                kcal:391, p:7,   c:84,  f:1.1, s:9,   pn:'1 szt'},
+{n:'Makaron soba',                kcal:99,  p:5,   c:21,  f:0.1, s:100, pn:'100g'},
+{n:'Makaron udon',                kcal:132, p:4,   c:28,  f:0.5, s:100, pn:'100g'},
+{n:'Makaron ryżowy',              kcal:109, p:2,   c:25,  f:0.2, s:100, pn:'100g'},
+{n:'Gnocchi gotowane',            kcal:130, p:3,   c:28,  f:0.6, s:100, pn:'100g'},
+{n:'Owies błyskawiczny',          kcal:363, p:12,  c:62,  f:7,   s:40,  pn:'porcja'},
+
+// ── WARZYWA dodatkowe ──
+{n:'Brokuły gotowane',            kcal:35,  p:2.4, c:7,   f:0.4, s:100, pn:'100g'},
+{n:'Brokuły surowe',              kcal:34,  p:2.8, c:7,   f:0.4, s:100, pn:'100g'},
+{n:'Kalafior gotowany',           kcal:23,  p:1.8, c:4.5, f:0.3, s:100, pn:'100g'},
+{n:'Kapusta kiszona',             kcal:19,  p:0.9, c:4,   f:0.1, s:100, pn:'100g'},
+{n:'Kapusta biała surowa',        kcal:25,  p:1.3, c:5.8, f:0.1, s:100, pn:'100g'},
+{n:'Kapusta czerwona',            kcal:31,  p:1.5, c:7,   f:0.2, s:100, pn:'100g'},
+{n:'Kapusta pekińska',            kcal:16,  p:1.2, c:3.2, f:0.2, s:100, pn:'100g'},
+{n:'Jarmuż',                      kcal:49,  p:4.3, c:9,   f:0.9, s:100, pn:'100g'},
+{n:'Sałata masłowa',              kcal:13,  p:1.4, c:2.2, f:0.2, s:100, pn:'100g'},
+{n:'Sałata lodowa',               kcal:14,  p:1,   c:3,   f:0.2, s:100, pn:'100g'},
+{n:'Rukola',                      kcal:25,  p:2.6, c:3.6, f:0.7, s:100, pn:'100g'},
+{n:'Szpinak gotowany',            kcal:23,  p:3,   c:3.8, f:0.3, s:100, pn:'100g'},
+{n:'Szpinak mrożony',             kcal:22,  p:2.8, c:3.4, f:0.4, s:100, pn:'100g'},
+{n:'Boćwina (liście buraka)',     kcal:19,  p:1.8, c:3.7, f:0.1, s:100, pn:'100g'},
+{n:'Seler naciowy',               kcal:16,  p:0.7, c:3,   f:0.2, s:100, pn:'100g'},
+{n:'Seler korzeniowy',            kcal:42,  p:1.5, c:9.2, f:0.3, s:100, pn:'100g'},
+{n:'Por',                         kcal:61,  p:1.5, c:14,  f:0.3, s:100, pn:'100g'},
+{n:'Pietruszka korzeń',           kcal:55,  p:2.1, c:12,  f:0.4, s:100, pn:'100g'},
+{n:'Pietruszka natka',            kcal:36,  p:3,   c:6,   f:0.8, s:15,  pn:'garść'},
+{n:'Koper świeży',                kcal:43,  p:3.5, c:7,   f:1.1, s:15,  pn:'garść'},
+{n:'Rzodkiewka',                  kcal:16,  p:0.7, c:3.4, f:0.1, s:100, pn:'100g'},
+{n:'Burak gotowany',              kcal:44,  p:1.7, c:10,  f:0.2, s:100, pn:'100g'},
+{n:'Burak surowy',                kcal:43,  p:1.6, c:10,  f:0.2, s:100, pn:'100g'},
+{n:'Dynia hokkaido',              kcal:40,  p:1.4, c:9,   f:0.2, s:100, pn:'100g'},
+{n:'Dynia piżmowa',               kcal:45,  p:1,   c:12,  f:0.1, s:100, pn:'100g'},
+{n:'Kabaczek',                    kcal:18,  p:1.2, c:3.5, f:0.2, s:100, pn:'100g'},
+{n:'Ogórek kiszony',              kcal:15,  p:0.7, c:3,   f:0.2, s:100, pn:'100g'},
+{n:'Papryka zielona',             kcal:26,  p:0.9, c:6,   f:0.3, s:100, pn:'100g'},
+{n:'Papryka żółta',               kcal:27,  p:1,   c:6.3, f:0.2, s:100, pn:'100g'},
+{n:'Chili świeże',                kcal:40,  p:1.9, c:9,   f:0.4, s:15,  pn:'szt'},
+{n:'Pomidor suszony',             kcal:258, p:14,  c:56,  f:3,   s:30,  pn:'porcja'},
+{n:'Pomidor z puszki (krojony)',  kcal:24,  p:1.2, c:5,   f:0.2, s:400, pn:'puszka'},
+{n:'Kukurydza z puszki',          kcal:86,  p:3,   c:19,  f:1.2, s:100, pn:'100g'},
+{n:'Szparagi',                    kcal:20,  p:2.2, c:3.9, f:0.1, s:100, pn:'100g'},
+{n:'Karczoch gotowany',           kcal:53,  p:3.3, c:12,  f:0.2, s:100, pn:'100g'},
+{n:'Brukselka gotowana',          kcal:36,  p:2.6, c:7.1, f:0.5, s:100, pn:'100g'},
+{n:'Bataty (słodkie ziemniaki)',  kcal:86,  p:1.6, c:20,  f:0.1, s:100, pn:'100g'},
+{n:'Bataty pieczone',             kcal:90,  p:2,   c:21,  f:0.2, s:100, pn:'100g'},
+{n:'Ziemniaki gotowane',          kcal:87,  p:1.9, c:20,  f:0.1, s:150, pn:'szt'},
+{n:'Ziemniaki pieczone',          kcal:93,  p:2.5, c:21,  f:0.1, s:150, pn:'szt'},
+{n:'Frytki pieczone (oven)',      kcal:149, p:2.5, c:28,  f:3.5, s:100, pn:'100g'},
+{n:'Frytki smażone',              kcal:312, p:3.4, c:41,  f:15,  s:100, pn:'100g'},
+{n:'Puree ziemniaczane (instant)',kcal:359, p:8,   c:80,  f:0.5, s:26,  pn:'porcja'},
+{n:'Tofu twarde',                 kcal:76,  p:8,   c:1.9, f:4.2, s:100, pn:'100g'},
+{n:'Tofu jedwabiste',             kcal:55,  p:5,   c:2,   f:2.7, s:100, pn:'100g'},
+{n:'Tempeh',                      kcal:193, p:19,  c:9,   f:11,  s:100, pn:'100g'},
+{n:'Seitan',                      kcal:370, p:75,  c:14,  f:2,   s:100, pn:'100g'},
+
+// ── OWOCE dodatkowe ──
+{n:'Grejpfrut',                   kcal:42,  p:0.8, c:11,  f:0.1, s:250, pn:'szt'},
+{n:'Mandarynka',                  kcal:53,  p:0.8, c:13,  f:0.3, s:70,  pn:'szt'},
+{n:'Cytryna (sok)',               kcal:22,  p:0.4, c:6.9, f:0.2, s:50,  pn:'sok z 1 szt'},
+{n:'Limonka (sok)',               kcal:25,  p:0.4, c:8,   f:0.1, s:50,  pn:'sok z 1 szt'},
+{n:'Wiśnie',                      kcal:63,  p:1,   c:16,  f:0.3, s:100, pn:'100g'},
+{n:'Czereśnie',                   kcal:63,  p:1.1, c:16,  f:0.2, s:100, pn:'100g'},
+{n:'Śliwki',                      kcal:46,  p:0.7, c:11,  f:0.3, s:100, pn:'100g'},
+{n:'Śliwki suszone',              kcal:240, p:2.2, c:64,  f:0.4, s:30,  pn:'5 szt'},
+{n:'Morele',                      kcal:48,  p:1.4, c:11,  f:0.4, s:60,  pn:'szt'},
+{n:'Morele suszone',              kcal:241, p:3.4, c:63,  f:0.5, s:30,  pn:'5 szt'},
+{n:'Daktyle suszone',             kcal:282, p:2.5, c:75,  f:0.4, s:30,  pn:'5 szt'},
+{n:'Figi świeże',                 kcal:74,  p:0.8, c:19,  f:0.3, s:50,  pn:'szt'},
+{n:'Figi suszone',                kcal:249, p:3.3, c:63,  f:0.9, s:30,  pn:'3 szt'},
+{n:'Rodzynki',                    kcal:299, p:3.1, c:79,  f:0.5, s:30,  pn:'garść'},
+{n:'Żurawina suszona',            kcal:308, p:0.1, c:82,  f:1.4, s:30,  pn:'garść'},
+{n:'Papaja',                      kcal:43,  p:0.5, c:11,  f:0.3, s:100, pn:'100g'},
+{n:'Guawa',                       kcal:68,  p:2.6, c:14,  f:1,   s:100, pn:'100g'},
+{n:'Liczi',                       kcal:66,  p:0.8, c:17,  f:0.4, s:100, pn:'100g'},
+{n:'Kokos (miąższ świeży)',       kcal:354, p:3.3, c:15,  f:33,  s:30,  pn:'kawałek'},
+{n:'Nektaryna',                   kcal:44,  p:1.1, c:10,  f:0.3, s:140, pn:'szt'},
+{n:'Brzoskwinia',                 kcal:39,  p:0.9, c:9.5, f:0.3, s:150, pn:'szt'},
+{n:'Pigwa',                       kcal:57,  p:0.4, c:15,  f:0.1, s:100, pn:'100g'},
+{n:'Jeżyny',                      kcal:43,  p:1.4, c:10,  f:0.5, s:100, pn:'100g'},
+{n:'Porzeczki czarne',            kcal:63,  p:1.4, c:15,  f:0.4, s:100, pn:'100g'},
+{n:'Porzeczki czerwone',          kcal:56,  p:1.4, c:14,  f:0.2, s:100, pn:'100g'},
+{n:'Agrest',                      kcal:44,  p:0.9, c:10,  f:0.6, s:100, pn:'100g'},
+
+// ── ROŚLINY STRĄCZKOWE dodatkowe ──
+{n:'Soczewica czerwona gotowana', kcal:116, p:9,   c:20,  f:0.4, s:100, pn:'100g'},
+{n:'Soczewica zielona gotowana',  kcal:116, p:9,   c:20,  f:0.4, s:100, pn:'100g'},
+{n:'Fasola biała gotowana',       kcal:139, p:9,   c:25,  f:0.5, s:100, pn:'100g'},
+{n:'Fasola czarna gotowana',      kcal:132, p:8.9, c:24,  f:0.5, s:100, pn:'100g'},
+{n:'Fasola lima gotowana',        kcal:115, p:7.8, c:21,  f:0.4, s:100, pn:'100g'},
+{n:'Fasola adzuki',               kcal:128, p:7.5, c:25,  f:0.1, s:100, pn:'100g'},
+{n:'Groch łupany gotowany',       kcal:118, p:8,   c:21,  f:0.4, s:100, pn:'100g'},
+{n:'Hummus',                      kcal:177, p:8,   c:20,  f:8,   s:60,  pn:'porcja'},
+{n:'Bób gotowany',                kcal:110, p:8,   c:20,  f:0.5, s:100, pn:'100g'},
+{n:'Mung (fasola mung gotowana)', kcal:105, p:7.2, c:19,  f:0.4, s:100, pn:'100g'},
+
+// ── ORZECHY i NASIONA dodatkowe ──
+{n:'Pistacje',                    kcal:562, p:20,  c:28,  f:45,  s:30,  pn:'garść'},
+{n:'Orzechy brazylijskie',        kcal:656, p:14,  c:12,  f:66,  s:30,  pn:'4 szt'},
+{n:'Orzechy makadamia',           kcal:718, p:8,   c:14,  f:76,  s:30,  pn:'garść'},
+{n:'Orzechy pekan',               kcal:691, p:9,   c:14,  f:72,  s:30,  pn:'garść'},
+{n:'Orzechy laskowe',             kcal:628, p:15,  c:17,  f:61,  s:30,  pn:'garść'},
+{n:'Nasiona słonecznika',         kcal:584, p:21,  c:20,  f:51,  s:30,  pn:'garść'},
+{n:'Nasiona konopi',              kcal:553, p:32,  c:8.7, f:49,  s:30,  pn:'łyżka'},
+{n:'Tahini (pasta sezamowa)',     kcal:595, p:17,  c:21,  f:54,  s:15,  pn:'łyżka'},
+{n:'Masło słonecznikowe',         kcal:582, p:19,  c:22,  f:52,  s:32,  pn:'2 łyżki'},
+{n:'Kokosowe wiórki',             kcal:660, p:6.9, c:24,  f:65,  s:15,  pn:'łyżka'},
+{n:'Kakao (proszek 100%)',        kcal:228, p:19,  c:54,  f:14,  s:15,  pn:'łyżka'},
+{n:'Maca (proszek)',              kcal:325, p:10,  c:72,  f:2,   s:10,  pn:'łyżeczka'},
+
+// ── OLEJE i TŁUSZCZE dodatkowe ──
+{n:'Olej MCT',                    kcal:882, p:0,   c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Olej lniany',                 kcal:884, p:0,   c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Olej z awokado',              kcal:884, p:0,   c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Olej sezamowy',               kcal:884, p:0,   c:0,   f:100, s:10,  pn:'łyżka'},
+{n:'Margaryna',                   kcal:717, p:0.2, c:0.5, f:80,  s:10,  pn:'łyżeczka'},
+{n:'Oliwa — Extra Virgin',        kcal:884, p:0,   c:0,   f:100, s:10,  pn:'łyżka'},
+
+// ── SOSY, PRZYPRAWY, DODATKI ──
+{n:'Sos sojowy',                  kcal:53,  p:8,   c:5,   f:0.1, s:15,  pn:'łyżka'},
+{n:'Sos worcester',               kcal:78,  p:0,   c:20,  f:0,   s:15,  pn:'łyżka'},
+{n:'Sos teriyaki',                kcal:89,  p:1.5, c:20,  f:0,   s:30,  pn:'łyżka'},
+{n:'Sos tabasco',                 kcal:12,  p:0.5, c:2,   f:0.2, s:5,   pn:'kilka kropelek'},
+{n:'Majonez',                     kcal:680, p:1,   c:1,   f:75,  s:15,  pn:'łyżka'},
+{n:'Majonez light',               kcal:360, p:1.5, c:6,   f:38,  s:15,  pn:'łyżka'},
+{n:'Musztarda',                   kcal:70,  p:5,   c:7,   f:3,   s:15,  pn:'łyżka'},
+{n:'Ketchup',                     kcal:112, p:1.6, c:27,  f:0.3, s:30,  pn:'łyżka'},
+{n:'Guacamole',                   kcal:152, p:2,   c:8,   f:13,  s:60,  pn:'porcja'},
+{n:'Salsa (sos pomidorowy)',       kcal:36,  p:1.7, c:7,   f:0.4, s:60,  pn:'porcja'},
+{n:'Pesto',                       kcal:472, p:5.5, c:4,   f:49,  s:20,  pn:'łyżka'},
+{n:'Ocet jabłkowy',               kcal:22,  p:0,   c:1,   f:0,   s:15,  pn:'łyżka'},
+{n:'Ocet balsamiczny',            kcal:88,  p:0.5, c:17,  f:0,   s:15,  pn:'łyżka'},
+{n:'Cukier biały',                kcal:387, p:0,   c:100, f:0,   s:10,  pn:'łyżeczka'},
+{n:'Cukier brązowy',              kcal:380, p:0,   c:98,  f:0,   s:10,  pn:'łyżeczka'},
+{n:'Syrop klonowy',               kcal:260, p:0,   c:67,  f:0,   s:20,  pn:'łyżka'},
+{n:'Syrop ryżowy',                kcal:316, p:0.5, c:80,  f:0,   s:20,  pn:'łyżka'},
+{n:'Stevia (proszek)',            kcal:0,   p:0,   c:0,   f:0,   s:1,   pn:'szczypta'},
+{n:'Erytrytol',                   kcal:0,   p:0,   c:0,   f:0,   s:10,  pn:'łyżeczka'},
+
+// ── SUPLEMENTY dodatkowe ──
+{n:'BCAA (proszek)',              kcal:20,  p:5,   c:0,   f:0,   s:5,   pn:'porcja'},
+{n:'Beta-alanina',                kcal:0,   p:0,   c:0,   f:0,   s:3,   pn:'porcja'},
+{n:'Cytrulina malat',             kcal:0,   p:0,   c:0,   f:0,   s:6,   pn:'porcja'},
+{n:'Glutamina (proszek)',         kcal:16,  p:4,   c:0,   f:0,   s:5,   pn:'porcja'},
+{n:'Magnez (suplement)',          kcal:0,   p:0,   c:0,   f:0,   s:1,   pn:'tabletka'},
+{n:'Gazer / pre-workout',        kcal:25,  p:0,   c:6,   f:0,   s:10,  pn:'porcja'},
+{n:'Shake węglowodanowy',         kcal:360, p:5,   c:85,  f:1,   s:75,  pn:'porcja'},
+{n:'Kazeinowe białko (proszek)', kcal:380, p:78,  c:6,   f:3,   s:33,  pn:'miarka'},
+{n:'Kolagen hydrolizowany',       kcal:36,  p:9,   c:0,   f:0,   s:10,  pn:'miarka'},
+{n:'Omega-3 (kapsułki)',          kcal:9,   p:0,   c:0,   f:1,   s:1,   pn:'kapsułka'},
+
+// ── NAPOJE dodatkowe ──
+{n:'Americano (podwójne espresso)',kcal:10, p:0.5, c:1.5, f:0.1, s:200, pn:'kubek'},
+{n:'Cappuccino (pełne mleko)',    kcal:120, p:6,   c:10,  f:6,   s:250, pn:'kubek'},
+{n:'Flat white',                  kcal:100, p:5,   c:8.5, f:4,   s:180, pn:'kubek'},
+{n:'Kawa mrożona (cold brew)',    kcal:3,   p:0.3, c:0,   f:0,   s:300, pn:'szklanka'},
+{n:'Zielona herbata',             kcal:2,   p:0.2, c:0.3, f:0,   s:250, pn:'szklanka'},
+{n:'Yerba mate',                  kcal:5,   p:0.4, c:1,   f:0,   s:250, pn:'szklanka'},
+{n:'Kombucha',                    kcal:30,  p:0,   c:7,   f:0,   s:330, pn:'butelka'},
+{n:'Woda kokosowa',               kcal:19,  p:0.2, c:4,   f:0.2, s:330, pn:'butelka'},
+{n:'Napój energetyczny (Red Bull)',kcal:112,p:1.1, c:28,  f:0,   s:250, pn:'puszka'},
+{n:'Piwo jasne 5%',               kcal:150, p:1.3, c:13,  f:0,   s:500, pn:'butelka'},
+{n:'Piwo bezalkoholowe',          kcal:42,  p:0.4, c:10,  f:0,   s:330, pn:'puszka'},
+{n:'Wino czerwone (kieliszek)',   kcal:125, p:0.1, c:4,   f:0,   s:150, pn:'kieliszek'},
+{n:'Wino białe (kieliszek)',      kcal:121, p:0.1, c:3.8, f:0,   s:150, pn:'kieliszek'},
+{n:'Koktajl mleczny (wanilia)',   kcal:112, p:3.8, c:18,  f:3,   s:300, pn:'szklanka'},
+{n:'Smoothie owocowe (domowe)',   kcal:90,  p:1.5, c:20,  f:0.5, s:300, pn:'szklanka'},
+
+// ── FAST FOOD i GOTOWE dodatkowe ──
+{n:'Big Mac (McDonalds)',         kcal:563, p:26,  c:44,  f:33,  s:210, pn:'szt'},
+{n:'Filet-O-Fish (McDonalds)',    kcal:379, p:15,  c:38,  f:18,  s:142, pn:'szt'},
+{n:'McWraps z kurczakiem',        kcal:395, p:23,  c:43,  f:14,  s:220, pn:'szt'},
+{n:'Pizza pepperoni (plaster)',   kcal:298, p:12,  c:34,  f:12,  s:100, pn:'plaster'},
+{n:'Döner kebab (mięso)',         kcal:226, p:26,  c:2,   f:13,  s:100, pn:'100g'},
+{n:'Zapiekanka (bułka + ser + pieczarki)',kcal:350,p:14,c:48,f:10,s:1,pn:'szt'},
+{n:'Szawarma wołowa',             kcal:280, p:22,  c:18,  f:13,  s:200, pn:'porcja'},
+{n:'Falafel smażony',             kcal:333, p:13,  c:32,  f:18,  s:100, pn:'100g'},
+{n:'Burrito wołowe (kompletne)',  kcal:490, p:26,  c:55,  f:18,  s:290, pn:'szt'},
+{n:'Taco z kurczakiem',           kcal:210, p:14,  c:22,  f:7,   s:120, pn:'szt'},
+{n:'Pad Thai z krewetkami',       kcal:357, p:18,  c:40,  f:13,  s:300, pn:'porcja'},
+{n:'Ryż z chińskim kurczakiem',   kcal:480, p:32,  c:50,  f:14,  s:350, pn:'porcja'},
+{n:'Sushi — łosoś nigiri (2 szt)',kcal:130, p:8,   c:18,  f:3,   s:100, pn:'2 szt'},
+{n:'Maki z ogórkiem (6 szt)',     kcal:180, p:4,   c:38,  f:0.5, s:90,  pn:'6 szt'},
+{n:'Nachos z dipem serowym',      kcal:485, p:11,  c:52,  f:28,  s:150, pn:'porcja'},
+{n:'Hot dog (z bułką)',           kcal:430, p:16,  c:45,  f:21,  s:200, pn:'szt'},
+{n:'Jajka sadzone (2 szt)',       kcal:185, p:12,  c:0.5, f:14,  s:2,   pn:'2 szt'},
+{n:'Tosty francuskie (2 szt)',    kcal:310, p:10,  c:38,  f:13,  s:2,   pn:'2 szt'},
+{n:'Pancakes (3 szt bez oleju)',  kcal:312, p:9,   c:52,  f:7,   s:3,   pn:'3 szt'},
+{n:'Granola bowl (jogurt+granola+owoce)',kcal:420,p:14,c:65,f:11,s:1,pn:'porcja'},
+
+// ── DESERY i SŁODYCZE dodatkowe ──
+{n:'Lody waniliowe (1 gałka)',    kcal:137, p:2.3, c:16,  f:7,   s:65,  pn:'gałka'},
+{n:'Lody czekoladowe',            kcal:216, p:3.8, c:28,  f:11,  s:100, pn:'100g'},
+{n:'Sernik (plaster)',            kcal:318, p:7,   c:24,  f:22,  s:100, pn:'plaster'},
+{n:'Tiramisu',                    kcal:283, p:5.4, c:24,  f:19,  s:100, pn:'100g'},
+{n:'Brownie czekoladowe',         kcal:466, p:6,   c:60,  f:24,  s:70,  pn:'kawałek'},
+{n:'Muffin czekoladowy',          kcal:371, p:6,   c:57,  f:14,  s:100, pn:'szt'},
+{n:'Wafel czekoladowy (Kitkat)',  kcal:518, p:7,   c:60,  f:27,  s:42,  pn:'1 baton'},
+{n:'Guma do żucia (bez cukru)',   kcal:7,   p:0,   c:2,   f:0,   s:3,   pn:'1 guma'},
+{n:'Żelki owocowe',               kcal:310, p:6,   c:73,  f:0.2, s:30,  pn:'garść'},
+{n:'Ciastko owsiane',             kcal:420, p:7,   c:63,  f:16,  s:30,  pn:'szt'},
+{n:'Baton energetyczny (Cliff)',  kcal:250, p:10,  c:44,  f:5,   s:68,  pn:'szt'},
+{n:'Nutella',                     kcal:539, p:6,   c:57,  f:31,  s:20,  pn:'łyżka'},
+{n:'Czekolada biała',             kcal:539, p:5.9, c:59,  f:32,  s:30,  pn:'kostka'},
+{n:'Kakao na mleku',              kcal:180, p:8,   c:28,  f:5,   s:300, pn:'kubek'},
 ];
+
 
 function parseQty(text){
   // Wyodrębnij ilość z tekstu np. "200g kurczaka", "3 jajka", "2 porcje ryżu"
@@ -5411,8 +5722,8 @@ function updateStreak(){
   if(data.current===3||data.current===7||data.current===30){
     setTimeout(()=>showToast(`🔥 ${data.current} dni z rzędu! Niesamowite!`),500);
   }
-  return data;
   checkDeloadAlert();
+  return data;
 }
 
 // ═══════════════════════════════════════════════
@@ -6384,41 +6695,67 @@ async function submitReview() {
     showToast('Wygeneruj plan, aby dodać opinię');
     return;
   }
-  var name = (document.getElementById('review-name')?.value.trim() || 'Anonim').slice(0, 40);
-  var text = (document.getElementById('review-text')?.value.trim() || '');
-  if (text.length < 10) { showToast('Napisz przynajmniej kilka słów'); return; }
+  // ── Filtr wulgaryzmów (PL + EN) ──────────────────────────────
+const PROFANITY = [
+  'kurwa','chuj','jebać','pierdolić','pierdol','jebany','kurewski','skurwysyn','skurwiel',
+  'pizda','pizdo','zjebany','wyjebany','zajebany','pojebany','cwel','cipa','cipka',
+  'bydlę','bydlo','spierdalaj','spierdalać','spierdolić','odpierdolić','odpierdalać',
+  'zajebiście','kurewstwo','kurewka','suka','suko','dupek','dupa','dupą','dupe','dupę',
+  'fuck','shit','bitch','cunt','asshole','ass','dick','cock','pussy','faggot','nigger',
+  'motherfucker','bastard','whore','slut','retard','idiot','moron','stupid'
+];
+
+function _hasProfanity(str) {
+  var low = str.toLowerCase().replace(/[^a-ząćęłńóśźż ]/gi, '');
+  return PROFANITY.some(function(w) { return low.includes(w); });
+}
+
+// Wykrywa fałszywe opinie: losowe znaki, powtórzenia, brak sensu
+function _isFakeReview(text) {
+  var t = text.trim();
+  // Za krótka
+  if (t.length < 15) return true;
+  // Zbyt mało unikalnych znaków (np. "bbbbbggggg")
+  var unique = new Set(t.toLowerCase().replace(/\s/g, '')).size;
+  if (unique < 5) return true;
+  // Brak żadnej samogłoski (same spółgłoski = losowe)
+  var vowels = (t.match(/[aeiouyąęóu]/gi) || []).length;
+  if (vowels < 3) return true;
+  // Powtarzający się wzorzec (np. "abcabcabc")
+  if (/(.{2,})\1{3,}/i.test(t)) return true;
+  // Wszystkie słowa mają < 2 znaków
+  var words = t.split(/\s+/).filter(function(w) { return w.length > 0; });
+  if (words.length > 0 && words.every(function(w) { return w.length < 2; })) return true;
+  return false;
+}
+
+async function submitReview() {
+  if (!window.__split) {
+    showToast('Wygeneruj plan, aby dodać opinię');
+    return;
+  }
+  var nameRaw = (document.getElementById('review-name')?.value.trim() || 'Anonim').slice(0, 40);
+  var textRaw = (document.getElementById('review-text')?.value.trim() || '');
+
+  if (textRaw.length < 15) { showToast('Napisz przynajmniej kilka słów'); return; }
+
+  // Filtr fałszywych opinii
+  if (_isFakeReview(textRaw)) {
+    showToast('Opinia wygląda jak spam — napisz coś sensownego');
+    return;
+  }
+
+  // Filtr wulgaryzmów
+  if (_hasProfanity(nameRaw) || _hasProfanity(textRaw)) {
+    showToast('Opinia zawiera niedozwolone słowa — usuń je i spróbuj ponownie');
+    return;
+  }
 
   // Max 1 opinia na 24h
   var lastTs = parseInt(localStorage.getItem('fp_last_review') || '0');
   if (Date.now() - lastTs < 24 * 3600000) {
     showToast('Możesz dodać jedną opinię na 24 godziny');
     return;
-  }
-
-  var review = {
-    name:   sanitize(name),
-    text:   sanitize(text).slice(0, 300),
-    stars:  _selectedStars,
-    goal:   answers.goal || 'bulk',
-    date:   new Date().toLocaleDateString('pl-PL', { month:'short', year:'numeric' }),
-    ts:     Date.now(),
-    _remote: !!REVIEWS_BLOB_URL,
-  };
-
-  // Zapisz lokalnie
-  var local = _getReviewsLocal();
-  local.unshift(review);
-  if (local.length > 50) local.pop();
-  localStorage.setItem('fp_reviews', JSON.stringify(local));
-  localStorage.setItem('fp_last_review', String(Date.now()));
-
-  // Zapisz zdalnie jeśli skonfigurowane
-  if (REVIEWS_BLOB_URL) {
-    var all = await _getAllReviews();
-    all.unshift({ ...review, _remote: true });
-    if (all.length > 100) all.pop();
-    await _saveReviewsRemote(all);
-    localStorage.removeItem('fp_reviews_cache'); // wyczyść cache
   }
 
   // Reset formularza
@@ -6462,7 +6799,7 @@ function openReviewForm() {
   const btn = document.getElementById('btn-add-review');
   if (fw)  fw.style.display = 'block';
   if (btn) btn.style.display = 'none';
-}
+}};
 
 // ═══════════════════════════════════════════════
 // PIN SYSTEM
@@ -6866,33 +7203,31 @@ function editBodyEntry(idx) {
       <span class="settings-row-value" id="storage-size">—</span>
     </div>
   </div>
-  <!-- OPINIA -->
-  <div class="settings-section" style="margin-top:14px" id="review-settings-wrap">
-    <div class="settings-section-title">Zostaw opinię</div>
-    <div id="review-settings-locked" style="padding:10px 16px 12px;font-size:13px;color:var(--muted2)">
-      Wygeneruj plan, aby dodać opinię.
-    </div>
-    <div id="review-settings-form" style="display:none;padding:0 16px 14px">
-      <div id="star-select" style="display:flex;gap:3px;margin-bottom:10px">
-        <span onclick="selectStar(1)" data-star="1" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
-        <span onclick="selectStar(2)" data-star="2" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
-        <span onclick="selectStar(3)" data-star="3" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
-        <span onclick="selectStar(4)" data-star="4" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
-        <span onclick="selectStar(5)" data-star="5" style="font-size:26px;cursor:pointer;transition:.1s">☆</span>
-      </div>
-      <input type="text" id="review-name" placeholder="Imię (opcjonalnie)"
-        style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);
-               font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;
-               outline:none;margin-bottom:8px;box-sizing:border-box"
-        onfocus="this.style.borderColor='var(--accent)'"
-        onblur="this.style.borderColor='var(--border2)'">
-      <textarea id="review-text" placeholder="Twoja opinia (min. 10 znaków)..." rows="3"
-        style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);
-               font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;
-               outline:none;resize:none;margin-bottom:8px;box-sizing:border-box"></textarea>
-      <button onclick="submitReview()" class="bt-save-btn">Wyślij opinię ⭐</button>
-    </div>
+  <!-- OPINIA W USTAWIENIACH -->
+<div class="settings-section" id="review-settings-wrap">
+  <div class="settings-section-title">Zostaw opinię</div>
+  <div id="review-settings-locked" style="padding:8px 0 10px;font-size:13px;color:var(--muted2)">
+    Wygeneruj plan, aby dodać opinię.
   </div>
+  <div id="review-settings-form" style="display:none">
+    <div id="star-select" style="display:flex;gap:4px;margin-bottom:10px">
+      <span onclick="selectStar(1)" data-star="1" style="font-size:26px;cursor:pointer">☆</span>
+      <span onclick="selectStar(2)" data-star="2" style="font-size:26px;cursor:pointer">☆</span>
+      <span onclick="selectStar(3)" data-star="3" style="font-size:26px;cursor:pointer">☆</span>
+      <span onclick="selectStar(4)" data-star="4" style="font-size:26px;cursor:pointer">☆</span>
+      <span onclick="selectStar(5)" data-star="5" style="font-size:26px;cursor:pointer">☆</span>
+    </div>
+    <input type="text" id="review-name" placeholder="Imię (opcjonalnie)"
+      style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border2);
+             color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 10px;
+             border-radius:4px;outline:none;margin-bottom:8px">
+    <textarea id="review-text" placeholder="Twoja opinia (min. 15 znaków)..." rows="3"
+      style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border2);
+             color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 10px;
+             border-radius:4px;outline:none;resize:none;margin-bottom:8px"></textarea>
+    <button onclick="submitReview()" class="bt-save-btn">Wyślij opinię ⭐</button>
+  </div>
+</div>
 
   <button class="settings-danger-btn" onclick="confirmReset()" style="margin-top:14px">
     Usuń wszystkie dane
