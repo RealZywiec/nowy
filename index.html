@@ -8,6 +8,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--border2); border: 2px solid var(--border2);
+  transition: background .15s, transform .15s;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); transform: scale(1.15); }
+.pin-dot.error  { background: var(--accent2); border-color: var(--accent2); animation: shake .3s; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)}
+  60%{transform:translateX(6px)}   80%{transform:translateX(-3px)}
+}
+.pin-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--fd); font-size: 26px; font-weight: 800;
+  cursor: pointer; transition: .12s;
+}
+.pin-btn:active { background: var(--accent); color: #000; transform: scale(.92); }
+.pin-btn-del { font-size: 18px; color: var(--muted2); }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#070707;--bg2:#0f0f0f;--bg3:#181818;--card:#111;
@@ -1352,6 +1371,38 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </style>
 </head>
 <body>
+<!-- PIN OVERLAY -->
+<div id="pin-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:99999;
+  flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <div style="font-family:var(--fd);font-size:32px;font-weight:900;text-transform:uppercase;color:var(--accent)">
+    FormulaPlan
+  </div>
+  <div id="pin-mode-lbl" style="font-family:var(--fm);font-size:11px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.15em;text-align:center"></div>
+  <div id="pin-dots" style="display:flex;gap:16px">
+    <div class="pin-dot"></div><div class="pin-dot"></div>
+    <div class="pin-dot"></div><div class="pin-dot"></div>
+  </div>
+  <div id="pin-error" style="font-family:var(--fm);font-size:11px;color:var(--accent2);height:16px;
+    text-align:center"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px">
+    <button class="pin-btn" onclick="pinPress(1)">1</button>
+    <button class="pin-btn" onclick="pinPress(2)">2</button>
+    <button class="pin-btn" onclick="pinPress(3)">3</button>
+    <button class="pin-btn" onclick="pinPress(4)">4</button>
+    <button class="pin-btn" onclick="pinPress(5)">5</button>
+    <button class="pin-btn" onclick="pinPress(6)">6</button>
+    <button class="pin-btn" onclick="pinPress(7)">7</button>
+    <button class="pin-btn" onclick="pinPress(8)">8</button>
+    <button class="pin-btn" onclick="pinPress(9)">9</button>
+    <button class="pin-btn pin-btn-del" onclick="pinPress('C')" style="grid-column:1">C</button>
+    <button class="pin-btn" onclick="pinPress(0)">0</button>
+    <button class="pin-btn pin-btn-del" onclick="pinPress('←')">←</button>
+  </div>
+  <button id="pin-skip-btn" onclick="pinSkip()"
+    style="background:none;border:none;color:var(--muted);font-family:var(--fm);font-size:11px;
+    cursor:pointer;text-decoration:underline;margin-top:8px"></button>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════
   HERO — zastąp istniejące <div id="hero" class="screen active">
@@ -1383,37 +1434,45 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   <!-- WSZYSTKIE FUNKCJE -->
   <div class="how-wrap" style="padding-top:0">
   <div class="sec-label">Co mówią użytkownicy</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
 
-    <div class="step-card" style="padding:20px">
-      <div style="display:flex;gap:3px;margin-bottom:10px;color:#f59e0b;font-size:16px">★★★★★</div>
-      <p style="font-size:14px;line-height:1.7;margin-bottom:12px">"W 3 miesiące z 78 do 71 kg. Jedyne co zrobiłem to trzymałem się planu i pilnowałem kalorii. Plan jest konkretny — żadnego lania wody."</p>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8ff00,#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000">MK</div>
-        <div><div style="font-size:13px;font-weight:700">Maciej K.</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Redukcja · -7 kg w 3 mies.</div></div>
-      </div>
+  <!-- Formularz nowej opinii -->
+  <div id="review-form-wrap" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:none">
+    <div style="font-family:var(--fd);font-size:16px;font-weight:800;margin-bottom:10px">Zostaw opinię</div>
+    <div style="display:flex;gap:4px;margin-bottom:10px" id="star-select">
+  <span onclick="selectStar(1)" style="font-size:28px;cursor:pointer;transition:.1s" data-star="1">☆</span>
+  <span onclick="selectStar(2)" style="font-size:28px;cursor:pointer;transition:.1s" data-star="2">☆</span>
+  <span onclick="selectStar(3)" style="font-size:28px;cursor:pointer;transition:.1s" data-star="3">☆</span>
+  <span onclick="selectStar(4)" style="font-size:28px;cursor:pointer;transition:.1s" data-star="4">☆</span>
+  <span onclick="selectStar(5)" style="font-size:28px;cursor:pointer;transition:.1s" data-star="5">☆</span>
+</div>
+    <input type="text" id="review-name" placeholder="Imię (opcjonalnie)"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+             font-family:var(--fb);font-size:13px;padding:8px 12px;border-radius:4px;outline:none;margin-bottom:8px">
+    <textarea id="review-text" placeholder="Twoja opinia..." rows="3"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+             font-family:var(--fb);font-size:13px;padding:8px 12px;border-radius:4px;outline:none;
+             resize:none;margin-bottom:8px"></textarea>
+    <div style="display:flex;gap:8px">
+      <button onclick="submitReview()"
+        style="flex:1;background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:15px;
+               font-weight:800;padding:10px;border-radius:4px;cursor:pointer">Wyślij opinię</button>
+      <button onclick="document.getElementById('review-form-wrap').style.display='none'"
+        style="background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-size:13px;
+               padding:10px 16px;border-radius:4px;cursor:pointer">Anuluj</button>
     </div>
-
-    <div class="step-card" style="padding:20px">
-      <div style="display:flex;gap:3px;margin-bottom:10px;color:#f59e0b;font-size:16px">★★★★★</div>
-      <p style="font-size:14px;line-height:1.7;margin-bottom:12px">"Zaczęłam od zera, teraz po 4 miesiącach robię martwy na 60 kg. Plan dla początkujących jest super — technika opisana krok po kroku, zero domysłów."</p>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff4d00,#c8ff00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000">AS</div>
-        <div><div style="font-size:13px;font-weight:700">Anna G.</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Budowa siły · 4 mies. treningu</div></div>
-      </div>
-    </div>
-
-    <div class="step-card" style="padding:20px">
-      <div style="display:flex;gap:3px;margin-bottom:10px;color:#f59e0b;font-size:16px">★★★★★</div>
-      <p style="font-size:14px;line-height:1.7;margin-bottom:12px">"Trenuję od 5 lat i nigdy nie miałem tak dobrze ułożonego planu. PPL na 6 dni z periodyzacją, kalkulator 1RM, dziennik serii — wszystko w jednym miejscu."</p>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#ff4d00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000">PW</div>
-        <div><div style="font-size:13px;font-weight:700">Piotr W.</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Masa · 5 lat doświadczenia</div></div>
-      </div>
-    </div>
-
-
   </div>
+
+  <div id="reviews-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+    <!-- wypełni JS -->
+  </div>
+
+  <button onclick="document.getElementById('review-form-wrap').style.display='block';this.style.display='none'"
+    id="btn-add-review"
+    style="width:100%;margin-top:12px;background:none;border:1px solid var(--border2);color:var(--muted2);
+           font-family:var(--fd);font-size:14px;font-weight:700;padding:12px;border-radius:4px;cursor:pointer">
+    + Dodaj swoją opinię
+  </button>
+</div>
 
   <!-- Social proof bar -->
   <div style="display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:8px">
@@ -2699,6 +2758,8 @@ function renderPlan() {
     </div>
   </div>
   <div class="section">
+    ${buildGoalCalculator()}
+  </div>
     <div class="sec-title"><span class="dot">●</span> Zasady progresji</div>
     <div class="prog-card">${PROG.map(p => `
       <div class="prog-row">
@@ -2746,6 +2807,78 @@ function renderPlan() {
   const chatFab = document.getElementById('chat-fab');
   if (chatFab) chatFab.classList.add('visible');
   setTimeout(startOnboarding, 800);
+}
+
+// ═══════════════════════════════════════════════
+// KALKULATOR CZASU DO CELU
+// ═══════════════════════════════════════════════
+function buildGoalCalculator() {
+  const D      = getComputed();
+  const wLog   = getWeightLog();
+  const curW   = wLog.length > 0 ? wLog[wLog.length - 1].w : (answers.weight || 75);
+  const target = answers.targetWeight || (D.goal === 'cut' ? curW - 10 : curW + 10);
+  const wc     = answers.weeklyChange || 0.25;
+  const diff   = target - curW;
+
+  const wrongDir = (D.goal === 'bulk' && diff < 0) || (D.goal === 'cut' && diff > 0);
+
+  if (Math.abs(diff) < 0.1) {
+    return '<div class="macros-card"><div class="macros-title">🎯 Cel wagowy</div>'
+      + '<div style="text-align:center;padding:20px;font-family:var(--fd);font-size:28px;color:var(--accent)">Cel osiągnięty! 🏆</div></div>';
+  }
+
+  const weeks    = Math.abs(diff) / wc;
+  const weeksInt = Math.ceil(weeks);
+  const eta      = new Date();
+  eta.setDate(eta.getDate() + weeksInt * 7);
+  const etaStr   = eta.toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' });
+
+  const checkpoints = [0.25, 0.5, 0.75, 1.0].map(function(pct) {
+    const w   = curW + diff * pct;
+    const wks = Math.round(weeks * pct);
+    const d   = new Date();
+    d.setDate(d.getDate() + wks * 7);
+    return { pct:pct, w: w.toFixed(1), wks:wks, date: d.toLocaleDateString('pl-PL', { day:'numeric', month:'short' }) };
+  });
+
+  const timelineHtml = checkpoints.map(function(cp, i) {
+    return '<div style="flex:1;text-align:center">'
+      + '<div style="width:12px;height:12px;border-radius:50%;background:'
+      + (i === checkpoints.length - 1 ? 'var(--accent)' : 'var(--border2)')
+      + ';border:2px solid var(--accent);margin:0 auto 6px"></div>'
+      + '<div style="font-family:var(--fd);font-size:13px;font-weight:800">' + cp.w + ' kg</div>'
+      + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted)">' + cp.date + '</div>'
+      + '<div style="font-family:var(--fm);font-size:9px;color:var(--accent)">' + cp.wks + ' tydz</div>'
+      + '</div>';
+  }).join('<div style="width:2px;height:2px;background:var(--border);align-self:center"></div>');
+
+  const warnHtml = wrongDir
+    ? '<div style="background:rgba(255,77,0,.1);border:1px solid rgba(255,77,0,.3);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--accent2);margin-bottom:12px">⚠ Cel wagowy niezgodny z celem treningowym. Zaktualizuj cel w quizie.</div>'
+    : '';
+
+  return '<div class="macros-card" style="margin-top:16px">'
+    + '<div class="macros-title">🎯 Kalkulator czasu do celu</div>'
+    + warnHtml
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">'
+      + '<div style="text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px">'
+        + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">Teraz</div>'
+        + '<div style="font-family:var(--fd);font-size:24px;font-weight:900">' + curW + '<span style="font-size:12px;color:var(--muted)"> kg</span></div>'
+      + '</div>'
+      + '<div style="text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px">'
+        + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">Cel</div>'
+        + '<div style="font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent)">' + target + '<span style="font-size:12px;color:var(--muted)"> kg</span></div>'
+      + '</div>'
+      + '<div style="text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px">'
+        + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase">Tygodnie</div>'
+        + '<div style="font-family:var(--fd);font-size:24px;font-weight:900;color:var(--accent3)">' + weeksInt + '</div>'
+      + '</div>'
+    + '</div>'
+    + '<div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:12px;text-align:center">'
+      + 'Szacowana data: <strong style="color:var(--text)">' + etaStr + '</strong> &nbsp;·&nbsp; tempo ' + wc + ' kg/tydz'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">' + timelineHtml + '</div>'
+    + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:8px">* Obliczenia bazują na tempie ' + wc + ' kg/tydz.</div>'
+    + '</div>';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2941,16 +3074,45 @@ function initDayDrag(){
   });
 }
 
-function _swapDays(aIdx,bIdx){
-  const days=window.__split.days;
-  if(!days[aIdx]||!days[bIdx]) return;
-  const tmp={label:days[aIdx].label,tr:days[aIdx].tr,ex:days[aIdx].ex};
-  days[aIdx].label=days[bIdx].label;
-  days[aIdx].tr=days[bIdx].tr;
-  days[aIdx].ex=days[bIdx].ex;
-  days[bIdx].label=tmp.label;
-  days[bIdx].tr=tmp.tr;
-  days[bIdx].ex=tmp.ex;
+function _swapDays(aIdx, bIdx) {
+  const days = window.__split?.days;
+  if (!days || !days[aIdx] || !days[bIdx]) return;
+
+  // ZABEZPIECZENIE: nie pozwól zamieniać dnia odpoczynku z dniem odpoczynku
+  if (!days[aIdx].tr && !days[bIdx].tr) {
+    showToast('Nie można zamieniać dwóch dni odpoczynku');
+    return;
+  }
+
+  // ZABEZPIECZENIE: nie pozwól wstawiać dnia treningowego między dwa dni odpoczynku
+  // (sprawdź czy po zamianie dwa dni odpoczynku będą obok siebie, co niszczy logikę regeneracji)
+  const tmp = { label: days[aIdx].label, tr: days[aIdx].tr, ex: days[aIdx].ex };
+  days[aIdx].label = days[bIdx].label;
+  days[aIdx].tr    = days[bIdx].tr;
+  days[aIdx].ex    = days[bIdx].ex;
+  days[bIdx].label = tmp.label;
+  days[bIdx].tr    = tmp.tr;
+  days[bIdx].ex    = tmp.ex;
+
+  // Sprawdź czy mamy 3+ dni odpoczynku z rzędu po zamianie
+  let restStreak = 0, maxRest = 0;
+  days.forEach(d => {
+    if (!d.tr) { restStreak++; maxRest = Math.max(maxRest, restStreak); }
+    else restStreak = 0;
+  });
+  if (maxRest >= 3) {
+    // Cofnij zamianę
+    const tmp2 = { label: days[aIdx].label, tr: days[aIdx].tr, ex: days[aIdx].ex };
+    days[aIdx].label = days[bIdx].label;
+    days[aIdx].tr    = days[bIdx].tr;
+    days[aIdx].ex    = days[bIdx].ex;
+    days[bIdx].label = tmp2.label;
+    days[bIdx].tr    = tmp2.tr;
+    days[bIdx].ex    = tmp2.ex;
+    showToast('⚠ Zbyt wiele dni odpoczynku z rzędu — zamiana cofnięta');
+    return;
+  }
+
   showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
   renderPlan();
 }
@@ -3284,37 +3446,49 @@ async function exportPDF(){
 
 
 
+// ═══════════════════════════════════════════════════════════
+// ANTHROPIC API — bezpośrednie wywołanie z kluczem użytkownika
+// ═══════════════════════════════════════════════════════════
 async function callAnthropic(body) {
-  const contents = [];
-  if (body.system) {
-    contents.push({ role: 'user',  parts: [{ text: body.system }] });
-    contents.push({ role: 'model', parts: [{ text: 'Rozumiem.' }] });
+  const apiKey = localStorage.getItem('fp_api_key') || '';
+  if (!apiKey || apiKey.length < 20) {
+    throw new Error('Brak klucza API. Dodaj klucz w Ustawienia → AI.');
   }
+
+  const messages = [];
   (body.messages || []).forEach(m => {
-    const role = m.role === 'assistant' ? 'model' : 'user';
-    const text = typeof m.content === 'string'
+    const role = m.role === 'assistant' ? 'assistant' : 'user';
+    const content = typeof m.content === 'string'
       ? m.content
       : (m.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n');
-    if (text) contents.push({ role, parts: [{ text }] });
+    if (content) messages.push({ role, content });
   });
 
-  const res = await fetch('/.netlify/functions/ai', {
+  const payload = {
+    model: body.model || 'claude-haiku-4-5-20251001',
+    max_tokens: body.max_tokens || 500,
+    messages,
+  };
+  if (body.system) payload.system = body.system;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents,
-      generationConfig: { maxOutputTokens: body.max_tokens || 1000 }
-    })
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error || `HTTP ${res.status}`);
+    const msg = err?.error?.message || `HTTP ${res.status}`;
+    throw new Error(msg);
   }
 
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  return { content: [{ type: 'text', text }] };
+  return res.json();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3341,6 +3515,69 @@ function rlCheck(type) {
   log.push(now);
   localStorage.setItem(cfg.key, JSON.stringify(log));
   return true;
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input')?.value.trim();
+  if (!key || key.length < 10) { showToast('Podaj prawidłowy klucz'); return; }
+  localStorage.setItem('fp_api_key', key);
+  const st = document.getElementById('api-key-status');
+  if (st) st.innerHTML = '✓ Klucz zapisany. Zaczyna się od: <strong>' + key.slice(0,12) + '...</strong>';
+  showToast('Klucz API zapisany ✓');
+}
+
+// Wczytaj klucz gdy otwierasz zakładkę AI
+function _initApiKeyInput() {
+  const inp = document.getElementById('api-key-input');
+  const st  = document.getElementById('api-key-status');
+  const key = localStorage.getItem('fp_api_key') || '';
+  if (inp) inp.value = key ? '●'.repeat(20) : '';
+  if (st)  st.innerHTML = key
+    ? '✓ Klucz skonfigurowany: <strong>' + key.slice(0,12) + '...</strong>'
+    : '⚠ Brak klucza — AI nie będzie działać.';
+}
+
+// Chat wbudowany w ustawienia
+let _settingsChatHistory = [];
+
+async function sendSettingsChat() {
+  if (!rlCheck('chat')) return;
+  const inp = document.getElementById('settings-chat-input');
+  const msg = inp?.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const box = document.getElementById('settings-chat-messages');
+  const addMsg = (text, cls) => {
+    const d = document.createElement('div');
+    d.style.cssText = `max-width:85%;padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.5;
+      ${cls === 'user'
+        ? 'align-self:flex-end;background:var(--accent);color:#000;font-weight:600'
+        : 'align-self:flex-start;background:var(--bg2);border:1px solid var(--border2);color:var(--text)'}`;
+    d.textContent = text;
+    box.appendChild(d);
+    box.scrollTop = box.scrollHeight;
+    return d;
+  };
+
+  addMsg(msg, 'user');
+  _settingsChatHistory.push({ role: 'user', content: msg });
+
+  const typing = addMsg('...', 'ai');
+
+  try {
+    const data = await callAnthropic({
+      max_tokens: 400,
+      system: buildChatContext(),
+      messages: _settingsChatHistory.slice(-8),
+    });
+    const reply = data.content?.[0]?.text || 'Brak odpowiedzi.';
+    typing.textContent = reply;
+    _settingsChatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    typing.textContent = '⚠ ' + e.message;
+    typing.style.color = 'var(--accent2)';
+  }
 }
 
 async function sendChatMessage() {
@@ -5235,15 +5472,18 @@ function now(){
 // ── CHAT ──────────────────────────────────────────────────
 let _chatHistory = [];
 
-function toggleChat(){
+function toggleChat() {
   const panel = document.getElementById('chat-panel');
-  if(!panel) return;
+  if (!panel) return;
   const open = panel.classList.toggle('open');
-  if(open && _chatHistory.length === 0){
+  const fab  = document.getElementById('chat-fab');
+  if (fab) fab.classList.toggle('hidden', open); // ukryj FAB gdy chat otwarty
+
+  if (open && _chatHistory.length === 0) {
     _chatHistory.push({
-      role:'assistant',
-      content:'Cześć! Jestem Twoim AI trenerem. Zapytaj o technikę, dietę lub trening — odpowiem na podstawie Twojego planu.',
-      time:now()
+      role: 'assistant',
+      content: 'Cześć! Jestem Twoim AI trenerem. Zapytaj o technikę, dietę lub trening — odpowiem na podstawie Twojego planu.',
+      time: now()
     });
     renderChatMessages();
   }
@@ -5789,6 +6029,9 @@ function openSettings() {
   // Renderuj Body Timeline jeśli zakładka postępy była aktywna
   const activeTab = document.querySelector('.stab.active')?.dataset?.tab;
   if (activeTab === 'progress') renderBodyTimeline();
+  // Pokaż/ukryj przycisk usunięcia PIN
+  const pinRow = document.getElementById('pin-remove-row');
+  if (pinRow) pinRow.style.display = _pinSaved() ? 'flex' : 'none';
 }
 
 function closeSettings() {
@@ -5803,18 +6046,21 @@ function switchSettingsTab(tab) {
   if (tab === 'progress') renderBodyTimeline();
   if (tab === 'trening') _renderSettingsTrening();
   if (tab === 'kalorie') _renderSettingsKalorie();
+  if (tab === 'ai') _initApiKeyInput();
 }
 
-function _renderSettingsTrening(){
+function _renderSettingsTrening() {
   const D = getComputed();
-  const el = document.getElementById('st-plan-name');
+  const el  = document.getElementById('st-plan-name');
   const el2 = document.getElementById('st-plan-days');
   const el3 = document.getElementById('st-plan-goal');
-  if(el) el.textContent = window.__split?.name || 'Brak planu';
-  if(el2) el2.textContent = (answers.days||4) + ' dni/tydz';
-  if(el3) el3.textContent = D.glabs?.[D.goal] || '—';
+  if (el)  el.textContent  = window.__split?.name || 'Brak planu';
+  if (el2) el2.textContent = (answers.days || 4) + ' dni/tydz';
+  if (el3) el3.textContent = D.glabs?.[D.goal] || '—';
   const sc = document.getElementById('st-streak-content');
-  if(sc) sc.innerHTML = buildStreakWidget();
+  if (sc) sc.innerHTML = buildStreakWidget();
+  const ws = document.getElementById('st-week-summary-inner');
+  if (ws) ws.innerHTML = buildWeeklySummary();
 }
 
 function _renderSettingsKalorie(){
@@ -5893,10 +6139,13 @@ function setTheme(theme) {
 
 // ─── Pokaż/ukryj Chat FAB — wywołuj przy zmianie ekranu ──────
 function _updateChatFab(screenName) {
-  const fab = document.getElementById('chat-fab');
+  const fab  = document.getElementById('chat-fab');
+  const panel = document.getElementById('chat-panel');
   if (!fab) return;
-  // FAB widoczny tylko na ekranie treningu
-  fab.classList.toggle('hidden', screenName !== 'workout');
+  // Ukryj FAB jeśli: nie jesteśmy na planie/treningu LUB chat jest otwarty
+  const chatOpen = panel?.classList.contains('open');
+  const validScreen = ['plan', 'results'].includes(screenName);
+  fab.classList.toggle('hidden', !validScreen || chatOpen);
 }
 
 // ─── Patch do Twojej funkcji showScreen ───────────────────────
@@ -5913,6 +6162,234 @@ function _onScreenChange(screen) {
   const saved = localStorage.getItem('fp_theme') || 'dark';
   setTheme(saved);
 })();
+// ═══════════════════════════════════════════════
+// SYSTEM OPINII
+// ═══════════════════════════════════════════════
+let _selectedStars = 5;
+
+function selectStar(n) {
+  _selectedStars = n;
+  document.querySelectorAll('#star-select [data-star]').forEach(s => {
+    s.textContent = parseInt(s.dataset.star) <= n ? '★' : '☆';
+    s.style.color  = parseInt(s.dataset.star) <= n ? 'var(--accent)' : 'var(--muted)';
+  });
+}
+
+function submitReview() {
+  const name = document.getElementById('review-name').value.trim() || 'Anonim';
+  const text = document.getElementById('review-text').value.trim();
+  if (!text || text.length < 10) { showToast('Napisz przynajmniej kilka słów'); return; }
+
+  const reviews = _getReviews();
+  reviews.unshift({
+    name,
+    text,
+    stars: _selectedStars,
+    goal: answers.goal || 'bulk',
+    date: new Date().toLocaleDateString('pl-PL', { month: 'short', year: 'numeric' }),
+    ts: Date.now(),
+  });
+  // Ogranicz do 50 opinii
+  if (reviews.length > 50) reviews.pop();
+  localStorage.setItem('fp_reviews', JSON.stringify(reviews));
+
+  document.getElementById('review-form-wrap').style.display = 'none';
+  document.getElementById('btn-add-review').style.display = '';
+  document.getElementById('review-name').value = '';
+  document.getElementById('review-text').value = '';
+  _renderReviews();
+  showToast('Dziękujemy za opinię! ⭐');
+}
+
+function _getReviews() {
+  try { return JSON.parse(localStorage.getItem('fp_reviews') || '[]'); }
+  catch { return []; }
+}
+
+const GOAL_LABELS = { bulk:'Budowa masy', cut:'Redukcja', strength:'Siła', recomp:'Rekompozyacja' };
+const INITIALS_COLORS = ['#c8ff00','#00d4ff','#ff4d00','#a78bfa','#f59e0b'];
+
+function _renderReviews() {
+  const grid = document.getElementById('reviews-grid');
+  if (!grid) return;
+
+  const seed = [
+    { name:'Maciej K.', text:'W 3 miesiące z 78 do 71 kg. Plan konkretny — żadnego lania wody.', stars:5, goal:'cut',   date:'Sty 2026', _seed:true },
+    { name:'Anna G.',   text:'Po 4 miesiącach robię martwy na 60 kg. Plan dla początkujących super.', stars:5, goal:'strength', date:'Lut 2026', _seed:true },
+    { name:'Piotr W.',  text:'5 lat trenuje i nigdy nie miałem tak dobrze ułożonego planu.', stars:5, goal:'bulk', date:'Mar 2026', _seed:true },
+  ];
+
+  const user = _getReviews();
+  const all  = [...user, ...seed].slice(0, 9);
+  const avg  = (all.reduce((s, r) => s + r.stars, 0) / all.length).toFixed(1);
+
+  grid.innerHTML = all.map((r, i) => {
+    const initials = r.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0, 2);
+    const color    = INITIALS_COLORS[i % INITIALS_COLORS.length];
+    const stars    = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    const delBtn   = r._seed
+      ? ''
+      : '<button onclick="deleteReview(' + i + ')" style="background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;float:right">✕</button>';
+
+    return '<div class="step-card" style="padding:18px">'
+      + delBtn
+      + '<div style="display:flex;gap:3px;margin-bottom:8px;color:#f59e0b;font-size:14px">' + stars + '</div>'
+      + '<p style="font-size:13px;line-height:1.6;margin-bottom:10px;color:var(--muted2)">"' + r.text + '"</p>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + '<div style="width:32px;height:32px;border-radius:50%;background:' + color + ';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0">' + initials + '</div>'
+      + '<div>'
+      + '<div style="font-size:12px;font-weight:700">' + r.name + '</div>'
+      + '<div style="font-family:var(--fm);font-size:9px;color:var(--muted)">' + (GOAL_LABELS[r.goal] || '') + ' · ' + r.date + '</div>'
+      + '</div></div></div>';
+  }).join('');
+}
+
+function deleteReview(idx) {
+  const user = _getReviews();
+  // idx to pozycja w all = [...user, ...seed], więc user reviews są pierwsze
+  if (idx >= user.length) return; // seed — nie usuwaj
+  if (!confirm('Usunąć tę opinię?')) return;
+  user.splice(idx, 1);
+  localStorage.setItem('fp_reviews', JSON.stringify(user));
+  _renderReviews();
+}
+
+// Wywołaj przy starcie
+document.addEventListener('DOMContentLoaded', () => { _renderReviews(); });
+// lub jeśli DOMContentLoaded już minął:
+if (document.readyState !== 'loading') _renderReviews();
+// ═══════════════════════════════════════════════
+// PIN SYSTEM
+// ═══════════════════════════════════════════════
+const PIN_KEY     = 'fp_pin';
+const PIN_SESSION = 'fp_pin_unlocked';
+
+let _pinBuffer  = '';
+let _pinMode    = 'unlock'; // 'unlock' | 'set' | 'confirm'
+let _pinTemp    = '';       // tymczasowy PIN przy ustawianiu
+
+function _pinSaved() { return localStorage.getItem(PIN_KEY) || ''; }
+
+function initPin() {
+  const ov = document.getElementById('pin-overlay');
+  if (!ov) return;
+
+  // Jeśli PIN nie ustawiony — pomiń
+  if (!_pinSaved()) { ov.style.display = 'none'; return; }
+
+  // Jeśli już odblokowano w tej sesji
+  if (sessionStorage.getItem(PIN_SESSION)) { ov.style.display = 'none'; return; }
+
+  // Pokaż ekran odblokowania
+  _pinMode = 'unlock';
+  _pinBuffer = '';
+  ov.style.display = 'flex';
+  document.getElementById('pin-mode-lbl').textContent = 'Wprowadź PIN';
+  document.getElementById('pin-skip-btn').style.display = 'none';
+  _renderPinDots();
+}
+
+function pinPress(val) {
+  if (val === 'C') { _pinBuffer = ''; _renderPinDots(); return; }
+  if (val === '←') { _pinBuffer = _pinBuffer.slice(0, -1); _renderPinDots(); return; }
+  if (_pinBuffer.length >= 4) return;
+
+  _pinBuffer += String(val);
+  _renderPinDots();
+
+  if (_pinBuffer.length === 4) {
+    setTimeout(() => _pinSubmit(), 150);
+  }
+}
+
+function _renderPinDots() {
+  document.querySelectorAll('.pin-dot').forEach((d, i) => {
+    d.classList.toggle('filled', i < _pinBuffer.length);
+    d.classList.remove('error');
+  });
+  document.getElementById('pin-error').textContent = '';
+}
+
+function _pinSubmit() {
+  if (_pinMode === 'unlock') {
+    if (_pinBuffer === _pinSaved()) {
+      sessionStorage.setItem(PIN_SESSION, '1');
+      document.getElementById('pin-overlay').style.display = 'none';
+    } else {
+      _pinError('Nieprawidłowy PIN');
+    }
+
+  } else if (_pinMode === 'set') {
+    _pinTemp = _pinBuffer;
+    _pinBuffer = '';
+    _pinMode = 'confirm';
+    document.getElementById('pin-mode-lbl').textContent = 'Powtórz PIN';
+    document.getElementById('pin-skip-btn').textContent = 'Anuluj';
+    _renderPinDots();
+
+  } else if (_pinMode === 'confirm') {
+    if (_pinBuffer === _pinTemp) {
+      localStorage.setItem(PIN_KEY, _pinBuffer);
+      sessionStorage.setItem(PIN_SESSION, '1');
+      document.getElementById('pin-overlay').style.display = 'none';
+      showToast('PIN ustawiony ✓');
+    } else {
+      _pinError('PINy się nie zgadzają — spróbuj ponownie');
+      _pinMode = 'set';
+      _pinTemp = '';
+      document.getElementById('pin-mode-lbl').textContent = 'Ustaw PIN (4 cyfry)';
+    }
+  }
+}
+
+function _pinError(msg) {
+  document.querySelectorAll('.pin-dot').forEach(d => {
+    d.classList.remove('filled');
+    d.classList.add('error');
+  });
+  document.getElementById('pin-error').textContent = msg;
+  _pinBuffer = '';
+  setTimeout(_renderPinDots, 600);
+}
+
+function pinSkip() {
+  const ov = document.getElementById('pin-overlay');
+  ov.style.display = 'none';
+}
+
+// Otwórz ekran ustawiania PIN (wywołaj z ustawień)
+function openPinSetup() {
+  const hasPIN = !!_pinSaved();
+  const ov = document.getElementById('pin-overlay');
+  _pinBuffer = '';
+  _pinTemp   = '';
+  _pinMode   = 'set';
+  ov.style.display = 'flex';
+  document.getElementById('pin-mode-lbl').textContent = hasPIN
+    ? 'Nowy PIN (4 cyfry)' : 'Ustaw PIN (4 cyfry)';
+  document.getElementById('pin-skip-btn').textContent = 'Anuluj';
+  document.getElementById('pin-skip-btn').style.display = 'block';
+  _renderPinDots();
+}
+
+function removePIN() {
+  if (!confirm('Usunąć PIN? Aplikacja nie będzie chroniona.')) return;
+  localStorage.removeItem(PIN_KEY);
+  showToast('PIN usunięty');
+}
+
+// Wsparcie klawiatury
+document.addEventListener('keydown', e => {
+  const ov = document.getElementById('pin-overlay');
+  if (!ov || ov.style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') pinPress(parseInt(e.key));
+  if (e.key === 'Backspace') pinPress('←');
+  if (e.key === 'Escape' && _pinMode !== 'unlock') pinSkip();
+});
+
+// Wywołaj przy starcie
+document.addEventListener('DOMContentLoaded', initPin);
+if (document.readyState !== 'loading') initPin();
 </script>
 <!-- ═══════════════════════════════════════════════
      SETTINGS PANEL
@@ -5929,8 +6406,8 @@ function _onScreenChange(screen) {
     <!-- TABS -->
     <div class="stabs">
   <button class="stab active" data-tab="profile"  onclick="switchSettingsTab('profile')">Profil</button>
-  <button class="stab"        data-tab="trening"  onclick="closeSettings();setTimeout(()=>navOpenExLog(),200)">Trening</button>
-  <button class="stab"        data-tab="kalorie"  onclick="closeSettings();setTimeout(()=>navOpenCalories(),200)">Kalorie</button>
+  <button class="stab"        data-tab="trening"  onclick="switchSettingsTab('trening')">Trening</button>
+  <button class="stab"        data-tab="kalorie"  onclick="switchSettingsTab('kalorie')">Kalorie</button>
   <button class="stab"        data-tab="progress" onclick="switchSettingsTab('progress')">Postępy</button>
   <button class="stab"        data-tab="ai"       onclick="switchSettingsTab('ai')">AI</button>
   <button class="stab"        data-tab="backup"   onclick="switchSettingsTab('backup')">Backup</button>
@@ -5965,6 +6442,79 @@ function _onScreenChange(screen) {
       </div>
       <button class="settings-danger-btn" onclick="confirmReset()">Usuń wszystkie dane</button>
     </div>
+    <div class="settings-section" style="margin-top:12px">
+  <div class="settings-section-title">Bezpieczeństwo</div>
+  <div class="settings-row">
+    <span class="settings-row-label">PIN aplikacji</span>
+    <button class="settings-row-btn" onclick="openPinSetup()">
+      Ustaw PIN →
+    </button>
+  </div>
+  <div class="settings-row" id="pin-remove-row" style="display:none">
+    <span class="settings-row-label" style="color:var(--muted2)">Usuń PIN</span>
+    <button class="settings-row-btn" onclick="removePIN()" style="color:var(--accent2)">
+      Usuń →
+    </button>
+  </div>
+</div>
+
+
+    <!-- TAB: TRENING -->
+<div class="stab-content" id="stab-trening">
+  <div class="settings-section">
+    <div class="settings-section-title">Aktualny plan</div>
+    <div id="st-plan-name" style="font-family:var(--fd);font-size:18px;font-weight:800;margin-bottom:4px">—</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px">
+      <span id="st-plan-days" style="font-family:var(--fm);font-size:10px;color:var(--muted)">—</span>
+      <span id="st-plan-goal" style="font-family:var(--fm);font-size:10px;color:var(--accent)">—</span>
+    </div>
+    <div id="st-streak-content"></div>
+  </div>
+  <div class="settings-section" style="margin-top:12px">
+    <div class="settings-section-title">Dziennik ćwiczeń</div>
+    <button class="bt-save-btn" onclick="closeSettings();setTimeout(()=>navOpenExLog(),200)">
+      📓 Otwórz dziennik treningu →
+    </button>
+  </div>
+  <div class="settings-section" style="margin-top:12px">
+    <div class="settings-section-title">Szybka analiza tygodnia</div>
+    <div id="st-week-summary-inner"></div>
+  </div>
+</div>
+
+<!-- TAB: KALORIE -->
+<div class="stab-content" id="stab-kalorie">
+  <div class="settings-section">
+    <div class="settings-section-title">Dziś</div>
+    <div id="st-cal-summary"></div>
+  </div>
+  <div class="settings-section" style="margin-top:12px">
+    <div class="settings-section-title">Wpisy</div>
+    <div id="st-cal-entries" style="max-height:200px;overflow-y:auto"></div>
+  </div>
+  <div class="settings-section" style="margin-top:12px">
+    <div class="settings-section-title">Dodaj produkt</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input type="text" id="st-cal-name" placeholder="Nazwa produktu"
+        style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+               font-family:var(--fb);font-size:13px;padding:8px 10px;border-radius:4px;outline:none"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+      <input type="number" id="st-cal-kcal" placeholder="kcal" min="1" max="5000"
+        style="width:72px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+               font-family:var(--fd);font-size:16px;font-weight:800;padding:8px;border-radius:4px;
+               outline:none;text-align:center"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+    </div>
+    <button class="bt-save-btn" onclick="stQuickCalAdd()">+ Dodaj wpis</button>
+    <div style="margin-top:10px">
+      <button onclick="closeSettings();setTimeout(()=>navOpenCalories(),200)"
+        style="background:none;border:1px solid var(--border2);color:var(--muted2);font-family:var(--fd);
+               font-size:13px;font-weight:700;padding:8px 14px;border-radius:4px;cursor:pointer;width:100%">
+        🍽 Pełny dziennik kalorii →
+      </button>
+    </div>
+  </div>
+</div>
 
     <!-- TAB: POSTĘPY (Body Timeline) -->
     <div class="stab-content" id="stab-progress">
@@ -5989,20 +6539,55 @@ function _onScreenChange(screen) {
     </div>
 
     <!-- TAB: AI ANALIZA -->
-    <div class="stab-content" id="stab-ai">
-      <div class="settings-section">
-        <div class="settings-section-title">Analiza tygodniowa</div>
-        <p class="settings-desc">AI sprawdza Twój postęp, wykrywa stagnację i sugeruje zmiany w planie. Dostępna 5× dziennie.</p>
-        <button id="analysis-btn" class="bt-save-btn" style="margin-top:8px" onclick="runProgressAnalysis()">
-          🔍 Analizuj mój postęp
-        </button>
-        <div id="analysis-panel" style="margin-top:12px"></div>
+<div class="stab-content" id="stab-ai">
+  <div class="settings-section">
+    <div class="settings-section-title">Klucz API Anthropic</div>
+    <p class="settings-desc">
+      Klucz jest przechowywany tylko w Twojej przeglądarce, nigdzie nie jest wysyłany poza Anthropic.
+      Pobierz na <strong>console.anthropic.com</strong>.
+    </p>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off"
+        style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+               font-family:var(--fm);font-size:12px;padding:9px 12px;border-radius:4px;outline:none"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
+        value="">
+      <button onclick="saveApiKey()"
+        style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:14px;
+               font-weight:800;padding:9px 16px;border-radius:4px;cursor:pointer">Zapisz</button>
+    </div>
+    <div id="api-key-status" style="font-family:var(--fm);font-size:10px;margin-top:6px;color:var(--muted)"></div>
+  </div>
+
+  <div class="settings-section" style="margin-top:16px">
+    <div class="settings-section-title">Analiza tygodniowa AI</div>
+    <p class="settings-desc">AI sprawdza postęp, wykrywa stagnację i sugeruje zmiany. Dostępna 5× dziennie.</p>
+    <button id="analysis-btn" class="bt-save-btn" style="margin-top:8px" onclick="runProgressAnalysis()">
+      🔍 Analizuj mój postęp
+    </button>
+    <div id="analysis-panel" style="margin-top:12px"></div>
+  </div>
+
+  <div class="settings-section" style="margin-top:16px">
+    <div class="settings-section-title">AI Trener (chat)</div>
+    <p class="settings-desc">Chat z AI trenerem dostępny bezpośrednio tutaj:</p>
+    <div id="settings-chat-wrap" style="margin-top:10px;border:1px solid var(--border2);border-radius:8px;overflow:hidden">
+      <div id="settings-chat-messages" style="height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg3)">
+        <div style="font-size:12px;color:var(--muted);text-align:center">Cześć! Jestem Twoim AI trenerem.</div>
       </div>
-      <div class="settings-section" style="margin-top:16px">
-        <div class="settings-section-title">AI Trener (chat)</div>
-        <p class="settings-desc">Czat z trenerem dostępny z ekranu treningu — przycisk pojawia się podczas aktywnej sesji.</p>
+      <div style="display:flex;gap:8px;padding:10px;background:var(--bg2);border-top:1px solid var(--border)">
+        <input type="text" id="settings-chat-input" placeholder="Zapytaj o trening, dietę..."
+          style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+                 font-family:var(--fb);font-size:13px;padding:8px 12px;border-radius:4px;outline:none"
+          onkeydown="if(event.key==='Enter')sendSettingsChat()"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+        <button onclick="sendSettingsChat()"
+          style="background:var(--accent);color:#000;border:none;font-family:var(--fd);font-size:14px;
+                 font-weight:800;padding:8px 14px;border-radius:4px;cursor:pointer">→</button>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- TAB: BACKUP -->
     <div class="stab-content" id="stab-backup">
