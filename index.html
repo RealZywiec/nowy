@@ -557,6 +557,11 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 }
 /* Dodaj do @media(min-width:769px) */
 @media(min-width:769px){
+  /* Plan na desktopie — schowany, aplikacja jest mobilna */
+  #plan.screen.active {
+    display: none !important;
+  }
+  /* plan-desktop-msg pokazuje się TYLKO gdy plan jest aktywny — obsługiwane przez JS */
   /* Plan zajmuje całą dostępną szerokość obok sidebara */
   #plan.with-sidebar {
     padding-left: 80px;
@@ -928,6 +933,10 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .slider-inline-num:focus { border-bottom-color: var(--accent); }
 .slider-inline-num::-webkit-outer-spin-button,
 .slider-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+@keyframes slideIn {
+  from { opacity:0; transform: translateX(40px); }
+  to   { opacity:1; transform: translateX(0); }
+}
 .faq-wrap { display: none; }
 #hero .faq-wrap { display: block; }
 /* ══════════════════════════════════════════════════════════
@@ -1291,9 +1300,13 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   background: var(--bg3);
   border-radius: 8px; padding: 4px;
   margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.stabs::-webkit-scrollbar { display: none; }
 .stab {
-  flex: 1; padding: 8px 4px;
+  flex: 0 0 auto; padding: 8px 10px;
   background: none; border: none;
   color: var(--muted); font-family: var(--fm); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
@@ -1396,18 +1409,9 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 .settings-danger-btn:hover { background: rgba(248,113,113,.18); }
 
 /* ── Chat FAB (tylko podczas treningu) ─────────────── */
-.chat-fab {
-  position: fixed; bottom: 80px; right: 16px;
-  width: 52px; height: 52px;
-  background: var(--acc,#4ade80); color: #000;
-  border: none; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 20px rgba(74,222,128,.35);
-  cursor: pointer; z-index: 800;
-  transition: transform .2s, opacity .2s;
-}
-.chat-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.7); }
-.chat-fab:active { transform: scale(0.92); }
+/* Drugi blok — nadpisuje poprzedni; ujednolicamy tutaj */
+.chat-fab.hidden { display: none !important; }
+.chat-fab.visible { display: flex !important; }
 #reviews-carousel::-webkit-scrollbar { display: none; }
 #reviews-carousel .review-card {
   min-width: 240px; max-width: 280px;
@@ -1466,11 +1470,18 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <h1 class="hero-h1">TWÓJ PLAN<em> TRENINGOWY</em><span class="hero-sub">oparty na nauce</span></h1>
     <p class="hero-desc">Prawdziwy algorytm. Zero marketingu. Mifflin-St Jeor, periodyzacja blokowa, dobór splitu pod Twoje dane — gotowy w 3 minuty.</p>
     <div class="hero-stats">
-      <div class="hs"><strong>15</strong><span>Pytań</span></div>
+      <div class="hs"><strong>16</strong><span>Pytań</span></div>
       <div class="hs"><strong>4 000+</strong><span>Kombinacji</span></div>
-      <div class="hs"><strong>40+</strong><span>Ćwiczeń z opisem</span></div>
+      <div class="hs"><strong>50+</strong><span>Ćwiczeń z opisem</span></div>
     </div>
-    <button class="btn-cta" onclick="startQuiz()">Wygeneruj swój plan →</button>
+    <button class="btn-cta" id="hero-cta-btn" onclick="startQuiz()">Wygeneruj swój plan →</button>
+    <button id="hero-new-plan-btn" onclick="startQuiz()"
+      style="display:none;margin-top:12px;background:none;border:1px solid var(--border2);
+             color:var(--muted2);font-family:var(--fd);font-size:14px;font-weight:700;
+             text-transform:uppercase;padding:10px 24px;border-radius:4px;cursor:pointer;transition:.15s"
+      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'">
+      ↻ Wygeneruj nowy plan
+    </button>
   </div>
 
   <!-- JAK TO DZIAŁA -->
@@ -1563,12 +1574,12 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
   <div class="faq-wrap">
     <div class="sec-label">Najczęstsze pytania</div>
     <div id="faq-list">
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(0)"><span>Czy plan naprawdę jest oparty na nauce?</span><span class="faq-ico" id="faq-ico-0">+</span></div><div class="faq-a" id="faq-a-0">Tak. Kalorie: Mifflin-St Jeor (1990). TDEE: Harris-Benedict z korektą aktywności. Makra: metaanaliza Helms, Aragon i Fitschen (2014). Split: badania Schoenfelda (2010) dotyczące częstości treningu a hipertrofii.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(1)"><span>Jak działa dziennik kalorii — czy zeruje się każdego dnia?</span><span class="faq-ico" id="faq-ico-1">+</span></div><div class="faq-a" id="faq-a-1">Tak — każdy dzień ma osobne wpisy. Po północy dziennik automatycznie zaczyna nowy dzień. Poprzednie dni są przechowywane lokalnie przez 30 dni.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(2)"><span>Jak działa streak i gdzie są zapisywane dane?</span><span class="faq-ico" id="faq-ico-2">+</span></div><div class="faq-a" id="faq-a-2">Wszystkie dane (plan, dziennik, streak, historia ćwiczeń) są zapisywane lokalnie w przeglądarce (localStorage). Nie wysyłamy danych na serwer. Oznacza to, że dane są przypisane do konkretnej przeglądarki i urządzenia.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(3)"><span>Czy mogę zamienić ćwiczenia w planie?</span><span class="faq-ico" id="faq-ico-3">+</span></div><div class="faq-a" id="faq-a-3">Tak — każde ćwiczenie ma przycisk 🔄 zamiany na alternatywę z tej samej grupy mięśniowej. Plan automatycznie zachowuje zestawy, powtórzenia i RPE.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(4)"><span>Co jeśli mam kontuzję lub ograniczony sprzęt?</span><span class="faq-ico" id="faq-ico-4">+</span></div><div class="faq-a" id="faq-a-4">Algorytm automatycznie dobiera ćwiczenia dostępne dla wybranego sprzętu i bezpieczne przy wybranej kontuzji. W trakcie treningu możesz też użyć systemu zmęczenia (💢) żeby dostosować dzisiejszy plan.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(5)"><span>Czy plan można wydrukować lub pobrać?</span><span class="faq-ico" id="faq-ico-5">+</span></div><div class="faq-a" id="faq-a-5">Tak — w planie dostępny jest przycisk „📄 Pobierz PDF" generujący plik z pełnym harmonogramem oraz „🖨 Drukuj" otwierający okno druku przeglądarki.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(0)"><span>Zaczynam od zera — czy plan dla początkującego jest realnie do zrobienia?</span><span class="faq-ico" id="faq-ico-0">+</span></div><div class="faq-a" id="faq-a-0">Tak. Jeśli wybierzesz „Początkujący", algorytm automatycznie dobiera mniej ćwiczeń, niższe RPE (6-7 zamiast 8-9) i prostsze warianty bez martwego ciągu, drążka czy dipów. Celem jest nauka techniki i budowanie siły bez przeciążania. Pierwsze efekty siłowe widać już po 4-6 tygodniach.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(1)"><span>Ile białka potrzebuję naprawdę? Czy 3g/kg to konieczność?</span><span class="faq-ico" id="faq-ico-1">+</span></div><div class="faq-a" id="faq-a-1">Nie. Plan liczy białko metodą Helmsa (2014): 2.0-2.4g/kg w zależności od celu. Dla budowy masy 2.0g/kg w zupełności wystarczy przy odpowiedniej kaloryczności. Powyżej 2.4g/kg nie masz żadnych korzyści anabolicznych — to literalnie zmarnowane kcal i kasa na odżywki.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(2)"><span>Jak działa deload i czy plan sam go narzuca?</span><span class="faq-ico" id="faq-ico-2">+</span></div><div class="faq-a" id="faq-a-2">Po 28 dniach intensywnego treningu (min. 12 sesji) pojawi się powiadomienie o deloadzie. Jeśli klikniesz „Zaczynam deload", plan automatycznie zmienia się: serie −40%, zakresy 10-15 powt., RPE 5-6 przez 7 dni. Po 7 dniach plan wraca do Twojej wersji — z Twoimi zamieniami ćwiczeń. Możesz też zakończyć deload wcześniej w zakładce AI.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(3)"><span>Trenuję na siłowni bez pełnego sprzętu — czy plan to uwzględni?</span><span class="faq-ico" id="faq-ico-3">+</span></div><div class="faq-a" id="faq-a-3">Tak. Wybierz „Podstawowa" (sztangielki, ławka, drążek) lub „Dom" (ciężar własny). Plan automatycznie zamieni wszystkie niedostępne ćwiczenia: bench → wyciskanie sztangielek, deadlift → RDL, maszyny → wolne ciężary. Każde ćwiczenie można też ręcznie zamienić przyciskiem 🔄.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(4)"><span>Co to jest RPE i po co mi ta liczba przy każdym ćwiczeniu?</span><span class="faq-ico" id="faq-ico-4">+</span></div><div class="faq-a" id="faq-a-4">RPE (Rate of Perceived Exertion) to skala 1-10 gdzie RPE 10 = fizyczne maksimum. Plan używa RPE 7-8 dla hipertrofii (mógłbyś zrobić jeszcze 2-3 powtórzenia, ale kończysz wcześniej) i RPE 8-9 dla siły. Trening do failure na każdej serii = przepalanie CNS i słabsze wyniki. RPE chroni Cię przed tym.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(5)"><span>Czy moje dane treningowe i kalorie są bezpieczne? Kto to widzi?</span><span class="faq-ico" id="faq-ico-5">+</span></div><div class="faq-a" id="faq-a-5">Nikt. Wszystko — plan, serie, ciężary, kalorie, waga, pomiary ciała — jest przechowywane wyłącznie w przeglądarce Twojego telefonu (localStorage). Nie ma serwera, nie ma konta, nie ma synchronizacji. Dane znikną tylko jeśli wyczyścisz pamięć przeglądarki. Użyj Backup → Eksport aby mieć kopię zapasową.</div></div>
     </div>
   </div>
 
@@ -1610,6 +1621,26 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 <!-- PLAN -->
 <div id="plan" class="screen">
   <div class="plan-inner" id="plan-inner"></div>
+</div>
+<!-- DESKTOP — informacja że plan jest mobilny -->
+<div id="plan-desktop-msg" style="display:none;position:fixed;inset:0;background:var(--bg);
+  z-index:10;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  text-align:center;padding:40px">
+  <div style="font-size:64px">📱</div>
+  <div style="font-family:var(--fd);font-size:clamp(28px,4vw,48px);font-weight:900;text-transform:uppercase;color:var(--accent)">
+    Otwórz na telefonie
+  </div>
+  <div style="font-size:15px;color:var(--muted2);max-width:440px;line-height:1.7">
+    FormulaPlan działa najlepiej jako aplikacja mobilna. Otwórz tę stronę na telefonie i dodaj do ekranu głównego — będziesz mieć pełny plan, dziennik kalorii i timer przerw zawsze pod ręką.
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+    <button onclick="document.getElementById('plan').style.display='flex';document.getElementById('plan-desktop-msg').style.display='none'"
+      style="background:none;border:1px solid var(--border2);color:var(--muted2);
+             font-family:var(--fd);font-size:14px;font-weight:700;text-transform:uppercase;
+             padding:12px 24px;border-radius:4px;cursor:pointer">
+      Mimo to pokaż plan →
+    </button>
+  </div>
 </div>
 
 <!-- TIMER OVERLAY -->
@@ -1737,8 +1768,12 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
     <p>Masz prawo do dostępu, sprostowania i usunięcia swoich danych. Aby usunąć dane zapisane lokalnie, wyczyść localStorage przeglądarki lub skontaktuj się z nami.</p>
     <h3>Płatności</h3>
     <p>Płatności są przetwarzane przez Stripe Inc. — podmiot zewnętrzny. FormulaPlan.pl nie przechowuje danych kart płatniczych.</p>
+    <h3>Podstawa prawna przetwarzania</h3>
+    <p>Dane przetwarzane są na podstawie Art. 6 ust. 1 lit. b RODO — niezbędność do wykonania usługi (wygenerowanie planu treningowego). Wszystkie dane przechowywane są wyłącznie lokalnie na urządzeniu użytkownika (localStorage przeglądarki).</p>
+    <h3>Dane osobowe nieletnich</h3>
+    <p>Serwis nie jest przeznaczony dla osób poniżej 16. roku życia. Jeśli jesteś osobą niepełnoletnią, skonsultuj się z rodzicem lub opiekunem przed korzystaniem z usługi.</p>
     <h3>Zmiany polityki</h3>
-    <p>Polityka prywatności może być aktualizowana. Aktualna wersja zawsze dostępna na tej stronie. Ostatnia aktualizacja: 01.01.2025.</p>
+    <p>Polityka prywatności może być aktualizowana. Aktualna wersja zawsze dostępna na tej stronie. Ostatnia aktualizacja: Marzec 2026.</p>
   </div>
 </div>
 
@@ -1789,7 +1824,7 @@ input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(200,255,
 </div>
 
 <!-- CHAT FAB -->
-<button class="chat-fab" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny" style="display:none">💬</button>
+<button class="chat-fab hidden" id="chat-fab" onclick="toggleChat()" title="AI Trener personalny">💬</button>
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -1815,6 +1850,36 @@ function saveAnswers() {
   try { localStorage.setItem('fp_answers', JSON.stringify(answers)); } catch(e){}
 }
 
+// ── Persystencja splitu ──────────────────────────────────────
+function saveSplit() {
+  try {
+    if (window.__split) localStorage.setItem('fp_split', JSON.stringify(window.__split));
+  } catch(e){}
+}
+function loadSplit() {
+  try {
+    const s = localStorage.getItem('fp_split');
+    if (s) window.__split = JSON.parse(s);
+  } catch(e){}
+}
+
+// ── Persystencja stanu zwijania dni ─────────────────────────
+function saveCollapsedDays() {
+  try {
+    localStorage.setItem('fp_collapsed_days', JSON.stringify([..._collapsedDays]));
+  } catch(e){}
+}
+function loadCollapsedDays(numDays) {
+  try {
+    const saved = localStorage.getItem('fp_collapsed_days');
+    if (saved !== null) {
+      _collapsedDays = new Set(JSON.parse(saved));
+      return;
+    }
+  } catch(e){}
+  // Domyślnie — wszystkie dni zwinięte
+  _collapsedDays = new Set(Array.from({length: numDays}, (_, i) => i));
+}
 
 // ═══════════════════════════════════════════════════════════
 // EXERCISE DATABASE
@@ -2190,6 +2255,14 @@ const QUESTIONS = [
   {id:"age",       cat:"Dane podstawowe",  text:"Ile masz lat?",                 hint:"Wiek wpływa na regenerację, intensywność i objętość.", type:"slider", min:14,max:70,def:25,unit:"lat"},
   {id:"height",    cat:"Dane podstawowe",  text:"Twój wzrost?",                  hint:"Potrzebny do obliczenia BMI i idealnej masy ciała.", type:"slider", min:150,max:220,def:175,unit:"cm"},
   {id:"weight",    cat:"Dane podstawowe",  text:"Aktualna waga?",                hint:"Podstawa wszystkich obliczeń kalorycznych i białkowych.", type:"slider", min:45,max:150,def:75,unit:"kg"},
+  {id:"goal",      cat:"Cel treningowy",   text:"Jaki jest Twój cel?",
+   hint:"Kalorie, makra, split i intensywność — wszystko dobierane pod Twój cel.", type:"opts", grid:"c2",
+   opts:[
+     {v:"bulk",     l:"Budowa masy",       s:"Nadwyżka kaloryczna + mięśnie"},
+     {v:"cut",      l:"Redukcja tłuszczu", s:"Deficyt + zachowanie mięśni"},
+     {v:"strength", l:"Siła maksymalna",   s:"Niski zakres, ciężkie zakresy"},
+     {v:"recomp",   l:"Rekompozyacja",     s:"Zmiana proporcji bez zmiany wagi"}
+   ]},
   {id:"weeklyChange", cat:"Cel", text:"Tempo zmiany wagi?",
    hintFn: function(ans) {
     if(ans.goal==='bulk') return ans.sex==='F'
@@ -2377,15 +2450,33 @@ function buildMealPlanHtml(cal, mac, restCalArg, restMacArg){
 // ═══════════════════════════════════════════════════════════
 // SPLIT BUILDER
 // ═══════════════════════════════════════════════════════════
+// ── Przycinanie planu do czasu sesji i poziomu zaawansowania ─
+function trimSplitToSession(split, exp, sessionTime) {
+  const st = parseInt(sessionTime) || 60;
+  const isB = exp === 'beginner';
+  // Beginner max 4 ćwiczenia; 45min=5, 60min=6, 90min=8
+  const maxEx = isB ? 4 : (st === 45 ? 5 : st >= 90 ? 8 : 6);
+  split.days.forEach(day => {
+    if (day.tr && Array.isArray(day.ex) && day.ex.length > maxEx) {
+      // Zachowaj ćwiczenia złożone (pierwsza połowa) + przytnij izolacje
+      day.ex = day.ex.slice(0, maxEx);
+    }
+  });
+  return split;
+}
+
 function buildSplit(days,goal,exp){
   const sex=answers.sex||'M';
   const weak=answers.weakPoints||[];
   const femaleGlute=sex==='F'&&(weak.includes('glutes')||weak.includes('legs'));
   const isB=exp==='beginner',isA=exp==='advanced';
-  const rng=goal==='strength'?'3-5':goal==='bulk'?'8-12':goal==='cut'?'12-15':'6-10';
+  // Beginner: szerszy zakres powtórzeń + niższe RPE → lepsze uczenie techniki
+  const rng=isB?(goal==='strength'?'5-8':goal==='bulk'?'10-15':goal==='cut'?'12-15':'10-15'):
+               (goal==='strength'?'3-5':goal==='bulk'?'8-12':goal==='cut'?'12-15':'6-10');
   const rst=goal==='strength'?180:goal==='bulk'?90:60;
   const vol=isB?3:isA?5:4;
-  const rpe=goal==='strength'?'RPE 8-9':'RPE 7-8';
+  // Beginner RPE niższe — nauka techniki, nie fail
+  const rpe=isB?'RPE 6-7':(goal==='strength'?'RPE 8-9':'RPE 7-8');
   const s=()=>String(vol);
   const E=(k,ss,rr,rs,rp)=>{const mk=applyMods(k);const x=EX[mk];return{key:mk,...x,sets:String(ss),reps:rr,rest:rs,rpe:rp};};
   const R=(k)=>E(k,vol,rng,rst,rpe);
@@ -2462,7 +2553,60 @@ function dedupeDay(exArr){
 // ═══════════════════════════════════════════════════════════
 // QUIZ LOGIC
 // ═══════════════════════════════════════════════════════════
-function startQuiz(){show('quiz');currentStep=0;renderQ();}
+// ── Inicjalizuj hero button dynamicznie ─────────────
+function initHeroCTA() {
+  const btn  = document.getElementById('hero-cta-btn');
+  const hasPlan = !!localStorage.getItem('fp_plan_generated') && !!localStorage.getItem('fp_answers');
+  if (!btn) return;
+  if (hasPlan) {
+    btn.textContent = 'Przejdź do planu →';
+    btn.onclick = function() {
+      loadSplit();
+      if (window.__split) {
+        renderPlan();
+      } else {
+        // Odbuduj split jeśli zagubiony
+        try {
+          const ans = JSON.parse(localStorage.getItem('fp_answers') || '{}');
+          answers = ans;
+          const D = getComputed();
+          window.__split = applyWeakPoints(
+            trimSplitToSession(buildSplit(ans.days||4, D.goal, D.exp), D.exp, ans.sessionTime||60),
+            ans.weakPoints||[]
+          );
+          saveSplit();
+          renderPlan();
+        } catch(e) { startQuiz(); }
+      }
+    };
+    // Pokaż dodatkowy przycisk "Wygeneruj nowy plan"
+    const subBtn = document.getElementById('hero-new-plan-btn');
+    if (subBtn) subBtn.style.display = 'block';
+  } else {
+    btn.textContent = 'Wygeneruj swój plan →';
+    btn.onclick = startQuiz;
+  }
+}
+document.addEventListener('DOMContentLoaded', initHeroCTA);
+if (document.readyState !== 'loading') initHeroCTA();
+function startQuiz(){
+  const hasPlan = !!localStorage.getItem('fp_plan_generated');
+  if (hasPlan) {
+    if (!confirm('Masz już wygenerowany plan. Wygenerowanie nowego zastąpi aktualny.\n\nKontynuować?')) return;
+    // Wyczyść stary split i plan przy generowaniu nowego
+    localStorage.removeItem('fp_split');
+    localStorage.removeItem('fp_split_pre_deload');
+    localStorage.removeItem('fp_deload_active');
+    localStorage.removeItem('fp_deload_until');
+    localStorage.removeItem('fp_collapsed_days');
+    window.__split = null;
+    _fatigueApplied = false;
+    _originalPlan = null;
+  }
+  show('quiz');
+  currentStep = 0;
+  renderQ();
+}
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById(id);
@@ -2645,8 +2789,12 @@ if (goal === 'bulk' && wc > maxNatBulk) {
     ⚠️ Bardzo niskie kalorie (${cal} kcal). Przy tak niskim TDEE zmniejsz tempo do <strong>0.25 kg/tydz</strong>.
   </div>`;
 }
-  const split=applyWeakPoints(buildSplit(answers.days||4,goal,exp), answers.weakPoints||[]);
-  window.__split=split;
+  const rawSplit = buildSplit(answers.days||4, goal, exp);
+  const trimmed  = trimSplitToSession(rawSplit, exp, answers.sessionTime||60);
+  const split    = applyWeakPoints(trimmed, answers.weakPoints||[]);
+  window.__split = split;
+  saveSplit();
+  localStorage.setItem('fp_plan_generated', '1');
   if(window._skipPaywall){
     window._skipPaywall=false;
     openPlan();
@@ -2717,11 +2865,20 @@ function openPlan() {
     const D = getComputed();
     const { goal, exp } = D;
     if (!window.__split) {
+      // Spróbuj wczytać zapisany split
+      loadSplit();
+    }
+    if (!window.__split) {
       window.__split = applyWeakPoints(
-        buildSplit(answers.days || 4, goal, exp),
+        trimSplitToSession(
+          buildSplit(answers.days || 4, goal, exp),
+          exp, answers.sessionTime || 60
+        ),
         answers.weakPoints || []
       );
+      saveSplit();
     }
+    localStorage.setItem('fp_plan_generated', '1');
     renderPlan();
   } catch(e) {
     console.error('openPlan error:', e);
@@ -2740,6 +2897,7 @@ function openPlan() {
 // renderPlan — bez referral, bez porównania
 // ═══════════════════════════════════════════════════════════
 function renderPlan() {
+  _checkDeloadExpiry(); // auto-przywróć plan po deloadzie
   const D = getComputed();
   const { cal, mac, goal, glabs, gcol, wc } = D;
   const split = window.__split;
@@ -2774,9 +2932,9 @@ function renderPlan() {
         <div class="day-header" onclick="toggleDay(${di})">
           <span class="day-name">${day.name}</span>
           <span class="day-tag tr">${day.label}</span>
-          <span class="day-chev open" id="chev-${di}">▼</span>
+          <span class="day-chev" id="chev-${di}">▼</span>
         </div>
-        <div id="day-${di}" class="ex-table">
+        <div id="day-${di}" class="ex-table" style="display:none">
           <div class="ex-head"><span>Ćwiczenie</span><span>Serie</span><span>Powt.</span><span class="h-rest">Przerwa</span><span class="h-rpe">RPE</span><span></span></div>
           ${exHtml}
         </div>
@@ -2786,7 +2944,7 @@ function renderPlan() {
   document.getElementById('plan-inner').innerHTML = `
   ${buildStreakWidget()}
   <div class="plan-tag">Twój indywidualny plan</div>
-  <h1 class="plan-h1">${split.name}</h1>
+  <h1 class="plan-h1">${split.name}${split._deload ? ' <span style="font-size:16px;color:var(--accent2);background:rgba(255,77,0,.15);padding:4px 12px;border-radius:100px;font-size:14px">⚡ DELOAD</span>' : ''}</h1>
   <div class="plan-meta">Cel: <strong style="color:${gcol[goal]}">${glabs[goal]}</strong> &nbsp;·&nbsp;
     <strong>${cal.toLocaleString()} kcal/dzień</strong> &nbsp;·&nbsp;
     Białko: <strong>${mac.prot}g</strong> &nbsp;·&nbsp;
@@ -2809,21 +2967,7 @@ function renderPlan() {
   </div>
   <div class="section">
     <div class="sec-title"><span class="dot">●</span> Plan żywieniowy</div>
-    <div class="nutri-grid">
-      ${buildMealPlanHtml(cal, mac, restCal, {prot: mac.prot, carb: restCarb, fat: mac.fat})}
-      <div class="nc"><div class="nc-day">Dzień treningowy</div><div class="nc-kcal">${cal.toLocaleString()} <span>kcal</span></div>
-        <div class="nc-macros"><div class="nm">Białko <strong>${mac.prot}g</strong></div><div class="nm">Węgle <strong>${mac.carb}g</strong></div><div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div></div>
-      </div>
-      <!-- I w szablonie zastąp dzień odpoczynku: -->
-<div class="nc"><div class="nc-day">Dzień odpoczynku</div>
-  <div class="nc-kcal">${restCal.toLocaleString()} <span>kcal</span></div>
-  <div class="nc-macros">
-    <div class="nm">Białko <strong>${mac.prot}g</strong></div>
-    <div class="nm">Węgle <strong>${restCarb}g</strong></div>
-    <div class="nm">Tłuszcze <strong>${mac.fat}g</strong></div>
-  </div>
-</div>
-    </div>
+    ${buildMealPlanHtml(cal, mac, restCal, {prot: mac.prot, carb: restCarb, fat: mac.fat})}
   </div>
   <div class="section">
     ${buildGoalCalculator()}
@@ -2859,30 +3003,36 @@ function renderPlan() {
   } else {
     _updateNav('plan');
   }
+  // Na desktopie — pokaż komunikat zamiast planu
+  const desktopMsg = document.getElementById('plan-desktop-msg');
+  if (desktopMsg) {
+    desktopMsg.style.display = window.innerWidth > 768 ? 'flex' : 'none';
+  }
   if (alreadyOnPlan) {
     requestAnimationFrame(() => requestAnimationFrame(() =>
       window.scrollTo({ top: scrollPos, behavior: 'instant' })));
   }
+  // Wczytaj lub ustaw domyślnie zwinięte
+  const numDays = split.days.length;
+  loadCollapsedDays(numDays);
+
   requestAnimationFrame(() => {
-    _collapsedDays.forEach(i => {
+    split.days.forEach((_, i) => {
       const el = document.getElementById('day-' + i);
       const ch = document.getElementById('chev-' + i);
-      if (el) el.style.display = 'none';
-      if (ch) ch.classList.remove('open');
+      if (!el) return;
+      const collapsed = _collapsedDays.has(i);
+      el.style.display = collapsed ? 'none' : 'block';
+      if (ch) ch.classList.toggle('open', !collapsed);
     });
+    // Auto-scroll do dzisiejszego dnia — tylko jeśli otwarty
+    const todayCard = document.querySelector('.day-card.today');
+    if (todayCard) todayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   setTimeout(initDayDrag, 80);
   const chatFab = document.getElementById('chat-fab');
   if (chatFab) chatFab.classList.add('visible');
   setTimeout(startOnboarding, 800);
-
-  // Auto-scroll do dzisiejszego dnia
-  setTimeout(function() {
-    var todayCard = document.querySelector('.day-card.today');
-    if (todayCard) {
-      todayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, 250);
 }
 
 // ═══════════════════════════════════════════════
@@ -3030,7 +3180,6 @@ function doSwap(btn){
   const ei = parseInt(btn.dataset.ei);
   const k  = btn.dataset.key;
   const day = window.__split.days[di];
-  // blokuj jeśli ćwiczenie już jest w tym dniu
   const alreadyIn = day.ex.some((ex, i) => i !== ei && (ex.key === k));
   if(alreadyIn){
     showToast('To ćwiczenie już jest w tym dniu');
@@ -3038,6 +3187,7 @@ function doSwap(btn){
   }
   const old = day.ex[ei];
   day.ex[ei] = { key: k, ...EX[k], sets: old.sets, reps: old.reps, rest: old.rest, rpe: old.rpe };
+  saveSplit(); // ← zapisz po zamianie ćwiczenia
   closeModal();
   renderPlan();
 }
@@ -3054,8 +3204,9 @@ function toggleDay(i){
   if(!el)return;
   const hidden=el.style.display==='none';
   el.style.display=hidden?'block':'none';
-  hidden ? _collapsedDays.delete(i) : _collapsedDays.add(i);
+  if (hidden) { _collapsedDays.delete(i); } else { _collapsedDays.add(i); }
   if(ch)ch.classList.toggle('open',hidden);
+  saveCollapsedDays();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3189,6 +3340,7 @@ function _swapDays(aIdx, bIdx) {
     return;
   }
 
+  saveSplit(); // ← zapisz po zamianie dni
   showToast(`Zamieniono: ${days[aIdx].name} ↔ ${days[bIdx].name}`);
   renderPlan();
 }
@@ -3297,15 +3449,16 @@ function applyStatsChanges(){
   if(w>=40&&w<=200) answers.weight=w;
   if(wc>=0.1&&wc<=1.5) answers.weeklyChange=wc;
   saveAnswers();
-  // rebuild split with new data
-  const D=getComputed();
-  window.__split=applyWeakPoints(
-  buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate'),
-  answers.weakPoints||[]
-);
+  window.__split = applyWeakPoints(
+    trimSplitToSession(
+      buildSplit(answers.days||4, answers.goal||'bulk', answers.experience||'intermediate'),
+      answers.experience||'intermediate', answers.sessionTime||60
+    ),
+    answers.weakPoints||[]
+  );
+  saveSplit();
   toggleStats();
   renderPlan();
-  // flash meta
   const meta=document.querySelector('.plan-meta');
   if(meta){meta.style.transition='opacity .3s';meta.style.opacity='0';setTimeout(()=>meta.style.opacity='1',300);}
 }
@@ -3526,7 +3679,7 @@ async function exportPDF(){
 // ANTHROPIC API — bezpośrednie wywołanie z kluczem użytkownika
 // ═══════════════════════════════════════════════════════════
 async function callAnthropic(body) {
-  // Buduj tablicę contents dla Gemini
+  // ── Próba wywołania backendu ──────────────────────────────
   const contents = [];
 
   if (body.system) {
@@ -3547,28 +3700,36 @@ async function callAnthropic(body) {
     contents.push({ role: 'user', parts: [{ text: 'Odpowiedz.' }] });
   }
 
-  const res = await fetch('/api/ai', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents,
-      generationConfig: {
-        maxOutputTokens: body.max_tokens || 600,
-        temperature: 0.7,
-      }
-    })
-  });
+  let res;
+  try {
+    res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          maxOutputTokens: body.max_tokens || 600,
+          temperature: 0.7,
+        }
+      })
+    });
+  } catch(networkErr) {
+    // Backend niedostępny — zwróć pomocną wiadomość
+    throw new Error('Brak połączenia z serwerem AI. Sprawdź połączenie z internetem.');
+  }
 
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error('Serwer AI niedostępny (404). Skontaktuj się z pomocą techniczną.');
+    }
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error || 'HTTP ' + res.status);
+    throw new Error(err?.error || 'Błąd serwera: HTTP ' + res.status);
   }
 
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!text) throw new Error('Pusta odpowiedź z AI');
+  if (!text) throw new Error('AI nie zwróciło odpowiedzi — spróbuj ponownie');
 
-  // Zwróć w formacie kompatybilnym z resztą kodu
   return { content: [{ type: 'text', text }] };
 }
 
@@ -4276,11 +4437,21 @@ function buildWeeklySummary(){
 
 
 function saveExSet(){
-  const w   = parseFloat(document.getElementById('exl-w')?.value)   || 0;
-  const r   = parseInt(document.getElementById('exl-r')?.value)     || 0;
-  const rpe = parseFloat(document.getElementById('exl-rpe')?.value) || null;
-  const note = document.getElementById('exl-note')?.value.trim()    || '';
-  if (!r) return;
+  const wRaw  = parseFloat(document.getElementById('exl-w')?.value);
+  const rRaw  = parseInt(document.getElementById('exl-r')?.value);
+  const rpeRaw = parseFloat(document.getElementById('exl-rpe')?.value);
+  const note  = document.getElementById('exl-note')?.value.trim() || '';
+
+  const w = isNaN(wRaw) ? 0 : wRaw;
+  if (w < 0 || w > 600) { showToast('⚠ Ciężar: 0–600 kg'); return; }
+  if (!rRaw || isNaN(rRaw) || rRaw < 1) { showToast('⚠ Podaj powtórzenia (min. 1)'); return; }
+  if (rRaw > 100) { showToast('⚠ Maks. 100 powtórzeń'); return; }
+  const r = rRaw;
+  if (w > 250 && r > 25) {
+    if (!confirm(`${w} kg × ${r} powt. — na pewno?`)) return;
+  }
+  const rpe = (!isNaN(rpeRaw) && rpeRaw >= 5 && rpeRaw <= 10) ? rpeRaw : null;
+
   const today = new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
   const sessions = getExData(_exLogKey);
   let sess = sessions.find(s => s.date === today);
@@ -4291,6 +4462,13 @@ function saveExSet(){
   updateStreak();
   renderExLogBody();
   if (_exLogName && w) checkPR(_exLogName, w, r);
+
+  const rEl = document.getElementById('exl-r');
+  const rpeEl = document.getElementById('exl-rpe');
+  const noteEl = document.getElementById('exl-note');
+  if (rEl) { rEl.value = ''; rEl.focus(); }
+  if (rpeEl) rpeEl.value = '';
+  if (noteEl) noteEl.value = '';
 }
 
 function delExSession(idx){
@@ -4337,9 +4515,17 @@ function _updateNav(screenId) {
   ['plan','workout','calories','progress','settings'].forEach(id => {
     const btn = document.getElementById('nav-' + id);
     if (btn) btn.classList.toggle('act', id === screenId);
-    const fab = document.getElementById('chat-fab');
-   if (fab) fab.style.display = onPlan ? 'flex' : 'none';
   });
+  // chat-fab — tylko przez klasy, bez inline style
+  if (fab) {
+    if (onPlan) {
+      fab.classList.add('visible');
+      fab.classList.remove('hidden');
+    } else {
+      fab.classList.remove('visible');
+      fab.classList.add('hidden');
+    }
+  }
   ['plan'].forEach(id => {
   const dsbBtn = document.getElementById('dsb-' + id);
   if(dsbBtn) dsbBtn.classList.toggle('act', id === screenId);
@@ -4433,10 +4619,18 @@ function applySettings(){
   if(goalBtn) answers.goal=goalBtn.dataset.goal;
   if(daysBtn) answers.days=parseInt(daysBtn.dataset.days);
   saveAnswers();
-  window.__split=applyWeakPoints(
-  buildSplit(answers.days||4,answers.goal||'bulk',answers.experience||'intermediate'),
-  answers.weakPoints||[]
-);
+  // Wyczyść deload przy ręcznej zmianie ustawień
+  localStorage.removeItem('fp_split_pre_deload');
+  localStorage.removeItem('fp_deload_active');
+  localStorage.removeItem('fp_deload_until');
+  window.__split = applyWeakPoints(
+    trimSplitToSession(
+      buildSplit(answers.days||4, answers.goal||'bulk', answers.experience||'intermediate'),
+      answers.experience||'intermediate', answers.sessionTime||60
+    ),
+    answers.weakPoints||[]
+  );
+  saveSplit();
   closeMobileSettings();
   closeDesktopSettings();
   renderPlan();
@@ -4621,13 +4815,18 @@ function renderExLogBody(){
       <div class="exlog-form-lbl">Nowa seria${pr>0?` &nbsp;<span style="color:var(--accent)">🏆 PR: ${pr} kg</span>`:''}</div>
       <div class="exlog-inputs">
         <div class="exlog-field"><label>Ciężar kg</label>
-          <input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" placeholder="0" value="${lastSet?.w||''}">
+          <input class="exlog-input" id="exl-w" type="number" step="0.5" min="0" max="600"
+            inputmode="decimal" placeholder="0" value="${lastSet?.w||''}"
+            onkeydown="if(event.key==='Enter'){document.getElementById('exl-r')?.focus();}">
         </div>
         <div class="exlog-field"><label>Powtórzenia</label>
-          <input class="exlog-input" id="exl-r" type="number" min="1" placeholder="0" value="${lastSet?.r||''}">
+          <input class="exlog-input" id="exl-r" type="number" min="1" max="100"
+            inputmode="numeric" placeholder="0" value="${lastSet?.r||''}"
+            onkeydown="if(event.key==='Enter'){saveExSet();}">
         </div>
         <div class="exlog-field"><label>RPE (opcja)</label>
-          <input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10" placeholder="—">
+          <input class="exlog-input" id="exl-rpe" type="number" step="0.5" min="5" max="10"
+            inputmode="decimal" placeholder="—">
         </div>
       </div>
       <textarea class="exlog-notes-input" id="exl-note" placeholder="Notatka: pas, straps, kontuzja..."></textarea>
@@ -4709,28 +4908,6 @@ function exNavDate(dir){
   }
 }
 
-function saveExSet(){
-  const w=parseFloat(document.getElementById('exl-w')?.value)||0;
-  const r=parseInt(document.getElementById('exl-r')?.value)||0;
-  const rpe=parseFloat(document.getElementById('exl-rpe')?.value)||null;
-  const note=document.getElementById('exl-note')?.value.trim()||'';
-  if(!r) return;
-  const today=new Date().toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const sessions=getExData(_exLogKey);
-  let sess=sessions.find(s=>s.date===today);
-  if(!sess){sess={date:today,sets:[]};sessions.push(sess);}
-  sess.sets.push({w,r,rpe,note});
-  saveExData(_exLogKey,sessions);
-  _exViewDate=null;
-  renderExLogBody();
-}
-
-function delExSession(idx){
-  const sessions=getExData(_exLogKey);
-  sessions.splice(idx,1);
-  saveExData(_exLogKey,sessions);
-  renderExLogBody();
-}
 
 // ═══════════════════════════════════════════════════════════
 // BAZA ŻYWNOŚCI
@@ -5791,8 +5968,71 @@ function checkDeloadAlert(){
 
 function markDeloadDone(){
   localStorage.setItem('fp_last_deload', Date.now().toString());
+  localStorage.setItem('fp_deload_active', '1');
+  localStorage.setItem('fp_deload_until', String(Date.now() + 7 * 86400000));
   document.getElementById('deload-alert')?.remove();
-  showToast('Deload zaplanowany — trenuj z 40% mniejszą objętością przez 7 dni 💪');
+  _applyDeloadToSplit();
+}
+
+function _applyDeloadToSplit() {
+  if (!window.__split) return;
+  // Zapisz oryginalny split jeśli nie ma już backup
+  if (!localStorage.getItem('fp_split_pre_deload')) {
+    localStorage.setItem('fp_split_pre_deload', JSON.stringify(window.__split));
+  }
+
+  const split = JSON.parse(JSON.stringify(window.__split));
+  split.days.forEach(day => {
+    if (!day.tr || !day.ex) return;
+    day.ex.forEach(ex => {
+      // Zmniejsz serie z np. "4" na "2–3", reps zwiększ dla wyzdrowienia
+      const origSets = parseInt(ex.sets) || 3;
+      ex.sets = String(Math.max(2, Math.round(origSets * 0.6)));
+      // Zakres powtórzeń — deload zawsze 12-15 (lekko, dużo powtórzeń)
+      ex.reps = '10-15';
+      // RPE spada do 5-6 — czysto regeneracyjne
+      ex.rpe = 'RPE 5-6';
+      // Oznacz jako deload
+      ex._deload = true;
+    });
+    // Dodaj info o deloadzie do labelu dnia
+    if (!day.label.includes('[DELOAD]')) {
+      day.label = '[DELOAD] ' + day.label;
+    }
+  });
+  split._deload = true;
+  split._deloadUntil = Date.now() + 7 * 86400000;
+
+  window.__split = split;
+  saveSplit();
+  if (document.getElementById('plan').classList.contains('active')) {
+    renderPlan();
+  }
+  showToast('✅ Plan deload aktywny przez 7 dni — −40% objętości, RPE 5-6');
+}
+
+function _checkDeloadExpiry() {
+  const until = parseInt(localStorage.getItem('fp_deload_until') || '0');
+  if (!until || Date.now() < until) return;
+
+  // Deload zakończony — przywróć oryginalny split
+  const preDeload = localStorage.getItem('fp_split_pre_deload');
+  if (preDeload) {
+    try {
+      window.__split = JSON.parse(preDeload);
+      localStorage.removeItem('fp_split_pre_deload');
+      localStorage.removeItem('fp_deload_active');
+      localStorage.removeItem('fp_deload_until');
+      saveSplit();
+      showToast('🔥 Deload zakończony — Twój plan treningowy został przywrócony!');
+      if (document.getElementById('plan').classList.contains('active')) {
+        renderPlan();
+      }
+    } catch(e) {}
+  } else {
+    localStorage.removeItem('fp_deload_active');
+    localStorage.removeItem('fp_deload_until');
+  }
 }
 
 function getAllPRs(){
@@ -5886,11 +6126,53 @@ function renderChatMessages(){
 
 function buildChatContext(){
   const D = getComputed();
-  return `Jesteś doświadczonym trenerem personalnym i dietetykiem. Odpowiadasz ZAWSZE po polsku, krótko i konkretnie — max 3-4 zdania. Bez markdown, bez list z myślnikami.
-Dane użytkownika: waga ${D.w}kg, wzrost ${D.h}cm, wiek ${D.a} lat, ${D.s==='M'?'mężczyzna':'kobieta'}.
-Cel: ${D.glabs[D.goal]}, ${D.cal} kcal/dzień, białko: ${D.mac.prot}g, węgle: ${D.mac.carb}g, tłuszcze: ${D.mac.fat}g.
-Plan treningowy: ${window.__split?.name||'nie wygenerowany'}.
-Doświadczenie: ${D.exp}. Kontuzje: ${answers.injuries||'brak'}. Sprzęt: ${answers.equipment||'full'}.`;
+
+  // Zbierz ćwiczenia z planu (skrótowo)
+  let planExList = '';
+  if (window.__split) {
+    const trainingDays = window.__split.days.filter(d => d.tr && d.ex);
+    planExList = trainingDays.map(d =>
+      d.name + ': ' + d.ex.map(e => e.n).join(', ')
+    ).join(' | ');
+  }
+
+  // Ostatnie 3 treningi (klucze z localStorage)
+  let recentHistory = '';
+  try {
+    const exKeys = Object.keys(localStorage).filter(k => k.startsWith('fp_ex_'));
+    const recent = [];
+    exKeys.forEach(k => {
+      const sessions = JSON.parse(localStorage.getItem(k) || '[]');
+      const last = sessions[sessions.length - 1];
+      if (last && last.sets && last.sets.length > 0) {
+        const exName = k.replace('fp_ex_', '').replace(/_/g, ' ');
+        const bestSet = last.sets.reduce((a, b) => ((a.w||0) > (b.w||0) ? a : b), {});
+        if (bestSet.w) recent.push(`${exName}: ${bestSet.w}kg×${bestSet.r}`);
+      }
+    });
+    recentHistory = recent.slice(-5).join(', ') || 'brak danych';
+  } catch(e) {}
+
+  const streakData = getStreakData();
+  const deloadActive = localStorage.getItem('fp_deload_active') === '1';
+
+  return `Jesteś AI trenerem personalnym i dietetykiem aplikacji FormulaPlan. Odpowiadasz ZAWSZE po polsku, konkretnie — max 3-4 zdania. Bez markdown, bez gwiazdek, bez list z myślnikami.
+
+DANE UŻYTKOWNIKA:
+- Waga: ${D.w}kg | Wzrost: ${D.h}cm | Wiek: ${D.a}lat | Płeć: ${D.s==='M'?'Mężczyzna':'Kobieta'}
+- Cel: ${D.glabs[D.goal]} | ${D.cal} kcal/dzień | Białko: ${D.mac.prot}g | Węgle: ${D.mac.carb}g | Tłuszcze: ${D.mac.fat}g
+- Doświadczenie: ${D.exp} | Kontuzje: ${answers.injuries||'brak'} | Sprzęt: ${answers.equipment||'pełna siłownia'}
+- Aktywność: ${answers.activity||'umiarkowana'} | Sen: ${answers.sleep||'normalny'}
+- Plan: ${window.__split?.name||'nie wygenerowany'}${deloadActive?' [DELOAD AKTYWNY]':''}
+- Streak: ${streakData.current} dni z rzędu | Łącznie: ${streakData.totalWorkouts} treningów
+
+PLAN TYGODNIOWY:
+${planExList || 'Brak wygenerowanego planu'}
+
+OSTATNIE WYNIKI:
+${recentHistory}
+
+Gdy użytkownik pyta o ćwiczenia z planu, odwołuj się do konkretnych ćwiczeń które widzi. Gdy pyta o dietę, odwołuj się do jego makr.`;
 }
 
 function chatQuick(msg){
@@ -5949,12 +6231,20 @@ function toggleBodyTimeline() {
 function logBodyMeasurement() {
   const weight = vNum(document.getElementById('bt-weight').value, 'weight');
   if (weight === null) return;
-  const waist  = parseFloat(document.getElementById('bt-waist').value)  || null;
-  const chest  = parseFloat(document.getElementById('bt-chest').value)  || null;
-  const bicep  = parseFloat(document.getElementById('bt-bicep').value)  || null;
-  const note   = document.getElementById('bt-note').value.trim();
 
-  if (!weight || isNaN(weight)) { showToast('Podaj wagę'); return; }
+  const waistRaw = parseFloat(document.getElementById('bt-waist').value);
+  const chestRaw = parseFloat(document.getElementById('bt-chest').value);
+  const bicepRaw = parseFloat(document.getElementById('bt-bicep').value);
+  const note = document.getElementById('bt-note').value.trim();
+
+  // Walidacje wymiarów
+  const waist = (!isNaN(waistRaw) && waistRaw >= 40 && waistRaw <= 200) ? waistRaw : null;
+  const chest = (!isNaN(chestRaw) && chestRaw >= 50 && chestRaw <= 200) ? chestRaw : null;
+  const bicep = (!isNaN(bicepRaw) && bicepRaw >= 15 && bicepRaw <= 80)  ? bicepRaw : null;
+
+  if (!isNaN(waistRaw) && waistRaw && !waist) { showToast('⚠ Obwód pasa: 40–200 cm'); return; }
+  if (!isNaN(chestRaw) && chestRaw && !chest) { showToast('⚠ Obwód klatki: 50–200 cm'); return; }
+  if (!isNaN(bicepRaw) && bicepRaw && !bicep) { showToast('⚠ Obwód bicepsa: 15–80 cm'); return; }
 
   const data  = _btData();
   const today = new Date().toLocaleDateString('pl-PL');
@@ -6449,7 +6739,32 @@ function switchSettingsTab(tab) {
   if (tab === 'progress') renderBodyTimeline();
   if (tab === 'trening') _renderSettingsTrening();
   if (tab === 'kalorie') _renderSettingsKalorie();
-  if (tab === 'ai') _initApiKeyInput();
+  if (tab === 'ai') _initAiTab();
+}
+
+function _initAiTab() {
+  // Renderuje status deloadu w zakładce AI
+  const panel = document.getElementById('analysis-panel');
+  const deloadActive = localStorage.getItem('fp_deload_active') === '1';
+  const deloadUntil  = parseInt(localStorage.getItem('fp_deload_until') || '0');
+  if (deloadActive && deloadUntil > Date.now()) {
+    const daysLeft = Math.ceil((deloadUntil - Date.now()) / 86400000);
+    const existingBanner = document.getElementById('deload-status-banner');
+    if (!existingBanner) {
+      const banner = document.createElement('div');
+      banner.id = 'deload-status-banner';
+      banner.style.cssText = 'background:rgba(255,77,0,.1);border:1px solid rgba(255,77,0,.35);border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--accent2)';
+      banner.innerHTML = `⚡ <strong>Deload aktywny</strong> — jeszcze ${daysLeft} dni.
+        <button onclick="localStorage.removeItem('fp_deload_active');localStorage.removeItem('fp_deload_until');
+          localStorage.removeItem('fp_split_pre_deload');renderPlan();this.closest('#deload-status-banner').remove()"
+          style="margin-left:10px;background:none;border:1px solid var(--accent2);color:var(--accent2);
+            font-family:var(--fd);font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer">
+          Zakończ deload
+        </button>`;
+      const analysisBtn = document.getElementById('analysis-btn');
+      analysisBtn?.parentElement?.insertBefore(banner, analysisBtn);
+    }
+  }
 }
 
 function _renderSettingsTrening() {
@@ -6574,7 +6889,7 @@ function _onScreenChange(screen) {
 // Ustaw ten ID po utworzeniu bloba na jsonblob.com (raz, deploy):
 // Utwórz: curl -X POST -H "Content-Type: application/json" -d "[]" https://jsonblob.com/api/jsonBlob
 // Skopiuj ID z nagłówka Location i wklej tutaj:
-const REVIEWS_BLOB_ID = ''; // np. '1234567890abcdef'
+const REVIEWS_BLOB_ID = '019cf30e-86a3-756a-be1a-eb13ac1972f9'; // np. '1234567890abcdef'
 const REVIEWS_BLOB_URL = REVIEWS_BLOB_ID
   ? 'https://jsonblob.com/api/jsonBlob/' + REVIEWS_BLOB_ID
   : null;
@@ -6653,16 +6968,19 @@ async function _renderReviews() {
   carousel.innerHTML = '<div style="width:240px;height:120px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;flex-shrink:0;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px">Ładowanie...</div>';
 
   const user = await _getAllReviews();
-  const all  = [...user, ...REVIEW_SEED].slice(0, 12);
+  // Seed reviews NIE wchodzą do statystyk — tylko prawdziwe opinie użytkowników
+  const realReviews = user.filter(r => !r._seed);
+  const all = [...realReviews, ...REVIEW_SEED].slice(0, 12);
 
-  // Statystyki
-  var avg = all.length
-    ? (all.reduce(function(s, r) { return s + r.stars; }, 0) / all.length).toFixed(1)
+  // Statystyki — tylko z prawdziwych opinii (lub seed jeśli brak prawdziwych)
+  var statsBase = realReviews.length > 0 ? realReviews : REVIEW_SEED;
+  var avg = statsBase.length
+    ? (statsBase.reduce(function(s, r) { return s + (r.stars||5); }, 0) / statsBase.length).toFixed(1)
     : '—';
   var avgEl  = document.getElementById('review-stat-avg');
   var cntEl  = document.getElementById('review-stat-count');
   if (avgEl)  avgEl.textContent  = avg + '/5';
-  if (cntEl)  cntEl.textContent  = all.length;
+  if (cntEl)  cntEl.textContent  = statsBase.length + (statsBase === REVIEW_SEED ? '' : '+');
 
   // Karty
   carousel.innerHTML = all.map(function(r, i) {
@@ -6697,13 +7015,7 @@ function _updateReviewFormVisibility() {
   locked.style.display = hasPlan ? 'none'  : 'block';
   form.style.display   = hasPlan ? 'block' : 'none';
 }
-
-async function submitReview() {
-  if (!window.__split) {
-    showToast('Wygeneruj plan, aby dodać opinię');
-    return;
-  }
-  // ── Filtr wulgaryzmów (PL + EN) ──────────────────────────────
+// ── Filtr wulgaryzmów ───────────────────────────────────────
 const PROFANITY = [
   'kurwa','chuj','jebać','pierdolić','pierdol','jebany','kurewski','skurwysyn','skurwiel',
   'pizda','pizdo','zjebany','wyjebany','zajebany','pojebany','cwel','cipa','cipka',
@@ -6718,20 +7030,14 @@ function _hasProfanity(str) {
   return PROFANITY.some(function(w) { return low.includes(w); });
 }
 
-// Wykrywa fałszywe opinie: losowe znaki, powtórzenia, brak sensu
 function _isFakeReview(text) {
   var t = text.trim();
-  // Za krótka
   if (t.length < 15) return true;
-  // Zbyt mało unikalnych znaków (np. "bbbbbggggg")
   var unique = new Set(t.toLowerCase().replace(/\s/g, '')).size;
   if (unique < 5) return true;
-  // Brak żadnej samogłoski (same spółgłoski = losowe)
   var vowels = (t.match(/[aeiouyąęóu]/gi) || []).length;
   if (vowels < 3) return true;
-  // Powtarzający się wzorzec (np. "abcabcabc")
   if (/(.{2,})\1{3,}/i.test(t)) return true;
-  // Wszystkie słowa mają < 2 znaków
   var words = t.split(/\s+/).filter(function(w) { return w.length > 0; });
   if (words.length > 0 && words.every(function(w) { return w.length < 2; })) return true;
   return false;
@@ -6746,75 +7052,64 @@ async function submitReview() {
   var textRaw = (document.getElementById('review-text')?.value.trim() || '');
 
   if (textRaw.length < 15) { showToast('Napisz przynajmniej kilka słów'); return; }
+  if (_isFakeReview(textRaw)) { showToast('Opinia wygląda jak spam — napisz coś sensownego'); return; }
+  if (_hasProfanity(nameRaw) || _hasProfanity(textRaw)) { showToast('Opinia zawiera niedozwolone słowa — usuń je i spróbuj ponownie'); return; }
 
-  // Filtr fałszywych opinii
-  if (_isFakeReview(textRaw)) {
-    showToast('Opinia wygląda jak spam — napisz coś sensownego');
-    return;
-  }
-
-  // Filtr wulgaryzmów
-  if (_hasProfanity(nameRaw) || _hasProfanity(textRaw)) {
-    showToast('Opinia zawiera niedozwolone słowa — usuń je i spróbuj ponownie');
-    return;
-  }
-
-  // ID urządzenia — generujemy raz i zapisujemy na zawsze
   var deviceId = localStorage.getItem('fp_device_id');
   if (!deviceId) {
     deviceId = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
     localStorage.setItem('fp_device_id', deviceId);
   }
-
-  // Sprawdź czy to urządzenie już dodało opinię
-  var deviceReviewed = localStorage.getItem('fp_device_reviewed');
-  if (deviceReviewed === '1') {
+  if (localStorage.getItem('fp_device_reviewed') === '1') {
     showToast('Z tego urządzenia już dodano opinię. Dziękujemy! ⭐');
     return;
   }
-
-  // Dodatkowy limit 24h (backup)
   var lastTs = parseInt(localStorage.getItem('fp_last_review') || '0');
   if (Date.now() - lastTs < 24 * 3600000) {
     showToast('Możesz dodać jedną opinię na 24 godziny');
     return;
   }
 
-  // Reset formularza
   var ni = document.getElementById('review-name');
   var ti = document.getElementById('review-text');
+
+  // Buduj obiekt opinii
+  var newReview = {
+    name:  nameRaw || 'Anonim',
+    text:  textRaw,
+    stars: _selectedStars,
+    goal:  answers.goal || 'bulk',
+    date:  new Date().toLocaleDateString('pl-PL', {month:'short', year:'numeric'}),
+    ts:    Date.now(),
+    _local: true
+  };
+
+  // Zapisz lokalnie
+  var local = _getReviewsLocal();
+  local.unshift(newReview);
+  if (local.length > 20) local = local.slice(0, 20);
+  localStorage.setItem('fp_reviews', JSON.stringify(local));
+
+  // Wyślij do JSONBlob jeśli skonfigurowany
+  if (REVIEWS_BLOB_URL) {
+    try {
+      var remote = await _getReviewsRemote() || [];
+      remote.unshift({...newReview, _remote: true, _local: false});
+      if (remote.length > 50) remote = remote.slice(0, 50);
+      await _saveReviewsRemote(remote);
+      // Unieważnij cache — kolejne wejście pobierze świeże dane
+      localStorage.removeItem('fp_reviews_cache');
+    } catch(e) { console.warn('Błąd zapisu opinii remote:', e); }
+  }
+
   if (ni) ni.value = '';
   if (ti) ti.value = '';
   selectStar(5);
+  localStorage.setItem('fp_last_review', String(Date.now()));
+  localStorage.setItem('fp_device_reviewed', '1');
 
   await _renderReviews();
   showToast('Dziękujemy za opinię! ⭐');
-}
-
-async function deleteReview(idx) {
-  var local = _getReviewsLocal();
-  if (idx >= local.length) return;
-  if (!confirm('Usunąć tę opinię?')) return;
-  local.splice(idx, 1);
-  localStorage.setItem('fp_reviews', JSON.stringify(local));
-  localStorage.setItem('fp_last_review', String(Date.now()));
-  localStorage.setItem('fp_device_reviewed', '1'); // blokada per urządzenie
-  await _renderReviews();
-}
-
-function reviewsCarouselScroll(dir) {
-  var c = document.getElementById('reviews-carousel');
-  if (c) c.scrollBy({ left: dir * 270, behavior:'smooth' });
-}
-
-// Init przy starcie
-document.addEventListener('DOMContentLoaded', function() {
-  _renderReviews();
-  _updateReviewFormVisibility();
-});
-if (document.readyState !== 'loading') {
-  _renderReviews();
-  _updateReviewFormVisibility();
 }
 
 function openReviewForm() {
@@ -6822,7 +7117,7 @@ function openReviewForm() {
   const btn = document.getElementById('btn-add-review');
   if (fw)  fw.style.display = 'block';
   if (btn) btn.style.display = 'none';
-}};
+}
 
 // ═══════════════════════════════════════════════
 // PIN SYSTEM
@@ -6956,6 +7251,64 @@ document.addEventListener('keydown', e => {
 // Wywołaj przy starcie
 document.addEventListener('DOMContentLoaded', initPin);
 if (document.readyState !== 'loading') initPin();
+
+// Sprawdź czy deload dobiegł końca
+document.addEventListener('DOMContentLoaded', _checkDeloadExpiry);
+if (document.readyState !== 'loading') _checkDeloadExpiry();
+
+// ── Startup routing — jeśli plan już wygenerowany, idź do planu ──
+(function initStartupRouting() {
+  function _doRoute() {
+    try {
+      const planGenerated = localStorage.getItem('fp_plan_generated');
+      const savedAnswers  = localStorage.getItem('fp_answers');
+      if (planGenerated !== '1' || !savedAnswers) return; // nowy użytkownik
+
+      const ans = JSON.parse(savedAnswers);
+      // Sprawdź czy quiz był ukończony (goal musi istnieć)
+      if (!ans.goal) return;
+
+      answers = ans;
+
+      // Załaduj zapisany split
+      loadSplit();
+
+      if (window.__split) {
+        // Plan istnieje — idź bezpośrednio do niego
+        renderPlan();
+        // Pokaż bottom nav
+        const nav = document.getElementById('bottom-nav');
+        if (nav) nav.classList.remove('hidden');
+        const chatFab = document.getElementById('chat-fab');
+        if (chatFab) chatFab.classList.add('visible');
+      } else {
+        // Split zaginął — odbuduj z odpowiedzi i idź do planu
+        const D = getComputed();
+        window.__split = applyWeakPoints(
+          trimSplitToSession(
+            buildSplit(ans.days || 4, D.goal, D.exp),
+            D.exp, ans.sessionTime || 60
+          ),
+          ans.weakPoints || []
+        );
+        saveSplit();
+        renderPlan();
+        const nav = document.getElementById('bottom-nav');
+        if (nav) nav.classList.remove('hidden');
+        const chatFab = document.getElementById('chat-fab');
+        if (chatFab) chatFab.classList.add('visible');
+      }
+    } catch(e) {
+      console.warn('Startup routing error:', e);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _doRoute);
+  } else {
+    _doRoute();
+  }
+})();
 function deleteBodyEntry(idx) {
   if (!confirm('Usunąć ten wpis?')) return;
   const data = _btData();
